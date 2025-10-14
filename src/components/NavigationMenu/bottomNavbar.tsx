@@ -40,7 +40,7 @@ const menu = [
 
 const BottomNavbar = () => {
   return (
-    <div className="fixed w-full  bottom-0 border-t-[1px] border-gray-600/20 flex md:hidden gap-4 justify-evenly px-4 py-4 items-center ">
+    <div className="fixed w-full  bottom-0 border-t-[1px] shadow-2xl flex md:hidden gap-4 justify-evenly px-4 py-4 items-center bg-white z-50">
       {menu.map((item) => (
         <Link
           key={item.name}

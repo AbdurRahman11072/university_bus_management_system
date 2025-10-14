@@ -46,7 +46,7 @@ const menu = [
 
 const TopNavbar = () => {
   return (
-    <nav className=" w-full flex justify-between items-center p-4 border-b-[1px] border-slate-500/20 z-50 ">
+    <nav className=" w-full flex bg-white justify-between items-center p-4 border-b-[1px] border-slate-500/20 z-50 ">
       <div className="flex gap-5 justify-center items-center">
         <h1 className="text-xl font-serif">Comico</h1>
         {/* desktop search field  */}
