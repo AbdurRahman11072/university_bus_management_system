@@ -4,7 +4,7 @@ import BottomNavbar from "./bottomNavbar";
 
 const Header = () => {
   return (
-    <div>
+    <div className="">
       <TopNavbar />
       <BottomNavbar />
     </div>
