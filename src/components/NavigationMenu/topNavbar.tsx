@@ -24,7 +24,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
 
 const menu = [
   {
@@ -66,7 +65,7 @@ const TopNavbar = () => {
         {/* SERACH FIELD  */}
         <SearchIcon
           strokeWidth="2px"
-          className="stroke-accent block md:hidden"
+          className="stroke-accent-foreground block md:hidden"
         />
 
         {/* menu items  */}
@@ -92,8 +91,12 @@ const TopNavbar = () => {
 
         {/* USER PROFILE DROP DOWN MENU  */}
         <DropdownMenu>
-          <DropdownMenuTrigger className=" md:block">
-            <CircleUser size={30} strokeWidth={1} className="stroke-accent" />
+          <DropdownMenuTrigger className="hidden md:block">
+            <CircleUser
+              size={30}
+              strokeWidth={1}
+              className="stroke-accent-foreground"
+            />
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="text-md border shadow-lg">
