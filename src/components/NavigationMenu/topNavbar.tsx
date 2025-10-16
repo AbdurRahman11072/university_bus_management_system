@@ -36,7 +36,7 @@ const menu = [
   },
   {
     name: "Contact Us",
-    path: "/home",
+    path: "/contact-us",
   },
   {
     name: "Notice",
@@ -48,7 +48,9 @@ const TopNavbar = () => {
   return (
     <nav className=" w-full flex bg-white justify-between items-center p-4 border-b-[1px] border-slate-500/20 z-50 ">
       <div className="flex gap-5 justify-center items-center">
-        <h1 className="text-xl font-serif">Comico</h1>
+        <h1 className="text-xl font-serif text-accent font-extrabold">
+          Green University
+        </h1>
         {/* desktop search field  */}
         <InputGroup className="hidden md:block rounded-3xl pl-2">
           <InputGroupInput placeholder="Search..." />

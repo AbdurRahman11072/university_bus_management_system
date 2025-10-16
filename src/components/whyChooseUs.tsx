@@ -28,7 +28,7 @@ const WhyChooseUs = () => {
         {Details.map((item) => (
           <div
             key={item.title}
-            className="flex gap-8 w-full  lg:w-[47%] xl:w-[32%]  p-5  border shadow-2xl rounded-lg"
+            className="flex gap-8 w-full  lg:w-[47%] xl:w-[32%]  p-5  border shadow-lg hover:shadow-[0_8px_16px_-5px_rgba(0,0,0,0.1)] transition-all duration-300  rounded-lg"
           >
             <item.icons size={30} className="stroke-accent" />
             <div className="space-y-4">
