@@ -52,7 +52,7 @@ const TopNavbar = () => {
           Green University
         </h1>
         {/* desktop search field  */}
-        <InputGroup className="hidden md:block rounded-3xl pl-2">
+        <InputGroup className="hidden lg:block rounded-3xl pl-2">
           <InputGroupInput placeholder="Search..." />
           <InputGroupAddon></InputGroupAddon>
           <InputGroupAddon align="inline-end">
@@ -67,11 +67,11 @@ const TopNavbar = () => {
         {/* SERACH FIELD  */}
         <SearchIcon
           strokeWidth="2px"
-          className="stroke-accent-foreground block md:hidden"
+          className="stroke-accent-foreground block lg:hidden"
         />
 
         {/* menu items  */}
-        <ul className="gap-4 hidden font-sans md:flex ">
+        <ul className="gap-4 hidden font-sans lg:flex ">
           {menu.map((item) => (
             <Link
               key={item.name}
@@ -84,16 +84,18 @@ const TopNavbar = () => {
         </ul>
 
         {/* LOGIN BUTTON  */}
-        <button
-          className="px-1 py-1.5 rounded-sm  w-18 h-9
+        <Link href={`/auth/login`}>
+          <button
+            className="px-1 py-1.5 rounded-sm  w-18 h-9
         bg-accent hover:bg-primary-foreground hover:text-black hover:border-2 hover:border-accent text-sm text-primary-foreground font-bold  "
-        >
-          Log in
-        </button>
+          >
+            Log in
+          </button>
+        </Link>
 
         {/* USER PROFILE DROP DOWN MENU  */}
         <DropdownMenu>
-          <DropdownMenuTrigger className="hidden md:block">
+          <DropdownMenuTrigger className="hidden lg:block">
             <CircleUser
               size={30}
               strokeWidth={1}

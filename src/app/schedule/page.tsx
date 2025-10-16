@@ -1,7 +1,12 @@
+import Schdule from "@/components/schedule";
 import React from "react";
 
 const SchedulePage = () => {
-  return <div className=" h-[100vh]">Schedlepage</div>;
+  return (
+    <div className="my-2 ">
+      <Schdule />
+    </div>
+  );
 };
 
 export default SchedulePage;
