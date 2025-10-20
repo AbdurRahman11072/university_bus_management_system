@@ -118,22 +118,26 @@ const TopNavbar = () => {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator></DropdownMenuSeparator>
-            <DropdownMenuItem>
-              <LayoutDashboard color="white" />
-              Dashboard
+            <DropdownMenuItem className="group group-hover:text-gray-100">
+              <LayoutDashboard className="text-black group-hover:text-gray-100" />
+              <span className="group-hover:text-gray-100">Dashboard</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <HandCoins color="white" /> Reward
+            <DropdownMenuItem className="group group-hover:text-gray-100">
+              <HandCoins className="text-black group-hover:text-gray-100" />{" "}
+              <span className="group-hover:text-gray-100">Reward</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <BadgeDollarSign color="white" /> Transaction
+            <DropdownMenuItem className="group group-hover:text-gray-100 ">
+              <BadgeDollarSign className="text-black group-hover:text-gray-100" />{" "}
+              <span className="group-hover:text-gray-100">Transation</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Cog color="white" /> Settings
+            <DropdownMenuItem className="group group-hover:text-gray-100">
+              <Cog className="text-black group-hover:text-gray-100" />{" "}
+              <span className="group-hover:text-gray-100">Setting</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator></DropdownMenuSeparator>
-            <DropdownMenuItem>
-              <LogOut color="red" /> Logout
+            <DropdownMenuItem className="group group-hover:text-gray-100">
+              <LogOut className="text-red-600 " />{" "}
+              <span className="group-hover:text-gray-100">Log Out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

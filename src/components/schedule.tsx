@@ -65,10 +65,10 @@ const SchduleData = [
 
 const Schdule = () => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
       {SchduleData.map((route) => (
         <Link key={route.route} href={`/schedule/${route.route}`}>
-          <div className="bg-white/80 rounded-xl p-4">
+          <div className="h-48 bg-white/80 rounded-xl p-4 border shadow-[0_8px_16px_-5px_rgba(0,0,0,0.1)] ">
             <div className="flex gap-2 h-8">
               <span className="w-1 h-full bg-accent"></span>
               <h1 className="text-2xl font-extrabold font-mono">
