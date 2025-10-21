@@ -79,37 +79,6 @@ const ScheduleDetails = () => {
             </div>
           </CardHeader>
           <CardContent className="pt-1 space-y-4">
-            {/* Driver Info */}
-            <div className="space-y-3 pb-4 border-b border-border">
-              <p className="text-sm font-semibold text-foreground">
-                Driver Information
-              </p>
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Users className="w-5 h-5 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-foreground">
-                    {bus.driver.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {bus.driver.phone}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 text-accent fill-accent" />
-                      <span className="text-xs font-medium text-foreground">
-                        {bus.driver.rating}
-                      </span>
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      {bus.driver.experience}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Bus Status */}
             <div className="space-y-3 pb-4 border-b border-border">
               <p className="text-sm font-semibold text-foreground">

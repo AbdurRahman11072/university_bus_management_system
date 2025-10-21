@@ -2,9 +2,7 @@ import FAQsTwo from "@/components/faqs-2";
 import GetStarted from "@/components/getStarted";
 import HeroSlider from "@/components/heroSlider";
 import HowItWorks from "@/components/howItWorks";
-import Slider from "@/components/slider";
 import WhyChooseUs from "@/components/whyChooseUs";
-import { Section } from "lucide-react";
 
 export default function Home() {
   return (
