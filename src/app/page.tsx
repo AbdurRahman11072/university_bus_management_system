@@ -1,4 +1,5 @@
-import FAQs from "@/components/faqs";
+import FAQsTwo from "@/components/faqs-2";
+import GetStarted from "@/components/getStarted";
 import HeroSlider from "@/components/heroSlider";
 import HowItWorks from "@/components/howItWorks";
 import WhyChooseUs from "@/components/whyChooseUs";
@@ -10,7 +11,8 @@ export default function Home() {
       <HeroSlider />
       <WhyChooseUs />
       <HowItWorks />
-      <FAQs />
+      <FAQsTwo />
+      <GetStarted />
     </div>
   );
 }

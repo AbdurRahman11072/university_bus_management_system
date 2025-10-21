@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import Logo from "../../../public/GUBLogo.svg";
 import {
   InputGroup,
   InputGroupAddon,
@@ -48,9 +49,15 @@ const TopNavbar = () => {
   return (
     <nav className=" w-full flex bg-white justify-between items-center p-4 border-b-[1px] border-slate-500/20 z-50 ">
       <div className="flex gap-5 justify-center items-center">
-        <h1 className="text-xl font-serif text-accent font-extrabold">
-          Green University
-        </h1>
+        <div className="logo-container">
+          <Image
+            src={Logo}
+            alt="logo"
+            width={100}
+            height={50}
+            className="w-48 h-12"
+          />
+        </div>
         {/* desktop search field  */}
         <InputGroup className="hidden lg:block rounded-3xl pl-2">
           <InputGroupInput placeholder="Search..." />

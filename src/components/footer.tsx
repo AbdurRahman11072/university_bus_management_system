@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { title } from "process";
+import Image from "next/image";
+import Logo from "../../public/GUBLogo.svg";
 
 const links = [
   {
@@ -74,11 +75,19 @@ const links = [
 export default function FooterSection() {
   return (
     <footer className="border-b bg-white pt-20 dark:bg-transparent">
-      <div className="mx-auto max-w-5xl px-6 ">
+      <div className="mx-auto max-w-7xl px-6 ">
         <div className="grid gap-10  md:grid-cols-5">
           <div className="md:col-span-2">
             <Link href="/" aria-label="go home" className="block size-fit">
-              Green University
+              <div className="logo-container">
+                <Image
+                  src={Logo}
+                  alt="logo"
+                  width={100}
+                  height={50}
+                  className="w-48 h-12"
+                />
+              </div>
             </Link>
           </div>
 
