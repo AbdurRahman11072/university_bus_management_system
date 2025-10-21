@@ -1,7 +1,8 @@
-import { LogoIcon } from "@/components/logo";
+import Logo from "../../public/GUBLogo.svg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function SignUp() {
@@ -14,7 +15,15 @@ export default function SignUp() {
         <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
           <div className="text-center">
             <Link href="/" aria-label="go home" className="mx-auto block w-fit">
-              <LogoIcon />
+              <div className="logo-container">
+                <Image
+                  src={Logo}
+                  alt="logo"
+                  width={100}
+                  height={50}
+                  className="w-48 h-12"
+                />
+              </div>
             </Link>
             <h1 className="mb-1 mt-4 text-xl font-semibold">
               Create a{" "}
@@ -84,7 +93,7 @@ export default function SignUp() {
           <p className="text-accent-foreground text-center text-sm">
             Have an account ?
             <Button asChild variant="link" className="px-2">
-              <Link href="/auth/login">Log In</Link>
+              <Link href="/auth/login">Sign In</Link>
             </Button>
           </p>
         </div>

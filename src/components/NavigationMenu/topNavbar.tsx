@@ -55,7 +55,8 @@ const TopNavbar = () => {
             alt="logo"
             width={100}
             height={50}
-            className="w-48 h-12"
+            className="w-48 h-12 -ml-5 lg:ml-0"
+            priority
           />
         </div>
         {/* desktop search field  */}
