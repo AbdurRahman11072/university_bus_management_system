@@ -55,11 +55,11 @@ export default function FAQsTwo() {
           </p>
         </div>
 
-        <div className="mx-auto mt-12 max-w-xl border-primary/10  hover:border-primary/30 transition-all">
+        <div className="mx-auto mt-12 max-w-xl  border-primary/10  hover:border-primary/30 transition-all">
           <Accordion
             type="single"
             collapsible
-            className="bg-card ring-muted w-full rounded-2xl border px-8 py-3 shadow-sm ring-4 dark:ring-0"
+            className="bg-white  ring-muted w-full rounded-2xl border px-8 py-3 shadow-sm ring-4 dark:ring-0"
           >
             {faqItems.map((item) => (
               <AccordionItem

@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -44,9 +45,7 @@ const Survey = () => {
 
           <div className="space-y-0.5">
             <div className="flex items-center justify-between">
-              <Label htmlFor="pwd" className="text-sm">
-                Semester
-              </Label>
+              <Label className="text-sm">Semester</Label>
               <Button asChild variant="link" size="sm">
                 <Link
                   href="#"
@@ -64,9 +63,7 @@ const Survey = () => {
           </div>
           <div className="space-y-0.5">
             <div className="flex items-center justify-between">
-              <Label htmlFor="pwd" className="text-sm">
-                Destination
-              </Label>
+              <Label className="text-sm">Destination</Label>
               <Button asChild variant="link" size="sm">
                 <Link
                   href="#"
@@ -84,9 +81,7 @@ const Survey = () => {
           </div>
           <div className="space-y-0.5">
             <div className="flex items-center justify-between">
-              <Label htmlFor="pwd" className="text-sm">
-                Class Time
-              </Label>
+              <Label className="text-sm">Class Time</Label>
               <Button asChild variant="link" size="sm">
                 <Link
                   href="#"

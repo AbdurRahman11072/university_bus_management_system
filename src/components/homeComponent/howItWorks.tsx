@@ -1,5 +1,5 @@
 import React from "react";
-import Title from "./ui/title";
+import Title from "../ui/title";
 import {
   Bus,
   BusFront,
@@ -9,7 +9,7 @@ import {
   Hourglass,
   LogIn,
 } from "lucide-react";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent } from "../ui/card";
 
 const Details = [
   {
@@ -50,7 +50,10 @@ const HowItWorks = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {Details.map((item, index) => (
-              <div key={item.title} className="relative">
+              <div
+                key={item.title}
+                className="relative hover:scale-110 transition-all duration-300"
+              >
                 <Card className="border-primary/20 bg-white">
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between mb-4">

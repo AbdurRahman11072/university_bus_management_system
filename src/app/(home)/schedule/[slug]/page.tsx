@@ -10,7 +10,7 @@ const ScheduleDetailsPage = async ({
   console.log(slug);
 
   return (
-    <div className="space-y-5 mb-10">
+    <div className="container mx-auto space-y-5 mb-10">
       <div>
         <h1 className="text-3xl font-bold text-foreground">
           Bus On Route:{slug}

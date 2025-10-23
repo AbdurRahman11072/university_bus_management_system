@@ -3,7 +3,7 @@ import React from "react";
 
 const SchedulePage = () => {
   return (
-    <div className="my-2 ">
+    <div className="container mx-auto my-10 ">
       <Schdule />
     </div>
   );

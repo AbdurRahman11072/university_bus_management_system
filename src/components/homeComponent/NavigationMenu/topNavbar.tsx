@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import Logo from "../../../public/GUBLogo.svg";
+import Logo from "../../../../public/GUBLogo.svg";
 import {
   InputGroup,
   InputGroupAddon,
@@ -24,7 +24,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "../../ui/dropdown-menu";
 
 const menu = [
   {

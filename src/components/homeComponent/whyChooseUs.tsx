@@ -1,7 +1,7 @@
 import React from "react";
-import Title from "./ui/title";
+import Title from "../ui/title";
 import { Bus, Clock, Earth, Eye, Hourglass, Shield, Zap } from "lucide-react";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent } from "../ui/card";
 
 const Details = [
   {
@@ -44,7 +44,7 @@ const WhyChooseUs = () => {
           {Details.map((item) => (
             <Card
               key={item.title}
-              className="border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg"
+              className="border-primary/30 shadow-xl hover:scale-110 transition-all duration-300"
             >
               <CardContent className="pt-6">
                 <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">

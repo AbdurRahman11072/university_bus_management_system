@@ -10,7 +10,7 @@ import React from "react";
 
 const BookTripPage = () => {
   return (
-    <div className="space-y-4 w-[95vw] lg:w-[40vw] md:w-[90vw] xl:w-[35vw] mx-auto my-10">
+    <div className="container mx-auto space-y-4 w-[95vw] lg:w-[40vw] md:w-[90vw] xl:w-[35vw]  my-10">
       <Card>
         <CardHeader>
           <CardTitle>Book a Bus for School Trips</CardTitle>
