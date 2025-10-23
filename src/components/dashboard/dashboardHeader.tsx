@@ -1,6 +1,6 @@
 import React from "react";
 import { Bell, Bus, LogOut, Search } from "lucide-react";
-import Logo from "../../public/GUBLogo.svg";
+import Logo from "../../../public/GUBLogo.svg";
 import Image from "next/image";
 
 const DashboardHader = () => {

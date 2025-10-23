@@ -1,4 +1,4 @@
-import { MaintenancePage } from "@/components/maintenancePage";
+import { MaintenancePage } from "@/components/dashboard/maintenancePage";
 import React from "react";
 
 const Maintenace = () => {
