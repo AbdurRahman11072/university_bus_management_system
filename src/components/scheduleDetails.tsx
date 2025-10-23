@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "./ui/button";
-import { MapPin, Phone, Star, Users } from "lucide-react";
+import { MapPin, Phone } from "lucide-react";
 import {
   Card,
   CardContent,

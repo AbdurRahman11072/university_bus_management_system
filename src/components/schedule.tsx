@@ -1,16 +1,7 @@
-import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Card, CardContent } from "./ui/card";
 
-interface ScheduleCards {
-  route: number;
-  buses: number;
-  destination: string[];
-  departure: string;
-  arrivel: string;
-  status: "On time" | "Late" | "In jame";
-}
 const SchduleData = [
   {
     route: 1,

@@ -1,9 +1,9 @@
-import { ManageBusesPage } from "@/components/dashboard/manageBusPage";
+import ManageBusesPage from "@/components/dashboard/manageBus/manageBusPage";
 import React from "react";
 
 const ManageBus = () => {
   return (
-    <div className="h-screen">
+    <div className="">
       <ManageBusesPage />
     </div>
   );

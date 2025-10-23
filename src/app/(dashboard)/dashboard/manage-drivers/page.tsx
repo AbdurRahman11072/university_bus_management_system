@@ -1,4 +1,4 @@
-import ManageDrivers from "@/components/dashboard/manageDriver";
+import ManageDrivers from "@/components/dashboard/manageDriver/manageDriver";
 import React from "react";
 
 const page = () => {

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-dropdown-menu";
-import Logo from "../../../public/GUBLogo.svg";
+import Logo from "../../../../public/GUBLogo.svg";
 import { Link, Star } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -37,9 +37,7 @@ const Survey = () => {
         {/* password field  */}
         <div className="mt-6 space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="email" className="block text-sm">
-              Username
-            </Label>
+            <Label className="block text-sm">Username</Label>
             <Input type="email" required name="email" id="email" />
           </div>
 
