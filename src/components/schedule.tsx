@@ -1,6 +1,10 @@
+"use client";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "./ui/card";
+import axios from "axios";
+import axiosInstance from "@/hooks/axiosInstance";
+import { Spinner } from "./ui/spinner";
 
 const SchduleData = [
   {
@@ -68,13 +72,26 @@ const SchduleData = [
 ];
 
 const Schdule = () => {
-  const getStatusColor = (status: string) => {
-    if (status === "On time") return "bg-accent/20 text-accent";
-    if (status === "Late") return "bg-destructive/20 text-destructive";
-    return "bg-secondary/20 text-secondary";
+  const [Data, setdata] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await axiosInstance.get("/bus/schedule");
+      setdata(response.data.data); // Handle the data here
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 h-[80vh]">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Bus Schedule</h1>
         <p className="text-muted-foreground mt-1">
@@ -84,75 +101,74 @@ const Schdule = () => {
       <h2 className="text-xl font-semibold text-foreground">
         Available Routes
       </h2>
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <Spinner className="w-8 h-8" />
+          <span className="ml-2 text-muted-foreground">
+            Loading all bus routes...
+          </span>
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {SchduleData.map((route) => (
+        {Data?.map((route: any) => (
           <Card
-            key={route.route}
+            key={route.busRoute}
             className="cursor-pointer hover:shadow-lg transition-all border-primary/20 hover:border-primary/50 bg-white"
           >
-            <Link href={`/schedule/${route.route}`}>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  {/* Route Header */}
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold text-primary">
-                        Route {route.route}
-                      </h3>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {route.buses} bus
-                        {route.buses !== 1 ? "es" : ""} available
-                      </p>
-                    </div>
-                    <span
-                      className={`text-xs font-medium px-3 py-1 rounded-full ${getStatusColor(
-                        route.status
-                      )}`}
-                    >
-                      {route.status}
-                    </span>
-                  </div>
-
-                  {/* Destinations */}
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase">
-                      Destinations
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                {/* Route Header */}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold text-primary">
+                      Route {route.busRoute}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {route.totalBus} bus
+                      {route.totalBus !== 1 ? "es" : ""} available
                     </p>
-                    <div className="flex flex-wrap gap-2">
-                      {route.destination.map((dest, i) => (
-                        <span
-                          key={i}
-                          className="text-xs bg-secondary/30 text-foreground px-2 py-1 rounded"
-                        >
-                          {dest}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Times */}
-                  <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Departure</p>
-                      <p className="font-semibold text-foreground">
-                        {route.departure}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Arrival</p>
-                      <p className="font-semibold text-foreground">
-                        {route.arrivel}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Click to expand */}
-                  <div className="flex items-center justify-center text-primary text-sm font-medium">
-                    View Buses
                   </div>
                 </div>
-              </CardContent>
-            </Link>
+
+                {/* Destinations */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase">
+                    Destinations
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {route.destinations.map((dest: string, i: number) => (
+                      <span
+                        key={i}
+                        className="text-xs bg-secondary/30 text-foreground px-2 py-1 rounded"
+                      >
+                        {dest}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Times */}
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Departure</p>
+                    <p className="font-semibold text-foreground">
+                      {route.departureTime}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Arrival</p>
+                    <p className="font-semibold text-foreground">
+                      {route.arrivalTime}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Click to expand */}
+                <div className="flex items-center justify-center text-primary text-sm font-medium">
+                  <Link href={`/schedule/${route.busRoute}`}>View Buses</Link>
+                </div>
+              </div>
+            </CardContent>
           </Card>
         ))}
       </div>

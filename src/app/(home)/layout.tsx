@@ -4,6 +4,7 @@ import "@/app/globals.css";
 import Header from "@/components/homeComponent/NavigationMenu/header";
 
 import Footer2 from "@/components/homeComponent/footer2";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
       >
         <Header />
         <main className="mx-auto">{children}</main>
+        <Toaster />
         <Footer2 />
       </body>
     </html>

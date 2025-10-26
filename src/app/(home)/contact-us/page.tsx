@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
-
+import { useForm } from "react-hook-form";
+import axios from "axios";
 import { AlertCircle, Bus, MapPin } from "lucide-react";
 import {
   Card,
@@ -10,8 +11,39 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import axiosInstance from "@/hooks/axiosInstance";
+import { toast } from "sonner";
+
+interface ContactFormData {
+  uId: string;
+  semester: string;
+  subject: string;
+  message: string;
+}
 
 const ContactUsPage = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<ContactFormData>();
+
+  const onSubmit = async (data: ContactFormData) => {
+    try {
+      const response = await axiosInstance.post("/contect-us/post-info", data);
+      toast("Successfull", {
+        description: "Thank you for you time & valueable comment",
+      });
+      console.log("Message sent successfully:", response);
+      reset(); // Clear form after successful submission
+      // You can add a toast notification here for success
+    } catch (error) {
+      console.error("Error sending message:", error);
+      // You can add a toast notification here for error
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="space-y-6">
@@ -33,50 +65,118 @@ const ContactUsPage = () => {
                 We'll get back to you as soon as possible
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="Your name"
-                  className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  placeholder="How can we help?"
-                  className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground">
-                  Message
-                </label>
-                <textarea
-                  placeholder="Your message..."
-                  rows={4}
-                  className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                />
-              </div>
-              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
-                Send Message
-              </Button>
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="space-y-2">
+                  <label
+                    htmlFor="uId"
+                    className="text-sm font-semibold text-foreground"
+                  >
+                    Name
+                  </label>
+                  <input
+                    id="uId"
+                    type="text"
+                    placeholder="Your uId"
+                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    {...register("uId", {
+                      required: "Name is required",
+                      minLength: {
+                        value: 2,
+                        message: "Name must be at least 2 characters",
+                      },
+                    })}
+                  />
+                  {errors.uId && (
+                    <p className="text-sm text-red-500">{errors.uId.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="semester"
+                    className="text-sm font-semibold text-foreground"
+                  >
+                    Semester
+                  </label>
+                  <input
+                    id="semester"
+                    type="semester"
+                    placeholder="which Semester are you in."
+                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    {...register("semester", {
+                      required: "Semester is required",
+                    })}
+                  />
+                  {errors.semester && (
+                    <p className="text-sm text-red-500">
+                      {errors.semester.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="subject"
+                    className="text-sm font-semibold text-foreground"
+                  >
+                    Subject
+                  </label>
+                  <input
+                    id="subject"
+                    type="text"
+                    placeholder="How can we help?"
+                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    {...register("subject", {
+                      required: "Subject is required",
+                      minLength: {
+                        value: 5,
+                        message: "Subject must be at least 5 characters",
+                      },
+                    })}
+                  />
+                  {errors.subject && (
+                    <p className="text-sm text-red-500">
+                      {errors.subject.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="message"
+                    className="text-sm font-semibold text-foreground"
+                  >
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    placeholder="Your message..."
+                    rows={4}
+                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                    {...register("message", {
+                      required: "Message is required",
+                      minLength: {
+                        value: 10,
+                        message: "Message must be at least 10 characters",
+                      },
+                    })}
+                  />
+                  {errors.message && (
+                    <p className="text-sm text-red-500">
+                      {errors.message.message}
+                    </p>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Sending..." : "Send Message"}
+                </Button>
+              </form>
             </CardContent>
           </Card>
 

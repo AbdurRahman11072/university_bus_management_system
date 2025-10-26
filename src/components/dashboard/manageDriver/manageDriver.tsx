@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "../../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
+import { Card, CardContent } from "../../ui/card";
+import { DriverModal } from "./driverModal";
 
 const ManageDrivers = () => {
   const [showModal, setShowModal] = useState(false);
@@ -18,12 +19,7 @@ const ManageDrivers = () => {
               Add, edit, or delete drivers
             </p>
           </div>
-          <Button
-            onClick={() => setShowModal(true)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-          >
-            Add Driver
-          </Button>
+        <DriverModal/>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

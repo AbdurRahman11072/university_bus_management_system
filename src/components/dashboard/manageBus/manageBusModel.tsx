@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 
 interface ManageBusModelProps {
   showModal: boolean;
@@ -21,46 +22,59 @@ interface BusFormData {
 
 const formField = [
   {
-    label: "Bus Number",
-    name: "busNumber",
+    label: "Bus ID",
+    name: "busId",
     type: "text",
-    placeholder: "e.g., BUS-001",
+    placeholder: "e.g., BUS001",
   },
   {
-    label: "Route",
-    name: "route",
+    label: "Bus Route",
+    name: "busRoute",
     type: "text",
-    placeholder: "e.g., Route 5A",
+    placeholder: "e.g., Route 1",
   },
   {
-    label: "Capacity (Seats)",
-    name: "capacity",
-    type: "number",
-    placeholder: "e.g., 45",
-  },
-  {
-    label: "Driver Name",
-    name: "driver",
+    label: "Bus Destination",
+    name: "busDestination",
     type: "text",
-    placeholder: "e.g., John Doe",
+    placeholder: "e.g., New Route, Second Route",
   },
   {
-    label: "License Plate",
-    name: "licensePlate",
+    label: "Driver ID",
+    name: "busDriverId",
     type: "text",
-    placeholder: "e.g., ABC-1234",
+    placeholder: "e.g., DRV2024010",
   },
   {
-    label: "Bus Model",
-    name: "model",
-    type: "text",
-    placeholder: "e.g., Volvo B7R",
+    label: "Departure Time",
+    name: "busDepartureTime",
+    type: "time",
+    placeholder: "e.g., 12:00",
   },
   {
-    label: "Year",
-    name: "year",
-    type: "number",
-    placeholder: "e.g., 2023",
+    label: "Arrival Time",
+    name: "busArrivalTime",
+    type: "time",
+    placeholder: "e.g., 12:45",
+  },
+  {
+    label: "Second Departure Time",
+    name: "busDepartureTime2",
+    type: "time",
+    placeholder: "e.g., 13:00",
+  },
+  {
+    label: "Second Arrival Time",
+    name: "busArrivalTime2",
+    type: "time",
+    placeholder: "e.g., 13:50",
+  },
+  {
+    label: "Bus Status",
+    name: "busStatus",
+    type: "select",
+    placeholder: "Select status",
+    options: ["On Time", "Delayed", "Cancelled", "Arrived", "Departed"],
   },
 ];
 
@@ -86,10 +100,20 @@ const ManageBusModel: React.FC<ManageBusModelProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    // You can replace this with your API or form submission logic
-    console.log("Bus saved:", formData);
-    setShowModal(false);
+  const handleSave = async () => {
+    try {
+      const baseUrl = process.env.baseUrl;
+      console.log(formData);
+
+      // const response = await axios.post(
+      //   `${baseUrl}/bus/post-bus-info`,
+      //   formData
+      // );
+      // console.log("Bus saved successfully:", response.data);
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error saving bus:", error);
+    }
   };
 
   return (
@@ -103,7 +127,7 @@ const ManageBusModel: React.FC<ManageBusModelProps> = ({
           />
 
           {/* Sliding Modal */}
-          <div className="fixed right-0 top-0 h-full w-full sm:w-96 bg-background shadow-2xl z-50 transform transition-transform duration-300 ease-out overflow-y-hidden">
+          <div className="fixed right-0 top-0 h-full w-full sm:w-96 bg-background shadow-2xl z-50 transform transition-transform duration-300 ease-out overflow-y-scroll">
             <div className="p-6 space-y-6">
               {/* Header */}
               <div className="flex items-center justify-between">
@@ -147,22 +171,6 @@ const ManageBusModel: React.FC<ManageBusModelProps> = ({
                     />
                   </div>
                 ))}
-
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Status
-                  </label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option>Active</option>
-                    <option>Inactive</option>
-                    <option>Maintenance</option>
-                  </select>
-                </div>
               </div>
 
               {/* Action Buttons */}

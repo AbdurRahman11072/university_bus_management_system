@@ -1,4 +1,5 @@
 import ScheduleDetails from "@/components/scheduleDetails";
+import axiosInstance from "@/hooks/axiosInstance";
 import React from "react";
 
 const ScheduleDetailsPage = async ({
@@ -7,21 +8,14 @@ const ScheduleDetailsPage = async ({
   params: Promise<{ slug: string }>;
 }) => {
   const { slug } = await params;
-  console.log(slug);
 
-  return (
-    <div className="container mx-auto space-y-5 mb-10">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">
-          Bus On Route:{slug}
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          View all available buses on route {slug}
-        </p>
-      </div>
-      <ScheduleDetails />
-    </div>
-  );
+  const response = await fetch(`http://localhost:5000/api/v1/bus/${slug}`);
+
+  const data = await response.json();
+  const busData = data.data;
+  console.log(busData);
+
+  return <ScheduleDetails busData={busData} slug={slug} />;
 };
 
 export default ScheduleDetailsPage;

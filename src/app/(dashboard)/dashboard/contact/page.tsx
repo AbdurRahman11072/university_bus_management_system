@@ -1,7 +1,13 @@
+import { ContactMessages } from "@/components/dashboard/contact";
+
 import React from "react";
 
 const page = () => {
-  return <div>This is contect</div>;
+  return (
+    <div>
+      <ContactMessages />
+    </div>
+  );
 };
 
 export default page;
