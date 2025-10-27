@@ -47,16 +47,7 @@ const NoticePage = () => {
 
         <div className="space-y-4">
           {noticeDetails.map((notice, i) => (
-            <Card
-              key={i}
-              className={`border-l-4 ${
-                notice.priority === "high"
-                  ? "border-l-destructive"
-                  : notice.priority === "medium"
-                  ? "border-l-secondary"
-                  : "border-l-primary"
-              }`}
-            >
+            <Card key={i} className="border-l-4 border-l-primary">
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">

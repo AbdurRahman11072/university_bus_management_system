@@ -5,6 +5,7 @@ import Header from "@/components/homeComponent/NavigationMenu/header";
 
 import Footer2 from "@/components/homeComponent/footer2";
 import { Toaster } from "sonner";
+import { AuthProvider } from "@/lib/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,10 +32,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased  mb-10 lg:mb-0`}
       >
-        <Header />
-        <main className="mx-auto">{children}</main>
-        <Toaster />
-        <Footer2 />
+        <AuthProvider>
+          <Header />
+          <main className="mx-auto">{children}</main>
+          <Toaster />
+          <Footer2 />
+        </AuthProvider>
       </body>
     </html>
   );

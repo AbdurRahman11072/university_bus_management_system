@@ -1,7 +1,12 @@
+import DashboardSchdule from "@/components/dashboard/dashbaordSchedule";
 import React from "react";
 
-const page = () => {
-  return <div>This is schedule page</div>;
+const SchedulePage = () => {
+  return (
+    <div className="container mx-auto my-10 ">
+      <DashboardSchdule />
+    </div>
+  );
 };
 
-export default page;
+export default SchedulePage;

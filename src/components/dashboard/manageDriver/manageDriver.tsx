@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Button } from "../../ui/button";
 import { Card, CardContent } from "../../ui/card";
 import { DriverModal } from "./driverModal";
+import DriverCards from "./driverDetails";
 
 const ManageDrivers = () => {
   const [showModal, setShowModal] = useState(false);
@@ -19,31 +20,10 @@ const ManageDrivers = () => {
               Add, edit, or delete drivers
             </p>
           </div>
-        <DriverModal/>
+          <DriverModal />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {["John Smith", "Mike Johnson", "David Lee"].map((driver) => (
-            <Card key={driver}>
-              <CardContent className="pt-6">
-                <p className="font-semibold text-foreground">{driver}</p>
-                <p className="text-sm text-muted-foreground">+91 98765 43210</p>
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 bg-transparent"
-                  >
-                    Edit
-                  </Button>
-                  <Button size="sm" variant="destructive" className="flex-1">
-                    Delete
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <DriverCards />
 
         {/* show model  */}
       </div>

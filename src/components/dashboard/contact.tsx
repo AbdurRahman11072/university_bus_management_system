@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown, ChevronUp, Mail } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronDown, ChevronUp, Mail, Trash } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -11,6 +11,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import axiosInstance from "@/hooks/axiosInstance";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ContactMessage {
   uId: string;
@@ -18,44 +21,6 @@ interface ContactMessage {
   subject: string;
   message: string;
 }
-
-const mockMessages: ContactMessage[] = [
-  {
-    uId: "USR001",
-    semester: "4th",
-    subject: "Course Material Issue",
-    message:
-      "I'm having trouble accessing the course materials for the advanced algorithms module. The download link seems to be broken. Could you please check and fix it?",
-  },
-  {
-    uId: "USR002",
-    semester: "2nd",
-    subject: "Exam Schedule Clarification",
-    message:
-      "Can you clarify the exam schedule for next semester? I need to plan my study schedule accordingly.",
-  },
-  {
-    uId: "USR003",
-    semester: "6th",
-    subject: "Project Submission Extension",
-    message:
-      "I would like to request an extension for the final project submission. I've been dealing with some personal issues and need more time.",
-  },
-  {
-    uId: "USR004",
-    semester: "3rd",
-    subject: "Lab Equipment Problem",
-    message:
-      "The lab equipment in room 204 is not working properly. It needs maintenance before the next lab session.",
-  },
-  {
-    uId: "USR005",
-    semester: "5th",
-    subject: "Internship Opportunity",
-    message:
-      "Are there any internship opportunities available for students in the 5th semester? I'm interested in gaining practical experience.",
-  },
-];
 
 const semesterColors: Record<string, string> = {
   "1st": "bg-blue-100 text-blue-800",
@@ -69,15 +34,78 @@ const semesterColors: Record<string, string> = {
 };
 
 export function ContactMessages() {
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
 
-  const filteredMessages = mockMessages.filter(
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/v1/contect-us");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch messages");
+        }
+
+        const data = await response.json();
+
+        // Adjust this based on your API response structure
+        // If the data is nested, you might need data.data or data.messages
+        setMessages(data.data || data || []);
+        console.log(data.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+        console.error("Error fetching messages:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMessages();
+  }, []);
+
+  const filteredMessages = messages.filter(
     (msg) =>
       msg.uId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       msg.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
       msg.semester.includes(searchTerm)
   );
+
+  if (loading) {
+    return (
+      <Card className="w-full mt-10">
+        <CardContent className="py-8">
+          <div className="text-center text-muted-foreground">
+            Loading messages...
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  const deleteHandler = async (id: string) => {
+    console.log(id);
+
+    const result = await axiosInstance.delete(`/contect-us/${id}`);
+
+    if (result?.status === 200) {
+      toast.success("Message has been deleted");
+      router.refresh();
+    }
+    toast.error("Failed to delete message");
+  };
+
+  if (error) {
+    return (
+      <Card className="w-full mt-10">
+        <CardContent className="py-8">
+          <div className="text-center text-red-500">Error: {error}</div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full mt-10">
@@ -105,17 +133,19 @@ export function ContactMessages() {
         <div className="space-y-2">
           {filteredMessages.length === 0 ? (
             <div className="py-8 text-center text-muted-foreground">
-              No messages found matching your search.
+              {messages.length === 0
+                ? "No messages found."
+                : "No messages found matching your search."}
             </div>
           ) : (
-            filteredMessages.map((msg) => (
+            filteredMessages.map((msg: any) => (
               <div
-                key={msg.uId}
+                key={msg._id}
                 className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
               >
                 <button
                   onClick={() =>
-                    setExpandedId(expandedId === msg.uId ? null : msg.uId)
+                    setExpandedId(expandedId === msg._id ? null : msg._id)
                   }
                   className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/50 transition-colors"
                 >
@@ -135,14 +165,14 @@ export function ContactMessages() {
                       </p>
                     </div>
                   </div>
-                  {expandedId === msg.uId ? (
+                  {expandedId === msg._id ? (
                     <ChevronUp className="h-5 w-5 text-muted-foreground" />
                   ) : (
                     <ChevronDown className="h-5 w-5 text-muted-foreground" />
                   )}
                 </button>
 
-                {expandedId === msg.uId && (
+                {expandedId === msg._id && (
                   <div className="px-4 py-3 bg-muted/30 border-t">
                     <div className="space-y-2">
                       <div>
@@ -153,7 +183,7 @@ export function ContactMessages() {
                           {msg.message}
                         </p>
                       </div>
-                      <div className="grid grid-cols-2 gap-4 pt-2">
+                      <div className="grid grid-cols-3 gap-4 pt-2">
                         <div>
                           <p className="text-xs font-semibold text-muted-foreground uppercase">
                             User ID
@@ -165,6 +195,17 @@ export function ContactMessages() {
                             Semester
                           </p>
                           <p className="text-sm">{msg.semester}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-muted-foreground uppercase">
+                            Delete
+                          </p>
+                          <p
+                            className="text-sm text-red-500"
+                            onClick={() => deleteHandler(msg._id)}
+                          >
+                            <Trash />
+                          </p>
                         </div>
                       </div>
                     </div>

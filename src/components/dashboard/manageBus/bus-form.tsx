@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
   Dialog,
@@ -11,11 +11,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X, Plus } from "lucide-react";
+import { X, Plus, ChevronDown } from "lucide-react";
 import { ImageUpload } from "../image-upload";
-import axios, { Axios } from "axios";
-import axiosInstance from "@/hooks/axiosInstance";
+import axios from "axios";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface BusFormData {
   busImg: string;
@@ -30,27 +30,74 @@ interface BusFormData {
   busArrivalTime2: string;
 }
 
+interface Driver {
+  _id: string;
+  username: string;
+
+  // Add other driver properties as needed
+}
+
 export function BusModal() {
-  const [isOpen, setIsOpen] = useState(false); // Changed to false initially
+  const [isOpen, setIsOpen] = useState(false);
   const [busImage, setBusImage] = useState<string>("");
   const [destinations, setDestinations] = useState<string[]>([]);
   const [destinationInput, setDestinationInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+  const [isDriverDropdownOpen, setIsDriverDropdownOpen] = useState(false);
+  const [isLoadingDrivers, setIsLoadingDrivers] = useState(false);
+  const router = useRouter();
 
-  const { register, handleSubmit, setValue, reset } = useForm<BusFormData>({
-    defaultValues: {
-      busImg: "",
-      busName: "",
-      busId: "",
-      busRoute: "",
-      busDestination: [],
-      busDriverId: "",
-      busDepartureTime: "",
-      busArrivalTime: "",
-      busDepartureTime2: "",
-      busArrivalTime2: "",
-    },
-  });
+  const { register, handleSubmit, setValue, reset, watch } =
+    useForm<BusFormData>({
+      defaultValues: {
+        busImg: "",
+        busName: "",
+        busId: "",
+        busRoute: "",
+        busDestination: [],
+        busDriverId: "",
+        busDepartureTime: "",
+        busArrivalTime: "",
+        busDepartureTime2: "",
+        busArrivalTime2: "",
+      },
+    });
+  console.log("Select", selectedDriver);
+
+  // Fetch drivers when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchDrivers();
+    }
+  }, [isOpen]);
+
+  const fetchDrivers = async () => {
+    setIsLoadingDrivers(true);
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/v1/user/get-all-driver"
+      );
+      console.log("driver:", response.data.data);
+
+      setDrivers(response.data.data);
+    } catch (error) {
+      console.error("Error fetching drivers:", error);
+      toast.error("Failed to load drivers");
+      setDrivers([]);
+    } finally {
+      setIsLoadingDrivers(false);
+    }
+  };
+
+  console.log("Driver:", drivers);
+
+  const handleDriverSelect = (driver: Driver) => {
+    setSelectedDriver(driver);
+    setValue("busDriverId", driver._id);
+    setIsDriverDropdownOpen(false);
+  };
 
   const addDestination = () => {
     if (
@@ -59,7 +106,7 @@ export function BusModal() {
     ) {
       const newDestinations = [...destinations, destinationInput.trim()];
       setDestinations(newDestinations);
-      setValue("busDestination", newDestinations); // Update form value
+      setValue("busDestination", newDestinations);
       setDestinationInput("");
     }
   };
@@ -67,31 +114,25 @@ export function BusModal() {
   const removeDestination = (index: number) => {
     const newDestinations = destinations.filter((_, i) => i !== index);
     setDestinations(newDestinations);
-    setValue("busDestination", newDestinations); // Update form value
+    setValue("busDestination", newDestinations);
   };
-  // Upload image on Imgbb
+
   const handleImageChange = async (value: string) => {
     console.log("Image value:", value);
 
     try {
-      // Create FormData object
       const formData = new FormData();
 
-      // If value is a base64 string
       if (value.startsWith("data:image")) {
-        formData.append("image", value.split(",")[1]); // Send only the base64 part
-      }
-      // If value is a file object (from file input)
-      else if (value) {
+        formData.append("image", value.split(",")[1]);
+      } else if (value) {
         formData.append("image", value);
-      }
-      // If value is already just base64 without data URL prefix
-      else {
+      } else {
         formData.append("image", value);
       }
 
       const response = await axios.post(
-        "https://api.imgbb.com/1/upload?key=c96a27f51a67e29bd7e8fbbdf52e996b", // Removed space
+        "https://api.imgbb.com/1/upload?key=c96a27f51a67e29bd7e8fbbdf52e996b",
         formData,
         {
           headers: {
@@ -102,9 +143,6 @@ export function BusModal() {
 
       if (response.data.success) {
         setBusImage(response.data.data.display_url);
-        // console.log("Upload successful:", response.data.data.display_url);
-        // Update form value with the uploaded image URL
-        // response.data.data.url contains the direct image URL
         return response.data.data.url;
       } else {
         throw new Error(response.data.error?.message || "Upload failed");
@@ -114,14 +152,13 @@ export function BusModal() {
       toast.error("Image upload failed", {
         description: error.response?.data?.error?.message || "Please try again",
       });
-      throw error; // Re-throw if you need to handle it in the calling function
+      throw error;
     }
   };
 
   const onSubmit = async (data: BusFormData) => {
     setIsLoading(true);
     try {
-      // Ensure all data is included
       const formData = {
         ...data,
         busImg:
@@ -136,9 +173,15 @@ export function BusModal() {
         "http://localhost:5000/api/v1/bus/post-bus-info",
         formData
       );
+
       toast("Success", {
         description: "New Bus Information Has Been Added",
       });
+
+      if (response.status === 200) {
+        router.refresh();
+        router.back();
+      }
 
       console.log("Response:", response.data);
 
@@ -147,12 +190,16 @@ export function BusModal() {
         reset();
         setBusImage("");
         setDestinations([]);
+        setSelectedDriver(null);
         setIsOpen(false);
       }
     } catch (error) {
       console.error("Error posting data:", error);
       if (axios.isAxiosError(error)) {
         console.error("Axios error details:", error.response?.data);
+        toast.error("Failed to add bus", {
+          description: error.response?.data?.message || "Please try again",
+        });
       }
     } finally {
       setIsLoading(false);
@@ -227,6 +274,61 @@ export function BusModal() {
             </div>
           </div>
 
+          {/* Driver Selection */}
+          <div>
+            <Label className="text-sm font-semibold text-gray-900 mb-2 block">
+              Bus Driver:
+            </Label>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsDriverDropdownOpen(!isDriverDropdownOpen)}
+                className="w-full bg-green-50 border border-green-200 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-green-400 rounded-md px-3 py-2 text-left flex items-center justify-between"
+              >
+                <span>
+                  {selectedDriver
+                    ? selectedDriver?.username
+                    : "Select a driver"}
+                </span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+
+              {isDriverDropdownOpen && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-green-200 rounded-md shadow-lg max-h-60 overflow-auto">
+                  {isLoadingDrivers ? (
+                    <div className="px-3 py-2 text-sm text-gray-500">
+                      Loading drivers...
+                    </div>
+                  ) : drivers.length === 0 ? (
+                    <div className="px-3 py-2 text-sm text-gray-500">
+                      No drivers available
+                    </div>
+                  ) : (
+                    drivers.map((driver: any) => (
+                      <button
+                        key={driver._id}
+                        type="button"
+                        onClick={() => handleDriverSelect(driver)}
+                        className="w-full px-3 py-2 text-left hover:bg-green-50 text-sm font-medium"
+                      >
+                        {driver?.username}
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+            <input
+              type="hidden"
+              {...register("busDriverId", { required: true })}
+            />
+            {selectedDriver && (
+              <p className="text-xs text-green-600 mt-1">
+                Selected: {selectedDriver.username}
+              </p>
+            )}
+          </div>
+
           {/* Destinations */}
           <div>
             <Label className="text-sm font-semibold text-gray-900 mb-2 block">
@@ -271,21 +373,6 @@ export function BusModal() {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Driver ID */}
-          <div>
-            <Label
-              htmlFor="busDriverId"
-              className="text-sm font-semibold text-gray-900 mb-2 block"
-            >
-              Driver ID:
-            </Label>
-            <Input
-              id="busDriverId"
-              {...register("busDriverId", { required: true })}
-              className="bg-green-50 border border-green-200 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-green-400"
-            />
           </div>
 
           {/* Departure & Arrival Times */}
@@ -354,7 +441,7 @@ export function BusModal() {
 
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !selectedDriver}
             className="w-full bg-green-600 hover:bg-green-700 text-white mt-6 disabled:opacity-50"
           >
             {isLoading ? "Saving..." : "Save Bus Details"}

@@ -1,5 +1,6 @@
 import {
   BarChart,
+  BellPlus,
   Bus,
   Calendar,
   FileText,
@@ -43,24 +44,16 @@ const menuItems = [
     link: "/dashboard/manage-drivers",
   },
   {
-    id: "manage-routes",
-    label: "Manage Routes",
-    icon: Map,
-    link: "/dashboard/manage-routes",
-  },
-
-  {
     id: "maintenance",
     label: "Maintenance",
     icon: Settings,
     link: "/dashboard/maintenance",
   },
-
   {
-    id: "reports",
-    label: "Reports",
-    icon: BarChart,
-    link: "/dashboard/reports",
+    id: "notices",
+    label: "Notices",
+    icon: BellPlus,
+    link: "/dashboard/notices",
   },
   {
     id: "gps-tracking",
