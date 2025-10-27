@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ProfileCard from "@/components/profile-card";
-import EditProfileDialog from "@/components/edit-profile-dialog";
 
 import { Spinner } from "@/components/ui/spinner";
 import { UserData } from "@/components/homeComponent/profile/user";
+import ProfileCard from "@/components/homeComponent/profile/profile-card";
+import EditProfileDialog from "@/components/homeComponent/profile/edit-profile";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserData | null>(null);
