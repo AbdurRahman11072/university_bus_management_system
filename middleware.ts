@@ -1,38 +1,73 @@
+// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Define routes that require authentication
-const protectedRoutes = ["/dashboard", "/profile", "/settings"];
-// Define routes that should be accessible only when not authenticated
-const authRoutes = ["/login", "/register"];
-
 export function middleware(request: NextRequest) {
+  // Get the current path
   const { pathname } = request.nextUrl;
+
+  // Get authentication token from cookies
   const token = request.cookies.get("auth_token")?.value;
 
-  // Check if the route is protected
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route)
+  // Get user data from cookies
+  const userCookie = request.cookies.get("user_data")?.value;
+  let user = null;
+
+  if (userCookie) {
+    try {
+      user = JSON.parse(userCookie);
+    } catch (error) {
+      console.error("Error parsing user_data cookie:", error);
+    }
+  }
+
+  console.log(`🛡️ Middleware checking: ${pathname}`);
+
+  // Define protected routes
+  const protectedRoutes = [
+    "/schedule",
+    "/notice",
+    "/booktrip",
+    "/profile",
+    "/dashboard",
+  ];
+
+  // Check if current path is protected
+  const isProtectedRoute = protectedRoutes.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
   );
 
-  // Check if the route is an auth route
-  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+  // Check if current path is auth route
+  const isAuthRoute = pathname.startsWith("/auth");
 
-  // Redirect to login if accessing protected route without token
+  // Check if current path is admin route
+  const isAdminRoute = pathname.startsWith("/dashboard");
+
+  // 🔒 Redirect to login if accessing protected route without token
   if (isProtectedRoute && !token) {
-    const loginUrl = new URL("/login", request.url);
+    console.log("🚫 No token - redirecting to login");
+    const loginUrl = new URL("/auth/login", request.url);
     loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Redirect to dashboard if accessing auth routes with token
-  if (isAuthRoute && token) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  // 👑 Redirect if non-admin tries to access admin routes
+  if (isAdminRoute && token && user?.role !== "Admin") {
+    console.log("🚫 Non-admin accessing admin route");
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
 
+  // 🔄 Redirect authenticated users away from auth pages
+  if (isAuthRoute && token) {
+    console.log("✅ Authenticated user on auth page - redirecting to home");
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // ✅ Allow access
   return NextResponse.next();
 }
 
+// Configure which paths the middleware should run on
 export const config = {
   matcher: [
     /*

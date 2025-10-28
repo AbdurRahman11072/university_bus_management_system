@@ -34,7 +34,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <Header />
-          <main className="mx-auto">{children}</main>
+          <main className="mx-auto ">{children}</main>
           <Toaster />
           <Footer2 />
         </AuthProvider>

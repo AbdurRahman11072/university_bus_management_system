@@ -4,6 +4,8 @@ export interface UserData {
   _id?: string; // Add this for MongoDB ID
   username: string;
   email: string;
+  batchNo: string;
+  department: string;
   password: string;
   avatar_url?: string;
   phone_number?: string;

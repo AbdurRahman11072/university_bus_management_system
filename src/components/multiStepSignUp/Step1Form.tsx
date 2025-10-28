@@ -30,9 +30,13 @@ export function Step1Form({ onSubmit, initialData }: Step1FormProps) {
       newErrors.username = "Username must be at least 3 characters long";
     } else if (formData.username.length > 30) {
       newErrors.username = "Username cannot exceed 30 characters";
-    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
-      newErrors.username =
-        "Username can only contain letters, numbers, and underscores";
+    }
+
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
     }
 
     // Password validation
@@ -119,6 +123,23 @@ export function Step1Form({ onSubmit, initialData }: Step1FormProps) {
         )}
       </div>
 
+      {/* Email */}
+      <div className="space-y-2">
+        <Label htmlFor="email" className="block text-sm">
+          Email *
+        </Label>
+        <Input
+          type="email"
+          required
+          name="email"
+          id="email"
+          value={formData.email || ""}
+          onChange={handleChange}
+          placeholder="Enter your email address"
+        />
+        {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+      </div>
+
       {/* Role Selection */}
       <div className="space-y-2">
         <Label htmlFor="roles" className="block text-sm">
@@ -132,7 +153,6 @@ export function Step1Form({ onSubmit, initialData }: Step1FormProps) {
             <SelectItem value="Student">Student</SelectItem>
             <SelectItem value="Teacher">Teacher</SelectItem>
             <SelectItem value="Driver">Driver</SelectItem>
-            <SelectItem value="Admin">Admin</SelectItem>
           </SelectContent>
         </Select>
       </div>

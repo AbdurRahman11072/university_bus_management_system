@@ -11,6 +11,13 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import EditUserDialog from "./edit-user-dialog";
 import { UserData } from "./userType";
@@ -36,20 +43,35 @@ const getRoleColor = (role: string) => {
   }
 };
 
+const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;
+const roles = ["Student", "Teacher", "Driver", "Admin"] as const;
+
 export default function UserTable({ users, onDelete, onEdit }: UserTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterField, setFilterField] = useState<string>("all");
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const filteredUsers = useMemo(() => {
-    return users.filter(
-      (user) =>
-        user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.phone_number?.includes(searchTerm) ||
-        user.bloodGroup.includes(searchTerm)
-    );
-  }, [users, searchTerm]);
+    if (!searchTerm) return users;
+
+    const lowercasedSearch = searchTerm.toLowerCase();
+
+    return users.filter((user) => {
+      if (filterField === "all") {
+        // Search across all fields
+        return Object.values(user).some((value) => {
+          if (value === null || value === undefined) return false;
+          return value.toString().toLowerCase().includes(lowercasedSearch);
+        });
+      } else {
+        // Search in specific field
+        const fieldValue = user[filterField as keyof UserData];
+        if (fieldValue === null || fieldValue === undefined) return false;
+        return fieldValue.toString().toLowerCase().includes(lowercasedSearch);
+      }
+    });
+  }, [users, searchTerm, filterField]);
 
   const handleEditClick = (user: UserData) => {
     setEditingUser(user);
@@ -62,116 +84,175 @@ export default function UserTable({ users, onDelete, onEdit }: UserTableProps) {
     setEditingUser(null);
   };
 
+  const getFieldDisplayValue = (user: UserData, field: keyof UserData) => {
+    const value = user[field];
+    if (value === null || value === undefined || value === "") return "N/A";
+    return value.toString();
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex gap-4">
-        <Input
-          placeholder="Search by username, email, phone, or blood group..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 border-primary/30 focus:border-primary focus:ring-primary/20"
-        />
+      {/* Search and Filter Controls */}
+      <div className="flex gap-4 flex-col sm:flex-row">
+        <div className="flex-1 flex gap-2">
+          <Select value={filterField} onValueChange={setFilterField}>
+            <SelectTrigger className="w-[180px] border-primary/30 focus:ring-primary/20">
+              <SelectValue placeholder="Filter by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Fields</SelectItem>
+              <SelectItem value="uId">ID</SelectItem>
+              <SelectItem value="username">Username</SelectItem>
+              <SelectItem value="email">Email</SelectItem>
+              <SelectItem value="batchNo">Batch No</SelectItem>
+              <SelectItem value="department">Department</SelectItem>
+              <SelectItem value="phone_number">Phone</SelectItem>
+              <SelectItem value="bloodGroup">Blood Group</SelectItem>
+              <SelectItem value="roles">Role</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input
+            placeholder={`Search by ${
+              filterField === "all" ? "any field" : filterField
+            }...`}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1 border-primary/30 focus:border-primary focus:ring-primary/20"
+          />
+        </div>
       </div>
 
+      {/* Users Table */}
       <div className="border border-border rounded-lg overflow-hidden shadow-sm bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gradient-to-r from-primary/5 to-accent/5 border-b border-primary/20">
-              <TableHead className="font-semibold text-primary">ID</TableHead>
-              <TableHead className="font-semibold text-primary">
-                Username
-              </TableHead>
-              <TableHead className="font-semibold text-primary">
-                Email
-              </TableHead>
-              <TableHead className="font-semibold text-primary">
-                Phone
-              </TableHead>
-              <TableHead className="font-semibold text-primary">
-                Blood Group
-              </TableHead>
-              <TableHead className="font-semibold text-primary">Role</TableHead>
-              <TableHead className="font-semibold text-primary">
-                Actions
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredUsers.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="text-center py-12 text-muted-foreground"
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="text-4xl">🔍</div>
-                    <p>No users found</p>
-                  </div>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gradient-to-r from-primary/5 to-accent/5 border-b border-primary/20 text-center">
+                <TableHead className="font-semibold text-primary whitespace-nowrap text-center">
+                  ID
+                </TableHead>
+                <TableHead className="font-semibold text-primary whitespace-nowrap text-center">
+                  Username
+                </TableHead>
+                <TableHead className="font-semibold text-primary whitespace-nowrap text-center">
+                  Email
+                </TableHead>
+                <TableHead className="font-semibold text-primary whitespace-nowrap text-center">
+                  Batch No
+                </TableHead>
+                <TableHead className="font-semibold text-primary whitespace-nowrap text-center">
+                  Department
+                </TableHead>
+                <TableHead className="font-semibold text-primary whitespace-nowrap text-center">
+                  Phone
+                </TableHead>
+                <TableHead className="font-semibold text-primary whitespace-nowrap text-center">
+                  Blood Group
+                </TableHead>
+                <TableHead className="font-semibold text-primary whitespace-nowrap text-center">
+                  Role
+                </TableHead>
+                <TableHead className="font-semibold text-primary whitespace-nowrap text-center">
+                  Actions
+                </TableHead>
               </TableRow>
-            ) : (
-              filteredUsers.map((user) => (
-                <TableRow
-                  key={user.uId}
-                  className="hover:bg-primary/5 border-b border-border/50 transition-colors"
-                >
-                  <TableCell className="font-medium text-foreground">
-                    {user.uId}
-                  </TableCell>
-                  <TableCell className="text-foreground">
-                    {user.username}
-                  </TableCell>
-                  <TableCell className="text-foreground">
-                    {user.email}
-                  </TableCell>
-                  <TableCell className="text-foreground">
-                    {user.phone_number || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-foreground font-medium">
-                    {user.bloodGroup}
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(
-                        user.roles
-                      )}`}
-                    >
-                      {user.roles}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditClick(user)}
-                        className="text-primary border-primary/30 hover:bg-primary/10 hover:border-primary/50"
-                      >
-                        ✏️ Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onDelete(user.uId)}
-                        className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:border-destructive/50"
-                      >
-                        🗑️ Delete
-                      </Button>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={11}
+                    className="text-center py-12 text-muted-foreground"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="text-4xl">🔍</div>
+                      <p>No users found</p>
+                      {searchTerm && (
+                        <p className="text-sm">
+                          Try adjusting your search or filter
+                        </p>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                filteredUsers.map((user) => (
+                  <TableRow
+                    key={user.uId}
+                    className="hover:bg-primary/5 border-b border-border/50 transition-colors"
+                  >
+                    <TableCell className="font-medium text-foreground whitespace-nowrap text-center">
+                      {user.uId}
+                    </TableCell>
+                    <TableCell className="text-foreground whitespace-nowrap text-center">
+                      {user.username}
+                    </TableCell>
+                    <TableCell className="text-foreground whitespace-nowrap text-center">
+                      {getFieldDisplayValue(user, "email")}
+                    </TableCell>
+                    <TableCell className="text-foreground whitespace-nowrap text-center">
+                      {user.batchNo}
+                    </TableCell>
+                    <TableCell className="text-foreground whitespace-nowrap text-center">
+                      {user.department}
+                    </TableCell>
+                    <TableCell className="text-foreground whitespace-nowrap text-center">
+                      {getFieldDisplayValue(user, "phone_number")}
+                    </TableCell>
+                    <TableCell className="text-foreground font-medium whitespace-nowrap text-center">
+                      {user.bloodGroup}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-center">
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(
+                          user.roles
+                        )}`}
+                      >
+                        {user.roles}
+                      </span>
+                    </TableCell>
+
+                    <TableCell className="whitespace-nowrap">
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditClick(user)}
+                          className="text-primary border-primary/30 hover:bg-primary/10 hover:border-primary/50"
+                        >
+                          ✏️ Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onDelete(user.uId)}
+                          className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:border-destructive/50"
+                        >
+                          🗑️ Delete
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
+      {/* Table Footer */}
       <div className="text-sm text-muted-foreground flex justify-between items-center">
         <span>
           Showing {filteredUsers.length} of {users.length} users
         </span>
+        {searchTerm && (
+          <span className="text-xs bg-primary/10 px-2 py-1 rounded">
+            Filtered by: {filterField === "all" ? "All Fields" : filterField}
+          </span>
+        )}
       </div>
 
+      {/* Edit Dialog */}
       {editingUser && (
         <EditUserDialog
           user={editingUser}

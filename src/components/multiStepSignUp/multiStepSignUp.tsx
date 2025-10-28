@@ -23,9 +23,12 @@ export function MultiStepSignUp() {
     uId: 0,
     username: "",
     password: "",
+    email: "", // Add this
     roles: "Student",
     phone_number: "",
     bloodGroup: "A+",
+    batchNo: "", // Add this
+    department: "", // Add this
   });
 
   const handleStep1Submit = (data: FormStep1Data) => {
@@ -68,7 +71,7 @@ export function MultiStepSignUp() {
   };
 
   return (
-    <section className="flex min-h-screen px-4 py-16 md:py-32 dark:bg-transparent -mt-2">
+    <section className="flex min-h-screen px-4dark:bg-transparent -mt-2">
       <div className="bg-muted m-auto h-fit w-full max-w-md overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)]">
         <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
           <div className="text-center">

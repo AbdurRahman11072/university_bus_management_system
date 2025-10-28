@@ -9,22 +9,15 @@ export type BloodGroup =
   | "O-";
 export type UserRole = "Student" | "Teacher" | "Driver" | "Admin";
 
-export interface UserFormData {
-  // Step 1
-  uId: number;
-  username: string;
-  password: string;
-  roles: UserRole;
-
-  // Step 2
-  avatar_url?: string;
+export interface UserFormData extends FormStep1Data {
   phone_number: string;
   bloodGroup: BloodGroup;
-
-  // Role-specific fields
-  verificationImage?: string; // For teachers
-  driverLicence?: string; // For drivers
-  licenceExpire?: string; // For drivers
+  avatar_url?: string;
+  verificationImage?: string;
+  driverLicence?: string;
+  licenceExpire?: string;
+  batchNo?: string; // Add this
+  department?: string; // Add this
 }
 
 export interface FormStep1Data {
@@ -32,6 +25,7 @@ export interface FormStep1Data {
   username: string;
   password: string;
   roles: UserRole;
+  email: string; // Add this
 }
 
 export type UserTypes = {

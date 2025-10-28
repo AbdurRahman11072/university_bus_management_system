@@ -41,20 +41,52 @@ export default function AddNoticeDialog({ onAddNotice }: AddNoticeDialogProps) {
     setLoading(true);
 
     try {
+      // Prepare the data for the API
+      const noticeData = {
+        subject: formData.subject,
+        description: formData.description,
+        noticeFor: formData.noticeFor,
+        // Add any other required fields that your backend expects
+      };
+
+      // POST data to the backend API
+      const response = await fetch(
+        "http://localhost:5000/api/v1/notice/post-notice",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(noticeData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Create the new notice object for the frontend
       const newNotice: Notice = {
-        id: Date.now().toString(),
+        id: result.data?.id || Date.now().toString(), // Use the ID from backend if available
         subject: formData.subject,
         description: formData.description,
         noticeFor: formData.noticeFor,
         seen: [],
-        createdAt: new Date().toISOString(),
+        createdAt: result.data?.createdAt || new Date().toISOString(),
       };
 
+      // Call the callback to update the frontend state
       onAddNotice(newNotice);
+
+      // Reset form and close dialog
       setFormData({ subject: "", description: "", noticeFor: "Student" });
       setOpen(false);
     } catch (error) {
       console.error("[v0] Error adding notice:", error);
+      // You might want to add error handling UI here
+      alert("Failed to create notice. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -86,6 +118,7 @@ export default function AddNoticeDialog({ onAddNotice }: AddNoticeDialogProps) {
                 setFormData({ ...formData, subject: e.target.value })
               }
               required
+              disabled={loading}
             />
           </div>
 
@@ -101,6 +134,7 @@ export default function AddNoticeDialog({ onAddNotice }: AddNoticeDialogProps) {
               }
               required
               rows={4}
+              disabled={loading}
             />
           </div>
 
@@ -113,6 +147,7 @@ export default function AddNoticeDialog({ onAddNotice }: AddNoticeDialogProps) {
               onValueChange={(value) =>
                 setFormData({ ...formData, noticeFor: value })
               }
+              disabled={loading}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -120,8 +155,8 @@ export default function AddNoticeDialog({ onAddNotice }: AddNoticeDialogProps) {
               <SelectContent>
                 <SelectItem value="Student">Student</SelectItem>
                 <SelectItem value="Teacher">Teacher</SelectItem>
-                <SelectItem value="Driver">Teacher</SelectItem>
-                <SelectItem value="All">All</SelectItem>
+                <SelectItem value="Driver">Driver</SelectItem>
+                <SelectItem value="All User">All</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -131,6 +166,7 @@ export default function AddNoticeDialog({ onAddNotice }: AddNoticeDialogProps) {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
+              disabled={loading}
             >
               Cancel
             </Button>

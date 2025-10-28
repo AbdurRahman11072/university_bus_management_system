@@ -32,8 +32,10 @@ export function Step2Form({
     phone_number: initialData.phone_number || "+8801",
     bloodGroup: initialData.bloodGroup,
     verificationImage: initialData.verificationImage,
-    driverLicence: initialData.driverLicence,
-    licenceExpire: initialData.licenceExpire,
+    driverLicence: initialData.driverLicence || "",
+    licenceExpire: initialData.licenceExpire || "",
+    batchNo: initialData.batchNo || "",
+    department: initialData.department || "",
   });
 
   const [avatarUrl, setAvatarUrl] = useState<string>("");
@@ -54,17 +56,13 @@ export function Step2Form({
 
     // Ensure the number always starts with +8801
     if (!value.startsWith("+8801")) {
-      // If user tries to delete the prefix, reset to +8801
       setFormData((prev) => ({ ...prev, phone_number: "+8801" }));
       return;
     }
 
-    // Only allow numbers after the prefix and limit total length
-    const remainingNumbers = value.slice(5); // Get numbers after +8801
-    const cleanRemaining = remainingNumbers.replace(/\D/g, ""); // Remove non-digits
-
-    // Limit total phone number length (including +8801 prefix)
-    const maxRemainingLength = 9; // +8801 + 9 digits = 14 characters total
+    const remainingNumbers = value.slice(5);
+    const cleanRemaining = remainingNumbers.replace(/\D/g, "");
+    const maxRemainingLength = 9;
     const finalRemaining = cleanRemaining.slice(0, maxRemainingLength);
 
     const finalPhoneNumber = "+8801" + finalRemaining;
@@ -80,10 +78,14 @@ export function Step2Form({
     setFormData((prev) => ({ ...prev, bloodGroup: value }));
   };
 
+  const handleDepartmentChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, department: value }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate phone number format and length (+8801 + 9 digits = 14 characters)
+    // Validate phone number format and length
     const phoneRegex = /^\+8801\d{9}$/;
     if (!phoneRegex.test(formData.phone_number || "")) {
       alert(
@@ -92,32 +94,105 @@ export function Step2Form({
       return;
     }
 
-    // Validate required images based on role
-    if (
-      (userRole === "Teacher" || userRole === "Driver") &&
-      !formData.verificationImage
-    ) {
-      alert(
-        `Please upload ${
-          userRole === "Teacher"
-            ? "teacher verification document"
-            : "driver verification photo"
-        }`
+    // Validate required fields for Student role
+    if (userRole === "Student") {
+      if (!formData.batchNo) {
+        alert("Please enter your batch number");
+        return;
+      }
+      if (!formData.department) {
+        alert("Please select your department");
+        return;
+      }
+    }
+
+    // Validate required fields for Teacher role
+    if (userRole === "Teacher" && !formData.verificationImage) {
+      alert("Please upload teacher verification document");
+      return;
+    }
+
+    // Validate required fields for Driver role
+    if (userRole === "Driver") {
+      if (!formData.verificationImage) {
+        alert("Please upload driver verification photo");
+        return;
+      }
+      if (!formData.driverLicence) {
+        alert("Please enter driver license number");
+        return;
+      }
+      if (!formData.licenceExpire) {
+        alert("Please select license expiry date");
+        return;
+      }
+    }
+
+    // Prepare the data to submit - only include fields that are relevant to the role
+    const submitData: Partial<UserFormData> = {
+      avatar_url: formData.avatar_url,
+      phone_number: formData.phone_number,
+      bloodGroup: formData.bloodGroup,
+    };
+
+    // Add role-specific fields
+    if (userRole === "Student") {
+      submitData.batchNo = formData.batchNo;
+      submitData.department = formData.department;
+    }
+
+    if (userRole === "Teacher" || userRole === "Driver") {
+      submitData.verificationImage = formData.verificationImage;
+    }
+
+    if (userRole === "Driver") {
+      submitData.driverLicence = formData.driverLicence;
+      submitData.licenceExpire = formData.licenceExpire;
+    }
+
+    console.log("Submitting data:", submitData);
+    onSubmit(submitData);
+  };
+
+  // Department options
+  const departments = [
+    "Computer Science and Engineering",
+    "Electrical and Electronic Engineering",
+    "Business Administration",
+    "Economics",
+    "English",
+    "Law",
+    "Pharmacy",
+    "Public Health",
+    "Architecture",
+    "Environmental Science",
+  ];
+
+  // Check if form is disabled based on role requirements
+  const isFormDisabled = () => {
+    // Basic required fields for all roles
+    if (!formData.phone_number || formData.phone_number.length !== 14) {
+      return true;
+    }
+
+    // Role-specific requirements
+    if (userRole === "Student") {
+      return !formData.batchNo || !formData.department;
+    }
+
+    if (userRole === "Teacher") {
+      return !formData.verificationImage;
+    }
+
+    if (userRole === "Driver") {
+      return (
+        !formData.verificationImage ||
+        !formData.driverLicence ||
+        !formData.licenceExpire
       );
-      return;
     }
 
-    if (userRole === "Driver" && !formData.driverLicence) {
-      alert("Please enter driver license number");
-      return;
-    }
-
-    if (userRole === "Driver" && !formData.licenceExpire) {
-      alert("Please select license expiry date");
-      return;
-    }
-
-    onSubmit(formData);
+    return false;
   };
 
   return (
@@ -146,7 +221,7 @@ export function Step2Form({
             value={formData.phone_number || "+8801"}
             onChange={handlePhoneNumberChange}
             placeholder="+8801XXXXXXXXX"
-            className="pl-16" // Add padding to prevent overlapping with prefix
+            className="pl-16"
           />
           <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm pointer-events-none">
             +8801
@@ -194,6 +269,49 @@ export function Step2Form({
           </SelectContent>
         </Select>
       </div>
+
+      {/* Student Specific Fields */}
+      {userRole === "Student" && (
+        <>
+          {/* Batch Number */}
+          <div className="space-y-2">
+            <Label htmlFor="batchNo" className="block text-sm">
+              Batch Number *
+            </Label>
+            <Input
+              type="text"
+              required
+              name="batchNo"
+              id="batchNo"
+              value={formData.batchNo || ""}
+              onChange={handleChange}
+              placeholder="Enter your batch number (e.g., 2023)"
+            />
+          </div>
+
+          {/* Department */}
+          <div className="space-y-2">
+            <Label htmlFor="department" className="block text-sm">
+              Department *
+            </Label>
+            <Select
+              value={formData.department}
+              onValueChange={handleDepartmentChange}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select your department" />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map((dept) => (
+                  <SelectItem key={dept} value={dept}>
+                    {dept}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </>
+      )}
 
       {/* Teacher Verification */}
       {userRole === "Teacher" && (
@@ -266,7 +384,7 @@ export function Step2Form({
               id="licenceExpire"
               value={formData.licenceExpire || ""}
               onChange={handleChange}
-              min={new Date().toISOString().split("T")[0]} // Prevent past dates
+              min={new Date().toISOString().split("T")[0]}
             />
           </div>
         </>
@@ -282,18 +400,7 @@ export function Step2Form({
         >
           Back
         </Button>
-        <Button
-          type="submit"
-          className="flex-1"
-          disabled={
-            ((userRole === "Teacher" || userRole === "Driver") &&
-              !formData.verificationImage) ||
-            (userRole === "Driver" &&
-              (!formData.driverLicence || !formData.licenceExpire)) ||
-            !formData.phone_number ||
-            formData.phone_number.length !== 14
-          }
-        >
+        <Button type="submit" className="flex-1" disabled={isFormDisabled()}>
           Create Account
         </Button>
       </div>

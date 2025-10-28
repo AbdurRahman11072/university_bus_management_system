@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "sonner";
 // Adjust the import path as needed
 
 export default function LoginPage() {
   const { login, isLoading } = useAuth();
+  const [errorMsg, setErrorMsg] = useState("");
   const [formData, setFormData] = useState({
     uId: "",
     password: "",
@@ -34,9 +36,10 @@ export default function LoginPage() {
       });
       // Redirect or show success message - you can add navigation here
       // For example: router.push('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       // Error is already handled in the auth context
-      console.error("Login failed:", error);
+      setErrorMsg(`${error.response.data.message}`);
+      toast.error(`${error.response.data.message}`);
     }
   };
 
@@ -111,6 +114,7 @@ export default function LoginPage() {
                 className="input sz-md variant-mixed"
               />
             </div>
+            <p className="text-red-500 text-xs">{errorMsg}</p>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Signing In..." : "Sign In"}

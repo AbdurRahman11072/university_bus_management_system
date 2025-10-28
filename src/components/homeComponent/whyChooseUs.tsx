@@ -44,7 +44,7 @@ const WhyChooseUs = () => {
           {Details.map((item) => (
             <Card
               key={item.title}
-              className="border-primary/30 shadow-xl hover:scale-110 transition-all duration-300"
+              className="border-primary/30 shadow-xl hover:scale-110 transition-all duration-300 bg-white"
             >
               <CardContent className="pt-6">
                 <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">

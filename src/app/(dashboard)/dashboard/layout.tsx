@@ -32,7 +32,9 @@ export default function RootLayout({
         <DashboardHader />
         <main className="mx-auto flex ">
           <DashboardSideBar />
-          <div className="p-6 overflow-y-scroll flex-1">{children}</div>
+          <div className="p-6 h-[90vh] overflow-y-scroll flex-1">
+            {children}
+          </div>
         </main>
       </body>
     </html>

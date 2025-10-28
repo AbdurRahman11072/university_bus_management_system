@@ -67,7 +67,7 @@ export default function SignUp() {
   };
 
   return (
-    <section className="flex min-h-screen px-4 py-16 md:py-32 dark:bg-transparent -mt-2">
+    <section className="flex min-h-screen px-4  dark:bg-transparent -mt-2">
       <form
         onSubmit={handleSubmit}
         className="bg-muted m-auto h-fit w-full max-w-md overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)]"

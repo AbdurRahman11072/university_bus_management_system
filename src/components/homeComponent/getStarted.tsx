@@ -2,6 +2,7 @@ import React from "react";
 
 import { ArrowRight } from "lucide-react";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 const GetStarted = () => {
   return (
@@ -13,10 +14,12 @@ const GetStarted = () => {
         <p className="text-lg text-muted-foreground mb-8">
           Join thousands of students and staff using Bus Manager
         </p>
-        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 px-8">
-          Sign Up Now
-          <ArrowRight className="w-4 h-4 ml-2" />
-        </Button>
+        <Link href={"/auth/register"}>
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12 px-8">
+            Sign Up Now
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { Notice } from "@/components/dashboard/notices/noticeType";
-import NoticeCard from "@/components/dashboard/notices/notice-card";
+
 import AddNoticeDialog from "@/components/dashboard/notices/add-notice";
+import NoticeCard from "@/components/dashboard/notices/notice-card";
 
 export default function NoticesPage() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<string>("All"); // Start with "All" as default
+  const [filter, setFilter] = useState<string>("All");
 
   useEffect(() => {
     fetchNotices();
@@ -23,11 +24,9 @@ export default function NoticesPage() {
       );
       const data = await response.json();
       console.log("notice", data.data);
-
       setNotices(data.data);
     } catch (err) {
       console.error("[v0] Error fetching notices:", err);
-      // Fallback to demo data
     } finally {
       setLoading(false);
     }
@@ -35,6 +34,18 @@ export default function NoticesPage() {
 
   const handleAddNotice = (newNotice: Notice) => {
     setNotices([newNotice, ...notices]);
+  };
+
+  const handleUpdateNotice = (updatedNotice: Notice) => {
+    setNotices(
+      notices.map((notice) =>
+        notice.id === updatedNotice.id ? updatedNotice : notice
+      )
+    );
+  };
+
+  const handleDeleteNotice = (noticeId: string) => {
+    setNotices(notices.filter((notice) => notice.id !== noticeId));
   };
 
   const filteredNotices =
@@ -49,7 +60,7 @@ export default function NoticesPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-background p-8">
+    <main className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -89,7 +100,12 @@ export default function NoticesPage() {
           <div className="grid gap-4">
             {filteredNotices.length > 0 ? (
               filteredNotices.map((notice) => (
-                <NoticeCard key={notice.id} notice={notice} />
+                <NoticeCard
+                  key={notice.id}
+                  notice={notice}
+                  onUpdate={handleUpdateNotice}
+                  onDelete={handleDeleteNotice}
+                />
               ))
             ) : (
               <div className="text-center py-12">

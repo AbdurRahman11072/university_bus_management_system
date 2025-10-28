@@ -2,16 +2,93 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@radix-ui/react-dropdown-menu";
+import { Label } from "@/components/ui/label";
 import Logo from "../../../../public/GUBLogo.svg";
-import { Link, Star } from "lucide-react";
+import { Link } from "lucide-react";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Survey = () => {
+  const { user } = useAuth(); // Remove loading since it's not available
+  const [formData, setFormData] = useState({
+    semester: "",
+    destination: "",
+    classTime: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!user) {
+      alert("Please log in to submit the survey");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Use type assertions for user properties
+      const username = (user as any).username || "Unknown";
+      const department = (user as any).department || "Not specified";
+
+      const surveyData = {
+        username: username,
+
+        department: department,
+        semester: formData.semester,
+        destination: formData.destination,
+        classTime: formData.classTime,
+        submittedAt: new Date().toISOString(),
+      };
+
+      const response = await fetch(
+        "http://localhost:5000/api/v1/survey/post-Survey",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(surveyData),
+        }
+      );
+
+      if (response.ok) {
+        alert("Survey submitted successfully!");
+        setFormData({
+          semester: "",
+          destination: "",
+          classTime: "",
+        });
+      } else {
+        throw new Error("Failed to submit survey");
+      }
+    } catch (error) {
+      console.error("Error submitting survey:", error);
+      alert("Error submitting survey. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Remove the loading check since it's not available
+
+  // Type-safe user info display
+  const userDisplayName = (user as any)?.username || "Not logged in";
+  const userDepartment = (user as any)?.department || "Not specified";
+
   return (
     <form
-      action=""
+      onSubmit={handleSubmit}
       className="bg-muted m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)] my-10"
     >
       <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
@@ -33,70 +110,72 @@ const Survey = () => {
             </span>
           </h1>
           <p className="text-sm">please fill the form</p>
+          {user && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Logged in as: {userDisplayName} | Department: {userDepartment}
+            </p>
+          )}
         </div>
-        {/* password field  */}
+
         <div className="mt-6 space-y-6">
           <div className="space-y-2">
-            <Label className="block text-sm">Username</Label>
-            <Input type="email" required name="email" id="email" />
-          </div>
-
-          <div className="space-y-0.5">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm">Semester</Label>
-              <Button asChild variant="link" size="sm">
-                <Link
-                  href="#"
-                  className="link intent-info variant-ghost text-sm"
-                ></Link>
-              </Button>
-            </div>
+            <Label htmlFor="semester" className="block text-sm">
+              Semester
+            </Label>
             <Input
-              type="semester"
+              type="text"
               required
-              name="pwd"
-              id="pwd"
-              className="input sz-md variant-mixed"
-            />
-          </div>
-          <div className="space-y-0.5">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm">Destination</Label>
-              <Button asChild variant="link" size="sm">
-                <Link
-                  href="#"
-                  className="link intent-info variant-ghost text-sm"
-                ></Link>
-              </Button>
-            </div>
-            <Input
-              type="Destination"
-              required
-              name="Add your location. Like (Mirpur)"
-              id="pwd"
-              className="input sz-md variant-mixed"
-            />
-          </div>
-          <div className="space-y-0.5">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm">Class Time</Label>
-              <Button asChild variant="link" size="sm">
-                <Link
-                  href="#"
-                  className="link intent-info variant-ghost text-sm"
-                ></Link>
-              </Button>
-            </div>
-            <Input
-              type="Class Time"
-              required
-              name="Add Class Time. Like (08:30 AM)"
-              id="pwd"
-              className="input sz-md variant-mixed"
+              name="semester"
+              id="semester"
+              value={formData.semester}
+              onChange={handleChange}
+              placeholder="Enter your semester"
             />
           </div>
 
-          <Button className="w-full">Submit</Button>
+          <div className="space-y-2">
+            <Label htmlFor="destination" className="block text-sm">
+              Destination
+            </Label>
+            <Input
+              type="text"
+              required
+              name="destination"
+              id="destination"
+              value={formData.destination}
+              onChange={handleChange}
+              placeholder="Add your location. Like (Mirpur)"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="classTime" className="block text-sm">
+              Class Time
+            </Label>
+            <Input
+              type="text"
+              required
+              name="classTime"
+              id="classTime"
+              value={formData.classTime}
+              onChange={handleChange}
+              placeholder="Add Class Time. Like (08:30 AM)"
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isSubmitting || !user}
+          >
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
+
+          {!user && (
+            <p className="text-xs text-center text-red-500">
+              Please log in to submit the survey
+            </p>
+          )}
         </div>
       </div>
     </form>
