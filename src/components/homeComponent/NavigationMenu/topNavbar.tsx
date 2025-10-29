@@ -20,6 +20,7 @@ import {
 import { Button } from "../../ui/button";
 import Profile from "./profile";
 import { useAuth } from "@/hooks/useAuth";
+import { usePathname } from "next/navigation"; // Import usePathname
 
 const menu = [
   {
@@ -29,6 +30,10 @@ const menu = [
   {
     name: "Schedule",
     path: "/schedule",
+  },
+  {
+    name: "Book Trip",
+    path: "/booktrip",
   },
   {
     name: "Contact Us",
@@ -62,6 +67,8 @@ const TopNavbar = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchError, setSearchError] = useState("");
   const { user, isAuthenticated } = useAuth();
+  const pathname = usePathname(); // Get current path
+
   console.log(user, isAuthenticated);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,6 +122,14 @@ const TopNavbar = () => {
 
   const formatTime = (time: string) => {
     return time; // You can add time formatting logic here
+  };
+
+  // Function to check if a menu item is active
+  const isActive = (path: string) => {
+    if (path === "/") {
+      return pathname === "/";
+    }
+    return pathname.startsWith(path);
   };
 
   return (
@@ -175,7 +190,11 @@ const TopNavbar = () => {
               <Link
                 key={item.name}
                 href={item.path}
-                className="flex justify-center items-center gap-1 text-sm font-semibold"
+                className={`flex justify-center items-center gap-1 text-sm font-semibold transition-all duration-200 px-3 py-2 rounded-md ${
+                  isActive(item.path)
+                    ? "bg-accent text-white shadow-md" // Active state styles
+                    : "text-gray-700 hover:bg-gray-100 hover:text-accent" // Default and hover states
+                }`}
               >
                 {item.name}
               </Link>

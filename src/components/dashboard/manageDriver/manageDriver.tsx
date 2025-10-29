@@ -4,8 +4,15 @@ import { Button } from "../../ui/button";
 import { Card, CardContent } from "../../ui/card";
 import { DriverModal } from "./driverModal";
 import DriverCards from "./driverDetails";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 const ManageDrivers = () => {
+  const { user } = useAuth();
+  const router = useRouter();
+  if (user?.roles != "Admin") {
+    router.push("/auth/login");
+  }
   const [showModal, setShowModal] = useState(false);
 
   return (

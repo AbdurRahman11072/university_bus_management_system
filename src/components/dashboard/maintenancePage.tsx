@@ -3,8 +3,15 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "../ui/card";
 import axiosInstance from "@/hooks/axiosInstance";
 import { formatDistanceToNow } from "date-fns";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 export function MaintenancePage() {
+  const { user } = useAuth();
+  const router = useRouter();
+  if (user?.roles != "Admin") {
+    router.push("/auth/login");
+  }
   const [maintenance, setMaintenance] = useState([]);
   const [loading, setLoading] = useState(false);
 

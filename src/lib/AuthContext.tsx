@@ -144,7 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const logout = () => {
     authService.logout();
     dispatch({ type: "AUTH_LOGOUT" });
-    router.refresh();
+    router.push("/");
   };
 
   const clearError = () => {

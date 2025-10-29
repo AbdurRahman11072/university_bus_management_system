@@ -1,23 +1,26 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import DriverDetails from "./driverDetails";
-import { Button } from "./ui/button";
-import LiveLocation from "./liveLocation";
 
-import axiosInstance from "@/hooks/axiosInstance";
-import { Spinner } from "./ui/spinner";
-import { Bus } from "lucide-react";
+import { Bus, MapPin } from "lucide-react";
+import { FullscreenMapModal } from "./liveLocation";
+import { Button } from "./ui/button";
 
 type Bus = {
-  _id: string;
+  busId: string;
   busName: string;
+  busImg: string;
   busRoute: string;
   busDestination: string[];
+  busDriverId: string;
   busDepartureTime: string;
+  busDepartureTime2: string;
   busArrivalTime: string;
-  busStatus: "On Time" | "Delayed" | "Cancelled" | "Arrived" | "Departed";
+  busArrivalTime2: string;
+  busStatus?: "On Time" | "Late" | "In Jame" | "Maintenance";
+  status?: "show" | "hidden";
 };
 type Sprops = {
   busData: Bus[];
@@ -25,27 +28,9 @@ type Sprops = {
 };
 
 const ScheduleDetails = ({ busData, slug }: Sprops) => {
-  console.log();
-
-  // const [data, setData] = useState([]);
-  // const [Loading, isLoading] = useState(false);
-
-  // useEffect(() => {
-  //   isLoading(true);
-  //   setData(bdata)
-  // }, []);
-
-  // const fetchData = async (slug: string) => {
-  //   try {
-  //     const response = await axiosInstance.get(
-  //       `http://localhost:5000/api/v1/bus/${slug}`
-  //     );
-  //     setData(response.data.data);
-  //     isLoading(false);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  const busIpAddress = "103.120.162.38";
+  const [isMapOpen, setIsMapOpen] = useState(false);
+  console.log("busData", busData);
 
   return (
     <div className="container mx-auto space-y-5 mb-10 h-[90vh]">
@@ -119,13 +104,28 @@ const ScheduleDetails = ({ busData, slug }: Sprops) => {
 
               {/* Action Buttons */}
               <div className="grid grid-cols-2 gap-3 pt-2">
-                <LiveLocation />
-                <DriverDetails />
+                <Button
+                  size="lg"
+                  className="gap-2"
+                  onClick={() => setIsMapOpen(true)}
+                >
+                  <MapPin className="h-5 w-5" />
+                  View Bus Location
+                </Button>
+
+                <DriverDetails id={data.busDriverId} />
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+      <FullscreenMapModal
+        ipAddress={busIpAddress}
+        busId="001"
+        busName="Express Route A"
+        isOpen={isMapOpen}
+        onClose={() => setIsMapOpen(false)}
+      />
     </div>
   );
 };

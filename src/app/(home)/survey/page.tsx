@@ -8,9 +8,15 @@ import { Link } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 const Survey = () => {
   const { user } = useAuth(); // Remove loading since it's not available
+  const router = useRouter();
+
+  if (!user) {
+    router.push("auth/login");
+  }
   const [formData, setFormData] = useState({
     semester: "",
     destination: "",

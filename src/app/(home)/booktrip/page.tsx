@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,9 +7,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const BookTripPage = () => {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  if (!user) {
+    router.push("auth/login");
+  }
   return (
     <div className="container mx-auto space-y-4 w-[95vw] lg:w-[40vw] md:w-[90vw] xl:w-[35vw]  my-10">
       <Card>

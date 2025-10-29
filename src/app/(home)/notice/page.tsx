@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 interface Notice {
   id: string;
@@ -44,6 +45,12 @@ export default function NoticeComponent({
   userId,
 }: NoticeComponentProps) {
   const { user } = useAuth();
+  const router = useRouter();
+
+  if (!user) {
+    router.push("auth/login");
+  }
+
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "unseen">("all");
@@ -140,7 +147,7 @@ export default function NoticeComponent({
 
   if (loading || !currentUserRole || !currentUserId) {
     return (
-      <div className="flex justify-center items-center py-12">
+      <div className="flex justify-center items-center py-12 h-[90vh]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         <span className="ml-2 text-muted-foreground">
           Loading user information...
@@ -151,7 +158,7 @@ export default function NoticeComponent({
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12">
+      <div className="flex justify-center items-center py-12 h-[90vh]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         <span className="ml-2 text-muted-foreground">Loading notices...</span>
       </div>

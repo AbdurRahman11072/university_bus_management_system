@@ -34,12 +34,13 @@ const semesterColors: Record<string, string> = {
 };
 
 export function ContactMessages() {
+  const router = useRouter();
+
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const router = useRouter();
 
   useEffect(() => {
     const fetchMessages = async () => {

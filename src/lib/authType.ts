@@ -14,7 +14,8 @@ export interface User {
   id: string;
   uId: string;
   name?: string;
-  // add other user properties as needed
+  email: string;
+  roles: string;
 }
 
 export interface AuthState {

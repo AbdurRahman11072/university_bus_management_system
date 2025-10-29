@@ -1,83 +1,66 @@
-// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  // Get the current path
-  const { pathname } = request.nextUrl;
+  const path = request.nextUrl.pathname;
 
-  // Get authentication token from cookies
-  const token = request.cookies.get("auth_token")?.value;
+  // Public routes
+  const isPublicRoute = path === "/auth/login" || path === "/auth/register";
 
-  // Get user data from cookies
-  const userCookie = request.cookies.get("user_data")?.value;
-  let user = null;
+  // Protected routes
+  const isProtectedRoute =
+    path === "/schedule" ||
+    path === "/notice" ||
+    path === "/booktrip" ||
+    path === "/profile" ||
+    path.startsWith("/dashboard");
 
-  if (userCookie) {
-    try {
-      user = JSON.parse(userCookie);
-    } catch (error) {
-      console.error("Error parsing user_data cookie:", error);
+  // Get token
+  const token = request.cookies.get("auth_token")?.value || "";
+
+  console.log("Path:", path, "Token:", !!token);
+
+  // If user has token and is on public route, redirect to dashboard
+  if (isPublicRoute && token) {
+    return NextResponse.redirect(new URL("/dashboard", request.nextUrl));
+  }
+
+  // If user has no token and is on protected route, redirect to login
+  if (isProtectedRoute && !token) {
+    return NextResponse.redirect(new URL("/auth/login", request.nextUrl));
+  }
+
+  // Additional: Check admin role for dashboard
+  if (path.startsWith("/dashboard") && token) {
+    const userCookie = request.cookies.get("user_data")?.value;
+    if (userCookie) {
+      try {
+        const user = JSON.parse(userCookie);
+        if (user.role !== "Admin") {
+          return NextResponse.redirect(new URL("/", request.nextUrl));
+        }
+      } catch (error) {
+        console.error("Error parsing user_data:", error);
+      }
     }
   }
 
-  console.log(`🛡️ Middleware checking: ${pathname}`);
-
-  // Define protected routes
-  const protectedRoutes = [
-    "/schedule",
-    "/notice",
-    "/booktrip",
-    "/profile",
-    "/dashboard",
-  ];
-
-  // Check if current path is protected
-  const isProtectedRoute = protectedRoutes.some(
-    (route) => pathname === route || pathname.startsWith(route + "/")
-  );
-
-  // Check if current path is auth route
-  const isAuthRoute = pathname.startsWith("/auth");
-
-  // Check if current path is admin route
-  const isAdminRoute = pathname.startsWith("/dashboard");
-
-  // 🔒 Redirect to login if accessing protected route without token
-  if (isProtectedRoute && !token) {
-    console.log("🚫 No token - redirecting to login");
-    const loginUrl = new URL("/auth/login", request.url);
-    loginUrl.searchParams.set("from", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // 👑 Redirect if non-admin tries to access admin routes
-  if (isAdminRoute && token && user?.role !== "Admin") {
-    console.log("🚫 Non-admin accessing admin route");
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
-  }
-
-  // 🔄 Redirect authenticated users away from auth pages
-  if (isAuthRoute && token) {
-    console.log("✅ Authenticated user on auth page - redirecting to home");
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  // ✅ Allow access
   return NextResponse.next();
 }
 
-// Configure which paths the middleware should run on
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/schedule",
+    "/schedule/:path*",
+    "/notice",
+    "/notice/:path*",
+    "/booktrip",
+    "/booktrip/:path*",
+    "/profile",
+    "/profile/:path*",
+    "/dashboard",
+    "/dashboard/:path*",
+    "/auth/login",
+    "/auth/register",
   ],
 };

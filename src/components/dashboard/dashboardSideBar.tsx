@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/hooks/useAuth";
 import {
   BarChart,
   BellPlus,
@@ -71,6 +72,7 @@ const menuItems = [
 ];
 
 const DashboardSideBar = () => {
+  const { logout } = useAuth();
   const pathname = usePathname();
 
   const isActive = (link: string) => {
@@ -115,11 +117,16 @@ const DashboardSideBar = () => {
             Profile
           </Link>
         </button>
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg  hover:bg-accent/30 transition-all mt-2">
-          <Home className="w-5 h-5" />
-          <span className="font-medium">Go Home</span>
-        </button>
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-destructive hover:bg-destructive/10 transition-all mt-2">
+        <Link href={"/"}>
+          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg  hover:bg-accent/30 transition-all mt-2">
+            <Home className="w-5 h-5" />
+            <span className="font-medium">Go Home</span>
+          </button>
+        </Link>
+        <button
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-destructive hover:bg-destructive/10 transition-all mt-2"
+          onClick={logout}
+        >
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Logout</span>
         </button>

@@ -1,9 +1,12 @@
+"use client";
 import React from "react";
 import { Bell, Bus, LogOut, Search } from "lucide-react";
 import Logo from "../../../public/GUBLogo.svg";
 import Image from "next/image";
+import { useAuth } from "@/hooks/useAuth";
 
 const DashboardHader = () => {
+  const { logout } = useAuth();
   return (
     <header className="bg-white border-b border-border sticky top-0 z-40 shadow-sm h-[70px]">
       <div className="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
@@ -31,7 +34,10 @@ const DashboardHader = () => {
           </button>
 
           {/* Desktop Profile Menu - Visible on lg+ */}
-          <div className="hidden lg:flex items-center gap-2 ml-4 pl-4 border-l border-border">
+          <div
+            className="hidden lg:flex items-center gap-2 ml-4 pl-4 border-l border-border"
+            onClick={logout}
+          >
             <button className="p-2 hover:bg-destructive/10 rounded-lg transition-colors text-destructive">
               <LogOut className="w-5 h-5" />
             </button>

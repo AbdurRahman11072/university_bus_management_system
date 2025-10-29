@@ -15,9 +15,16 @@ import { Step1Form } from "./Step1Form";
 import { Step2Form } from "./Step2Form";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 export function MultiStepSignUp() {
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
+  if (isAuthenticated) {
+    router.push("/");
+    toast.info("Your already loged in");
+  }
+
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<UserFormData>({
     uId: 0,

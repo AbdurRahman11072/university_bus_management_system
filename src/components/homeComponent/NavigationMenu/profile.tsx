@@ -61,11 +61,12 @@ const Profile = () => {
           <span className="group-hover:text-gray-100">Transation</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator></DropdownMenuSeparator>
-        <DropdownMenuItem className="group group-hover:text-gray-100">
+        <DropdownMenuItem
+          className="group group-hover:text-gray-100"
+          onClick={logout}
+        >
           <LogOut className="text-red-600 " />{" "}
-          <span className="group-hover:text-gray-100" onClick={logout}>
-            Log Out
-          </span>
+          <span className="group-hover:text-gray-100">Log Out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -5,6 +5,8 @@ import { Card, CardContent } from "./ui/card";
 import axios from "axios";
 import axiosInstance from "@/hooks/axiosInstance";
 import { Spinner } from "./ui/spinner";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 const SchduleData = [
   {
@@ -74,6 +76,12 @@ const SchduleData = [
 const Schdule = () => {
   const [Data, setdata] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
+
+  if (!user) {
+    router.push("auth/login");
+  }
 
   useEffect(() => {
     setIsLoading(true);

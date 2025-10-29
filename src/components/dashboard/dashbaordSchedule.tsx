@@ -1,76 +1,9 @@
 "use client";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-
-import axios from "axios";
 import axiosInstance from "@/hooks/axiosInstance";
 import { Spinner } from "../ui/spinner";
 import { Card, CardContent } from "../ui/card";
-
-const SchduleData = [
-  {
-    route: 1,
-    buses: 3,
-    destination: ["Central Station", "Maple Avenue"],
-    departure: "08:00 AM",
-    arrivel: "08:45 AM",
-    status: "On time",
-  },
-  {
-    route: 2,
-    buses: 3,
-    destination: ["Downtown Plaza", "Riverfront Park", "Hillside Mall"],
-    departure: "09:15 AM",
-    arrivel: "10:30 AM",
-    status: "Late",
-  },
-  {
-    route: 3,
-    buses: 3,
-    destination: [
-      "North Terminal",
-      "Business District",
-      "Central Station",
-      "Airport Zone",
-    ],
-    departure: "11:00 AM",
-    arrivel: "12:45 PM",
-    status: "In jame",
-  },
-  {
-    route: 4,
-    buses: 3,
-    destination: ["Eastgate", "Westview"],
-    departure: "01:20 PM",
-    arrivel: "02:10 PM",
-    status: "On time",
-  },
-  {
-    route: 5,
-    buses: 3,
-    destination: ["Central Station", "University Campus", "Research Park"],
-    departure: "03:30 PM",
-    arrivel: "04:25 PM",
-    status: "Late",
-  },
-  {
-    route: 6,
-    buses: 3,
-    destination: [
-      "South Station",
-      "Shopping Mall",
-      "Entertainment District",
-      "Waterfront",
-      "South Station",
-      "Shopping Mall",
-      "Entertainment District",
-      "Waterfront",
-    ],
-    departure: "05:45 PM",
-    arrivel: "07:15 PM",
-    status: "In jame",
-  },
-];
 
 const DashboardSchdule = () => {
   const [Data, setdata] = useState([]);

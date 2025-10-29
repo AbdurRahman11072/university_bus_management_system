@@ -8,10 +8,16 @@ import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 // Adjust the import path as needed
 
 export default function LoginPage() {
-  const { login, isLoading } = useAuth();
+  const { login, isLoading, isAuthenticated } = useAuth();
+  const router = useRouter();
+  if (isAuthenticated) {
+    router.push("/");
+    toast.info("Your already loged in");
+  }
   const [errorMsg, setErrorMsg] = useState("");
   const [formData, setFormData] = useState({
     uId: "",

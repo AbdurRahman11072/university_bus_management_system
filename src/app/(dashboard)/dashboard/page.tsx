@@ -2,8 +2,10 @@
 
 import { StatCard } from "@/components/dashboard/star-card";
 import UsersPage from "@/components/dashboard/user/userPage";
+import { useAuth } from "@/hooks/useAuth";
 
 import { Users, DollarSign, Wrench, TrendingUp } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
   return (
