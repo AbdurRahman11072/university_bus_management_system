@@ -13,6 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ImageUpload } from "./ImageUpload";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 interface Step2FormProps {
   onSubmit: (data: Partial<UserFormData>) => void;
@@ -54,7 +56,6 @@ export function Step2Form({
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
-    // Ensure the number always starts with +8801
     if (!value.startsWith("+8801")) {
       setFormData((prev) => ({ ...prev, phone_number: "+8801" }));
       return;
@@ -85,57 +86,51 @@ export function Step2Form({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate phone number format and length
     const phoneRegex = /^\+8801\d{9}$/;
     if (!phoneRegex.test(formData.phone_number || "")) {
-      alert(
-        "Phone number must be in the format: +8801XXXXXXXXX (14 digits total, including +8801)"
+      toast.error(
+        "Phone number must be in the format: +8801XXXXXXXXX (14 digits total)"
       );
       return;
     }
 
-    // Validate required fields for Student role
     if (userRole === "Student") {
       if (!formData.batchNo) {
-        alert("Please enter your batch number");
+        toast.error("Please enter your batch number");
         return;
       }
       if (!formData.department) {
-        alert("Please select your department");
+        toast.error("Please select your department");
         return;
       }
     }
 
-    // Validate required fields for Teacher role
     if (userRole === "Teacher" && !formData.verificationImage) {
-      alert("Please upload teacher verification document");
+      toast.error("Please upload teacher verification document");
       return;
     }
 
-    // Validate required fields for Driver role
     if (userRole === "Driver") {
       if (!formData.verificationImage) {
-        alert("Please upload driver verification photo");
+        toast.error("Please upload driver verification photo");
         return;
       }
       if (!formData.driverLicence) {
-        alert("Please enter driver license number");
+        toast.error("Please enter driver license number");
         return;
       }
       if (!formData.licenceExpire) {
-        alert("Please select license expiry date");
+        toast.error("Please select license expiry date");
         return;
       }
     }
 
-    // Prepare the data to submit - only include fields that are relevant to the role
     const submitData: Partial<UserFormData> = {
       avatar_url: formData.avatar_url,
       phone_number: formData.phone_number,
       bloodGroup: formData.bloodGroup,
     };
 
-    // Add role-specific fields
     if (userRole === "Student") {
       submitData.batchNo = formData.batchNo;
       submitData.department = formData.department;
@@ -150,11 +145,9 @@ export function Step2Form({
       submitData.licenceExpire = formData.licenceExpire;
     }
 
-    console.log("Submitting data:", submitData);
     onSubmit(submitData);
   };
 
-  // Department options
   const departments = [
     "Computer Science and Engineering",
     "Electrical and Electronic Engineering",
@@ -168,14 +161,11 @@ export function Step2Form({
     "Environmental Science",
   ];
 
-  // Check if form is disabled based on role requirements
   const isFormDisabled = () => {
-    // Basic required fields for all roles
     if (!formData.phone_number || formData.phone_number.length !== 14) {
       return true;
     }
 
-    // Role-specific requirements
     if (userRole === "Student") {
       return !formData.batchNo || !formData.department;
     }
@@ -196,214 +186,255 @@ export function Step2Form({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-      {/* Avatar Upload */}
-      <div className="space-y-2">
-        <Label className="block text-sm font-medium">Profile Photo</Label>
-        <ImageUpload
-          onUploadComplete={handleAvatarUpload}
-          previewUrl={avatarUrl}
-          label="Drag & drop your profile photo here or click to browse"
-        />
-      </div>
-
-      {/* Phone Number */}
-      <div className="space-y-2">
-        <Label htmlFor="phone_number" className="block text-sm">
-          Phone Number *
-        </Label>
-        <div className="relative">
-          <Input
-            type="tel"
-            required
-            name="phone_number"
-            id="phone_number"
-            value={formData.phone_number || "+8801"}
-            onChange={handlePhoneNumberChange}
-            placeholder="+8801XXXXXXXXX"
-            className="pl-16"
-          />
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm pointer-events-none">
-            +8801
+    <motion.form
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      onSubmit={handleSubmit}
+      className="space-y-4"
+    >
+      {/* Compact Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Profile Photo - Now in first row */}
+        <div className="md:col-span-2 space-y-2">
+          <Label className="text-sm font-semibold text-foreground">
+            Profile Photo (Optional)
+          </Label>
+          <div className="h-24">
+            <ImageUpload
+              onUploadComplete={handleAvatarUpload}
+              previewUrl={avatarUrl}
+              label="Click to upload profile photo"
+              compact
+            />
           </div>
         </div>
-        <p className="text-xs text-gray-600">
-          Enter the remaining 9 digits of your phone number
+
+        {/* Phone Number */}
+        <div className="space-y-2">
+          <Label
+            htmlFor="phone_number"
+            className="text-sm font-semibold text-foreground"
+          >
+            Phone Number *
+          </Label>
+          <div className="relative">
+            <Input
+              type="tel"
+              required
+              name="phone_number"
+              id="phone_number"
+              value={formData.phone_number || "+8801"}
+              onChange={handlePhoneNumberChange}
+              placeholder="+8801XXXXXXXXX"
+              className="h-10 text-sm"
+            />
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm pointer-events-none"></div>
+          </div>
           {formData.phone_number && (
-            <span
-              className={`block ${
+            <p
+              className={`text-xs font-medium ${
                 formData.phone_number.length === 14
                   ? "text-green-600"
                   : "text-amber-600"
               }`}
             >
-              Full number: {formData.phone_number} (
-              {formData.phone_number.length - 5}/9 digits entered)
-              {formData.phone_number.length === 14 && " ✓ Complete"}
-            </span>
-          )}
-        </p>
-      </div>
-
-      {/* Blood Group */}
-      <div className="space-y-2">
-        <Label htmlFor="bloodGroup" className="block text-sm">
-          Blood Group *
-        </Label>
-        <Select
-          value={formData.bloodGroup}
-          onValueChange={handleBloodGroupChange}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select blood group" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="A+">A+</SelectItem>
-            <SelectItem value="A-">A-</SelectItem>
-            <SelectItem value="B+">B+</SelectItem>
-            <SelectItem value="B-">B-</SelectItem>
-            <SelectItem value="AB+">AB+</SelectItem>
-            <SelectItem value="AB-">AB-</SelectItem>
-            <SelectItem value="O+">O+</SelectItem>
-            <SelectItem value="O-">O-</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Student Specific Fields */}
-      {userRole === "Student" && (
-        <>
-          {/* Batch Number */}
-          <div className="space-y-2">
-            <Label htmlFor="batchNo" className="block text-sm">
-              Batch Number *
-            </Label>
-            <Input
-              type="text"
-              required
-              name="batchNo"
-              id="batchNo"
-              value={formData.batchNo || ""}
-              onChange={handleChange}
-              placeholder="Enter your batch number (e.g., 2023)"
-            />
-          </div>
-
-          {/* Department */}
-          <div className="space-y-2">
-            <Label htmlFor="department" className="block text-sm">
-              Department *
-            </Label>
-            <Select
-              value={formData.department}
-              onValueChange={handleDepartmentChange}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select your department" />
-              </SelectTrigger>
-              <SelectContent>
-                {departments.map((dept) => (
-                  <SelectItem key={dept} value={dept}>
-                    {dept}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </>
-      )}
-
-      {/* Teacher Verification */}
-      {userRole === "Teacher" && (
-        <div className="space-y-2 p-4 border border-dashed rounded-lg bg-muted/50">
-          <Label className="block text-sm font-medium">
-            Teacher Verification Document *
-          </Label>
-          <p className="text-xs text-muted-foreground mb-2">
-            Upload a photo of your faculty ID or verification document
-          </p>
-          <ImageUpload
-            onUploadComplete={handleVerificationImageUpload}
-            previewUrl={verificationImageUrl}
-            label="Drag & drop verification document here or click to browse"
-          />
-          {verificationImageUrl && (
-            <p className="text-xs text-green-600 mt-2">
-              ✓ Verification document uploaded successfully
+              {formData.phone_number.length === 14
+                ? "✓ Complete"
+                : `${formData.phone_number.length - 5}/9 digits`}
             </p>
           )}
         </div>
-      )}
 
-      {/* Driver Information */}
-      {userRole === "Driver" && (
-        <>
-          {/* Driver Photo Verification */}
-          <div className="space-y-2 p-4 border border-dashed rounded-lg bg-muted/50">
-            <Label className="block text-sm font-medium">
-              Driver Verification Photo *
+        {/* Blood Group */}
+        <div className="space-y-2">
+          <Label
+            htmlFor="bloodGroup"
+            className="text-sm font-semibold text-foreground"
+          >
+            Blood Group *
+          </Label>
+          <Select
+            value={formData.bloodGroup}
+            onValueChange={handleBloodGroupChange}
+          >
+            <SelectTrigger className="h-10 text-sm">
+              <SelectValue placeholder="Select blood group" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover border shadow-xl">
+              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(
+                (group) => (
+                  <SelectItem key={group} value={group} className="text-sm">
+                    {group}
+                  </SelectItem>
+                )
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Student Specific Fields */}
+        {userRole === "Student" && (
+          <>
+            <div className="space-y-2">
+              <Label
+                htmlFor="batchNo"
+                className="text-sm font-semibold text-foreground"
+              >
+                Batch Number *
+              </Label>
+              <Input
+                type="text"
+                required
+                name="batchNo"
+                id="batchNo"
+                value={formData.batchNo || ""}
+                onChange={handleChange}
+                placeholder="e.g., 2023"
+                className="h-10 text-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="department"
+                className="text-sm font-semibold text-foreground"
+              >
+                Department *
+              </Label>
+              <Select
+                value={formData.department}
+                onValueChange={handleDepartmentChange}
+              >
+                <SelectTrigger className="h-10 text-sm">
+                  <SelectValue placeholder="Select department" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border shadow-xl max-h-48">
+                  {departments.map((dept) => (
+                    <SelectItem key={dept} value={dept} className="text-sm">
+                      {dept}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        )}
+
+        {/* Teacher Verification */}
+        {userRole === "Teacher" && (
+          <div className="md:col-span-2 space-y-2">
+            <Label className="text-sm font-semibold text-foreground">
+              Teacher Verification *
             </Label>
-            <p className="text-xs text-muted-foreground mb-2">
-              Upload a clear photo of yourself for identification
-            </p>
-            <ImageUpload
-              onUploadComplete={handleVerificationImageUpload}
-              previewUrl={verificationImageUrl}
-              label="Drag & drop driver photo here or click to browse"
-            />
+            <div className="h-24">
+              <ImageUpload
+                onUploadComplete={handleVerificationImageUpload}
+                previewUrl={verificationImageUrl}
+                label="Click to upload verification document"
+                compact
+              />
+            </div>
             {verificationImageUrl && (
-              <p className="text-xs text-green-600 mt-2">
-                ✓ Driver photo uploaded successfully
+              <p className="text-xs text-green-600 font-medium">
+                ✓ Document uploaded
               </p>
             )}
           </div>
+        )}
 
-          <div className="space-y-2">
-            <Label htmlFor="driverLicence" className="block text-sm">
-              Driver License Number *
-            </Label>
-            <Input
-              type="text"
-              required
-              name="driverLicence"
-              id="driverLicence"
-              value={formData.driverLicence || ""}
-              onChange={handleChange}
-              placeholder="Enter your driver license number"
-            />
-          </div>
+        {/* Driver Information */}
+        {userRole === "Driver" && (
+          <>
+            <div className="md:col-span-2 space-y-2">
+              <Label className="text-sm font-semibold text-foreground">
+                Driver Verification Photo *
+              </Label>
+              <div className="h-24">
+                <ImageUpload
+                  onUploadComplete={handleVerificationImageUpload}
+                  previewUrl={verificationImageUrl}
+                  label="Click to upload driver photo"
+                  compact
+                />
+              </div>
+              {verificationImageUrl && (
+                <p className="text-xs text-green-600 font-medium">
+                  ✓ Photo uploaded
+                </p>
+              )}
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="licenceExpire" className="block text-sm">
-              License Expiry Date *
-            </Label>
-            <Input
-              type="date"
-              required
-              name="licenceExpire"
-              id="licenceExpire"
-              value={formData.licenceExpire || ""}
-              onChange={handleChange}
-              min={new Date().toISOString().split("T")[0]}
-            />
-          </div>
-        </>
-      )}
+            <div className="space-y-2">
+              <Label
+                htmlFor="driverLicence"
+                className="text-sm font-semibold text-foreground"
+              >
+                License Number *
+              </Label>
+              <Input
+                type="text"
+                required
+                name="driverLicence"
+                id="driverLicence"
+                value={formData.driverLicence || ""}
+                onChange={handleChange}
+                placeholder="Driver license number"
+                className="h-10 text-sm"
+              />
+            </div>
 
-      {/* Navigation Buttons */}
-      <div className="flex gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
+            <div className="space-y-2">
+              <Label
+                htmlFor="licenceExpire"
+                className="text-sm font-semibold text-foreground"
+              >
+                Expiry Date *
+              </Label>
+              <Input
+                type="date"
+                required
+                name="licenceExpire"
+                id="licenceExpire"
+                value={formData.licenceExpire || ""}
+                onChange={handleChange}
+                min={new Date().toISOString().split("T")[0]}
+                className="h-10 text-sm"
+              />
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Navigation Buttons - Fixed at bottom */}
+      <div className="flex gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           className="flex-1"
         >
-          Back
-        </Button>
-        <Button type="submit" className="flex-1" disabled={isFormDisabled()}>
-          Create Account
-        </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onBack}
+            className="w-full h-11 border-2 hover:bg-accent hover:text-accent-foreground transition-all duration-200"
+          >
+            ← Back
+          </Button>
+        </motion.div>
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="flex-1"
+        >
+          <Button
+            type="submit"
+            className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isFormDisabled()}
+          >
+            Create Account 🎉
+          </Button>
+        </motion.div>
       </div>
-    </form>
+    </motion.form>
   );
 }

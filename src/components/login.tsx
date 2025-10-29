@@ -82,7 +82,7 @@ export default function LoginPage() {
           <div className="mt-6 space-y-6">
             <div className="space-y-2">
               <Label htmlFor="uId" className="block text-sm">
-                User Id
+                User ID:
               </Label>
               <Input
                 type="text"

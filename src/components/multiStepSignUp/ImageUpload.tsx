@@ -2,17 +2,21 @@
 
 import { useState, useCallback, useId } from "react";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { Upload, X } from "lucide-react";
 
 interface ImageUploadProps {
   onUploadComplete: (url: string) => void;
   previewUrl: string;
   label: string;
+  compact?: boolean;
 }
 
 export function ImageUpload({
   onUploadComplete,
   previewUrl,
   label,
+  compact = false,
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -95,11 +99,79 @@ export function ImageUpload({
     }
   };
 
+  const clearImage = () => {
+    onUploadComplete("");
+  };
+
+  // Compact version for Step2Form
+  if (compact) {
+    return (
+      <div className="space-y-2">
+        {previewUrl ? (
+          <div className="relative">
+            <img
+              src={previewUrl}
+              alt="Preview"
+              className="w-16 h-16 rounded-lg object-cover border-2 border-primary/20"
+            />
+            <button
+              type="button"
+              onClick={clearImage}
+              className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 shadow-lg hover:bg-destructive/90 transition-colors"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+        ) : (
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`border-2 border-dashed rounded-lg cursor-pointer transition-colors duration-200 ${
+              dragOver
+                ? "border-primary bg-primary/10"
+                : "border-muted-foreground/25 hover:border-primary/50"
+            } ${isUploading ? "opacity-50" : ""}`}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+          >
+            <input
+              type="file"
+              id={fileInputId}
+              accept="image/*"
+              onChange={handleFileInput}
+              disabled={isUploading}
+              className="hidden"
+            />
+
+            <div
+              className="flex items-center justify-center p-3"
+              onClick={handleBrowseClick}
+            >
+              <div className="text-center">
+                <Upload className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
+                <span className="text-xs text-muted-foreground">{label}</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+        {isUploading && (
+          <div className="text-xs text-muted-foreground text-center">
+            Uploading...
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Original version (for reference or other uses)
   return (
     <div className="space-y-3">
       <div
         className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-          dragOver ? "border-blue-500 bg-blue-50" : "border-gray-300"
+          dragOver
+            ? "border-primary bg-primary/10"
+            : "border-muted-foreground/25"
         } ${isUploading ? "opacity-50" : ""}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -121,27 +193,33 @@ export function ImageUpload({
               alt="Preview"
               className="mx-auto h-32 w-32 object-cover rounded-lg"
             />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleBrowseClick}
-              disabled={isUploading}
-            >
-              Change Image
-            </Button>
-          </div>
-        ) : (
-          <div className="cursor-pointer">
-            <div className="space-y-2">
-              <div className="text-gray-600">
-                {isUploading ? "Uploading..." : label}
-              </div>
+            <div className="flex gap-2 justify-center">
               <Button
                 type="button"
                 variant="outline"
-                disabled={isUploading}
                 onClick={handleBrowseClick}
+                disabled={isUploading}
               >
+                Change Image
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={clearImage}
+                disabled={isUploading}
+              >
+                Remove
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="cursor-pointer" onClick={handleBrowseClick}>
+            <div className="space-y-2">
+              <Upload className="w-8 h-8 text-muted-foreground mx-auto" />
+              <div className="text-muted-foreground">
+                {isUploading ? "Uploading..." : label}
+              </div>
+              <Button type="button" variant="outline" disabled={isUploading}>
                 {isUploading ? "Uploading..." : "Browse Files"}
               </Button>
             </div>
