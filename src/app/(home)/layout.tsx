@@ -6,6 +6,7 @@ import Header from "@/components/homeComponent/NavigationMenu/header";
 import Footer2 from "@/components/homeComponent/footer2";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/lib/AuthContext";
+import ProtectedSurvey from "@/hooks/protecedtSurvey";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,10 +34,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased  mb-10 lg:mb-0`}
       >
         <AuthProvider>
-          <Header />
-          <main className="mx-auto ">{children}</main>
-          <Toaster />
-          <Footer2 />
+          <ProtectedSurvey>
+            <Header />
+            <main className="mx-auto ">{children}</main>
+            <Toaster />
+            <Footer2 />
+          </ProtectedSurvey>
         </AuthProvider>
       </body>
     </html>

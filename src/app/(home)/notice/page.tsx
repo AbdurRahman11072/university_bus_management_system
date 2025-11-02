@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Bell, Eye, Calendar, Users, Filter, Sparkles } from "lucide-react";
 
 interface Notice {
   id: string;
@@ -83,36 +85,6 @@ export default function NoticeComponent({
     }
   };
 
-  const markAsSeen = async (noticeId: string) => {
-    if (!currentUserId) return;
-
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/v1/notice/mark-as-seen/${noticeId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId: currentUserId }),
-        }
-      );
-
-      if (response.ok) {
-        // Update local state
-        setNotices(
-          notices.map((notice) =>
-            notice.id === noticeId
-              ? { ...notice, seen: [...notice.seen, currentUserId] }
-              : notice
-          )
-        );
-      }
-    } catch (error) {
-      console.error("Error marking notice as seen:", error);
-    }
-  };
-
   // Filter notices based on user role
   const filteredNotices = notices.filter((notice) => {
     if (!currentUserRole) return false;
@@ -133,15 +105,30 @@ export default function NoticeComponent({
   const getNoticeColor = (noticeFor: string) => {
     switch (noticeFor) {
       case "Student":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-blue-500/10 text-blue-600 border-blue-200 dark:bg-blue-500/20 dark:text-blue-400";
       case "Teacher":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-green-500/10 text-green-600 border-green-200 dark:bg-green-500/20 dark:text-green-400";
       case "Driver":
-        return "bg-orange-100 text-orange-800 border-orange-200";
+        return "bg-orange-500/10 text-orange-600 border-orange-200 dark:bg-orange-500/20 dark:text-orange-400";
       case "All User":
-        return "bg-purple-100 text-purple-800 border-purple-200";
+        return "bg-purple-500/10 text-purple-600 border-purple-200 dark:bg-purple-500/20 dark:text-purple-400";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-500/10 text-gray-600 border-gray-200 dark:bg-gray-500/20 dark:text-gray-400";
+    }
+  };
+
+  const getNoticeIcon = (noticeFor: string) => {
+    switch (noticeFor) {
+      case "Student":
+        return "🎓";
+      case "Teacher":
+        return "👨‍🏫";
+      case "Driver":
+        return "🚌";
+      case "All User":
+        return "👥";
+      default:
+        return "📢";
     }
   };
 
@@ -166,145 +153,162 @@ export default function NoticeComponent({
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 h-[90vh]">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Notices</h1>
-          <p className="text-muted-foreground mt-1">
-            Notices relevant to {currentUserRole}s
-          </p>
+    <div className="max-w-6xl mx-auto p-6 min-h-[90vh]">
+      {/* Header Section */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-gradient-to-r from-primary to-accent rounded-2xl">
+              <Bell className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Notices & Announcements
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Stay updated with the latest information for{" "}
+                {currentUserRole.toLowerCase()}s
+              </p>
+            </div>
+          </div>
+
+          {/* Filter Buttons */}
         </div>
 
-        <div className="flex gap-2 mt-4 sm:mt-0">
-          <Button
-            variant={filter === "all" ? "default" : "outline"}
-            onClick={() => setFilter("all")}
-            size="sm"
-          >
-            All Notices
-          </Button>
-          <Button
-            variant={filter === "unseen" ? "default" : "outline"}
-            onClick={() => setFilter("unseen")}
-            size="sm"
-          >
-            Unread Only
-          </Button>
-        </div>
-      </div>
+        {/* Stats Card */}
+      </motion.div>
 
-      <div className="space-y-4">
+      {/* Notices Grid */}
+      <AnimatePresence>
         {filteredNotices.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center text-muted-foreground py-8">
-                {filter === "unseen"
-                  ? "No unread notices"
-                  : "No notices available for your role"}
-              </div>
-            </CardContent>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-16"
+          >
+            <div className="w-24 h-24 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+              <Bell className="w-10 h-10 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">
+              No Notices Available
+            </h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              {filter === "unseen"
+                ? "You're all caught up! No unread notices at the moment."
+                : "No notices are currently available for your role. Check back later!"}
+            </p>
+          </motion.div>
         ) : (
-          filteredNotices.map((notice) => {
-            const isUnseen = currentUserId
-              ? !notice.seen.includes(currentUserId)
-              : false;
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {filteredNotices.map((notice, index) => {
+              const isUnseen = currentUserId
+                ? !notice.seen.includes(currentUserId)
+                : false;
 
-            return (
-              <Card
-                key={notice.id}
-                className={`border-l-4 transition-all duration-200 ${
-                  isUnseen
-                    ? "border-l-blue-500 bg-blue-50/50 hover:bg-blue-50 shadow-sm"
-                    : "border-l-gray-300 hover:shadow-md"
-                }`}
-              >
-                <CardContent className="pt-6">
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                    <div className="flex-1 space-y-3">
-                      <div className="flex flex-wrap items-center gap-2">
+              return (
+                <motion.div
+                  key={notice.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  layout
+                >
+                  <Card
+                    className={`h-full transition-all duration-300 hover:shadow-lg border-l-4 ${
+                      isUnseen
+                        ? "border-l-primary bg-gradient-to-r from-primary/5 to-transparent"
+                        : "border-l-muted-foreground/30"
+                    } hover:scale-[1.02] group`}
+                  >
+                    <CardContent className="p-6">
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl">
+                            {getNoticeIcon(notice.noticeFor)}
+                          </span>
+                          <Badge
+                            variant="secondary"
+                            className={getNoticeColor(notice.noticeFor)}
+                          >
+                            {notice.noticeFor === "All User"
+                              ? "Everyone"
+                              : notice.noticeFor}
+                          </Badge>
+                        </div>
+                        {isUnseen && (
+                          <div className="flex items-center gap-1">
+                            <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                            <span className="text-xs text-primary font-medium">
+                              New
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="space-y-3">
                         <h3
-                          className={`font-semibold text-lg ${
-                            isUnseen ? "text-blue-900" : "text-foreground"
+                          className={`font-bold text-lg leading-tight group-hover:text-primary transition-colors ${
+                            isUnseen ? "text-foreground" : "text-foreground/80"
                           }`}
                         >
                           {notice.subject}
-                          {isUnseen && (
-                            <span className="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                          )}
                         </h3>
 
-                        <div className="flex flex-wrap gap-2">
-                          <Badge className={getNoticeColor(notice.noticeFor)}>
-                            {notice.noticeFor === "All User"
-                              ? "For Everyone"
-                              : `For ${notice.noticeFor}s`}
-                          </Badge>
+                        <p className="text-muted-foreground leading-relaxed line-clamp-3">
+                          {notice.description}
+                        </p>
+                      </div>
 
-                          {isUnseen && (
-                            <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                              New
-                            </Badge>
-                          )}
+                      {/* Footer */}
+                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>
+                              {new Date(notice.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Eye className="w-3 h-3" />
+                            <span>{notice.seen.length}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Users className="w-3 h-3" />
+                          <span>Seen</span>
                         </div>
                       </div>
-
-                      <p
-                        className={`leading-relaxed ${
-                          isUnseen ? "text-blue-800" : "text-muted-foreground"
-                        }`}
-                      >
-                        {notice.description}
-                      </p>
-
-                      <div className="flex flex-wrap items-center gap-4 text-sm">
-                        <span
-                          className={
-                            isUnseen ? "text-blue-700" : "text-muted-foreground"
-                          }
-                        >
-                          {new Date(notice.createdAt).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}
-                        </span>
-
-                        <span className="text-xs text-muted-foreground">
-                          Seen by {notice.seen.length} users
-                        </span>
-                      </div>
-                    </div>
-
-                    {isUnseen && (
-                      <Button
-                        onClick={() => markAsSeen(notice.id)}
-                        variant="outline"
-                        size="sm"
-                        className="whitespace-nowrap"
-                      >
-                        Mark as Read
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
         )}
-      </div>
+      </AnimatePresence>
 
-      <div className="mt-6 text-center text-sm text-muted-foreground">
-        Showing {filteredNotices.length} notice
-        {filteredNotices.length !== 1 ? "s" : ""}
-        {filter === "unseen" && " (unread only)"}
-        {currentUserRole && ` for ${currentUserRole}s`}
-      </div>
+      {/* Footer */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="mt-8 text-center"
+      >
+        <p className="text-sm text-muted-foreground">
+          Showing {filteredNotices.length} notice
+          {filteredNotices.length !== 1 ? "s" : ""}
+          {filter === "unseen" && " (unread only)"}
+          {currentUserRole &&
+            ` • Filtered for ${currentUserRole.toLowerCase()}s`}
+        </p>
+      </motion.div>
     </div>
   );
 }

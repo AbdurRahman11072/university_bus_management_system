@@ -22,6 +22,7 @@ import {
   Shield,
   Bell,
   HelpCircle,
+  NotebookPen,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -171,29 +172,22 @@ const Profile = () => {
 
         {/* Main Menu Items */}
         <div className="p-1">
-          <DropdownMenuItem className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-accent hover:text-white transition-all duration-200 group">
-            <Link href="/profile" className="flex items-center w-full">
-              <User className="h-4 w-4 mr-3 text-gray-600 group-hover:text-white" />
-              <span className="font-medium">My Profile</span>
-            </Link>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-accent hover:text-white transition-all duration-200 group">
-            <Link href="/transactions" className="flex items-center w-full">
-              <CreditCard className="h-4 w-4 mr-3 text-gray-600 group-hover:text-white" />
-              <span className="font-medium">Transactions</span>
-            </Link>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-accent hover:text-white transition-all duration-200 group">
-            <Link href="/notifications" className="flex items-center w-full">
-              <Bell className="h-4 w-4 mr-3 text-gray-600 group-hover:text-white" />
-              <span className="font-medium">Notifications</span>
-              <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1">
-                3
-              </span>
-            </Link>
-          </DropdownMenuItem>
+          {LoginUser?.roles === "Student" && (
+            <DropdownMenuItem className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-accent hover:text-white transition-all duration-200 group">
+              <Link href="/transactions" className="flex items-center w-full">
+                <CreditCard className="h-4 w-4 mr-3 text-gray-600 group-hover:text-white" />
+                <span className="font-medium">Transactions</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
+          {LoginUser?.roles === "Teacher" && (
+            <DropdownMenuItem className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-accent hover:text-white transition-all duration-200 group">
+              <Link href="/transactions" className="flex items-center w-full">
+                <CreditCard className="h-4 w-4 mr-3 text-gray-600 group-hover:text-white" />
+                <span className="font-medium">Transactions</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
 
           {/* Admin Dashboard */}
           {LoginUser?.roles === "Admin" && (
@@ -209,17 +203,6 @@ const Profile = () => {
           )}
 
           {/* Driver Specific Menu */}
-          {LoginUser?.roles === "Driver" && (
-            <DropdownMenuItem className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-accent hover:text-white transition-all duration-200 group">
-              <Link href="/driver" className="flex items-center w-full">
-                <LayoutDashboard className="h-4 w-4 mr-3 text-gray-600 group-hover:text-white" />
-                <span className="font-medium">Driver Portal</span>
-                <span className="ml-auto bg-blue-100 text-blue-800 text-xs rounded-full px-2 py-1">
-                  Driver
-                </span>
-              </Link>
-            </DropdownMenuItem>
-          )}
         </div>
 
         <DropdownMenuSeparator className="bg-gray-200" />
@@ -230,13 +213,6 @@ const Profile = () => {
             <Link href="/help" className="flex items-center w-full">
               <HelpCircle className="h-4 w-4 mr-3 text-gray-600 group-hover:text-white" />
               <span className="font-medium">Help & Support</span>
-            </Link>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-accent hover:text-white transition-all duration-200 group">
-            <Link href="/settings" className="flex items-center w-full">
-              <Cog className="h-4 w-4 mr-3 text-gray-600 group-hover:text-white" />
-              <span className="font-medium">Settings</span>
             </Link>
           </DropdownMenuItem>
         </div>
@@ -256,7 +232,7 @@ const Profile = () => {
         <div className="px-4 py-2 bg-gray-50 rounded-b-xl">
           <div className="flex justify-between items-center text-xs text-gray-500">
             <span>v1.0.0</span>
-            <span>© 2024 GUB</span>
+            <span>© 2025 GUB</span>
           </div>
         </div>
       </DropdownMenuContent>

@@ -11,12 +11,22 @@ export interface RegisterCredentials {
 }
 
 export interface User {
-  id: string;
+  _id: string;
   uId: string;
   name?: string;
   email: string;
-  roles: string;
+  roles: "Student" | "Teacher" | "Driver" | "Admin";
   department: string;
+  username: string;
+  password: string;
+  bloodGroup: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
+  batchNo?: string;
+  avatar_url?: string;
+  verificationImage?: string;
+  phone_number?: string;
+  driverLicence?: string;
+  licenceExpire?: string;
+  createdAt: string;
 }
 
 export interface AuthState {
@@ -24,4 +34,5 @@ export interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  initialCheckComplete: boolean;
 }

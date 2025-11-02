@@ -18,7 +18,7 @@ const Slider = () => {
     return () => clearInterval(interval);
   }, []);
   return (
-    <section className="relative w-[90%] h-[100vh] mx-auto overflow-hidden rounded-lg">
+    <section className="container relative w-[90%] h-[100vh] mx-auto overflow-hidden rounded-lg">
       {sliderImages.map((src, index) => (
         <div
           key={index}

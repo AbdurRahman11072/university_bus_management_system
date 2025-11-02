@@ -6,6 +6,7 @@ import {
   BellPlus,
   BookCopy,
   Bus,
+  BusIcon,
   Calendar,
   FileText,
   Home,
@@ -58,16 +59,22 @@ const menuItems = [
     link: "/dashboard/maintenance",
   },
   {
+    id: "booktrip",
+    label: "Trip Request",
+    icon: BusIcon,
+    link: "/dashboard/book-trip",
+  },
+  {
     id: "notices",
     label: "Notices",
     icon: BellPlus,
     link: "/dashboard/notices",
   },
   {
-    id: "gps-tracking",
-    label: "GPS Tracking",
-    icon: Navigation,
-    link: "/dashboard/gps-tracking",
+    id: "transaction",
+    label: "All Transaction",
+    icon: BellPlus,
+    link: "/dashboard/transaction",
   },
 ];
 

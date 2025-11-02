@@ -15,6 +15,7 @@ type Bus = {
   busRoute: string;
   busDestination: string[];
   busDriverId: string;
+  busIpAddress: string;
   busDepartureTime: string;
   busDepartureTime2: string;
   busArrivalTime: string;
@@ -116,16 +117,16 @@ const ScheduleDetails = ({ busData, slug }: Sprops) => {
                 <DriverDetails id={data.busDriverId} />
               </div>
             </CardContent>
+            <FullscreenMapModal
+              ipAddress={data.busIpAddress}
+              busId="001"
+              busName="Express Route A"
+              isOpen={isMapOpen}
+              onClose={() => setIsMapOpen(false)}
+            />
           </Card>
         ))}
       </div>
-      <FullscreenMapModal
-        ipAddress={busIpAddress}
-        busId="001"
-        busName="Express Route A"
-        isOpen={isMapOpen}
-        onClose={() => setIsMapOpen(false)}
-      />
     </div>
   );
 };

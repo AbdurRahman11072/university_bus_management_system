@@ -68,7 +68,7 @@ export function MultiStepSignUp() {
 
       if (response.ok) {
         toast.success("🎉 Account created successfully!");
-        router.push("/login");
+        router.push(`/auth/login`);
       } else {
         toast.error("Registration failed. Please try again.");
       }

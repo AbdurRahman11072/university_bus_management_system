@@ -29,14 +29,18 @@ export interface FormStep1Data {
 }
 
 export type UserTypes = {
-  uId: number;
+  _id: string;
+  uId: string;
   username: string;
-  password: string;
-  bloodGroup: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
+  email: string;
   roles: "Student" | "Teacher" | "Driver" | "Admin";
-  avatar_url?: string;
-  verificationImage?: string;
   phone_number?: string;
+  bloodGroup?: string;
+  avatar_url?: string;
+  batchNo?: string;
+  department?: string;
   driverLicence?: string;
   licenceExpire?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };

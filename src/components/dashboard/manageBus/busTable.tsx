@@ -22,6 +22,7 @@ export interface BusData {
   busImg: string;
   busDestination: string[];
   busDriverId: string;
+  busIpAddress?: string;
   busDepartureTime: string;
   busArrivalTime: string;
   busDepartureTime2: string;

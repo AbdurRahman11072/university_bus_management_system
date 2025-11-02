@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import BusTable from "./busTable";
-import { BusModal } from "./bus-form";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import { BusModal } from "./bus-form";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 // Update your BusData type to include _id
 export interface BusData {
@@ -33,6 +35,7 @@ export default function ManageBusPage() {
   const [buses, setBuses] = useState<BusData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchBuses();
@@ -127,7 +130,20 @@ export default function ManageBusPage() {
               Manage and monitor your bus fleet
             </p>
           </div>
-          <BusModal />
+          <div>
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 py-2 h-auto"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Bus
+            </Button>
+
+            <BusModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+            />
+          </div>
         </div>
 
         {loading && (
