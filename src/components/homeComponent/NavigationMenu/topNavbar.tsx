@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+
 import Link from "next/link";
 import React, { useState } from "react";
 import Logo from "../../../../public/GUBLogo.svg";
@@ -21,6 +22,9 @@ import { Button } from "../../ui/button";
 import Profile from "./profile";
 import { useAuth } from "@/hooks/useAuth";
 import { usePathname } from "next/navigation"; // Import usePathname
+import ScrollVelocity from "@/components/ScrollVelocity";
+import AutoTextScrolling from "../auto-text-scrolling";
+import TextMarquee from "../text-marquee";
 
 const menu = [
   {
@@ -59,6 +63,14 @@ interface BusSearchResult {
   startingPoint?: string;
   rating?: number;
 }
+const announcementTexts = [
+  "🚌 Book your tickets now! Special discounts available",
+  "🌟 New routes added: Downtown Express & Airport Shuttle",
+  "📱 Download our mobile app for exclusive offers",
+  "🎫 Group bookings available with 20% discount",
+  "⏰ Early bird special: Book 3 days in advance and save!",
+  "🔒 Safe and comfortable travel guaranteed",
+];
 
 const TopNavbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -116,14 +128,6 @@ const TopNavbar = () => {
     setSearchError("");
   };
 
-  const getBusImage = (bus: BusSearchResult) => {
-    return bus.busImage || "/api/placeholder/300/200";
-  };
-
-  const formatTime = (time: string) => {
-    return time; // You can add time formatting logic here
-  };
-
   // Function to check if a menu item is active
   const isActive = (path: string) => {
     if (path === "/") {
@@ -172,6 +176,9 @@ const TopNavbar = () => {
               </InputGroupAddon>
             </InputGroup>
           </form>
+        </div>
+        <div className="w-[40vw] overflow-hidden">
+          <TextMarquee texts={announcementTexts} />
         </div>
 
         <div className="flex items-center gap-3 text-xl">

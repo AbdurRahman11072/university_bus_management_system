@@ -27,7 +27,6 @@ const ManageDrivers = () => {
               Add, edit, or delete drivers
             </p>
           </div>
-          <DriverModal />
         </div>
 
         <DriverCards />

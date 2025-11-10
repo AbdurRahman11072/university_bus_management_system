@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   UserFormData,
   FormStep1Data,
@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Cookies from "js-cookie";
 
 export function MultiStepSignUp() {
   const { isAuthenticated } = useAuth();
@@ -65,10 +66,12 @@ export function MultiStepSignUp() {
           body: JSON.stringify(finalData),
         }
       );
-
+      const { email } = finalData;
       if (response.ok) {
         toast.success("🎉 Account created successfully!");
-        router.push(`/auth/login`);
+        Cookies.set("verification-email", email);
+
+        router.push(`/auth/email-verification`);
       } else {
         toast.error("Registration failed. Please try again.");
       }

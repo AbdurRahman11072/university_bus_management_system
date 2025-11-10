@@ -6,6 +6,8 @@ import bg1 from "@/assets/bg-1.jpg";
 import bg2 from "@/assets/bg-2.jpg";
 import bg3 from "@/assets/bg-3.jpg";
 import bg4 from "@/assets/bg-4.jpg";
+import Link from "next/link";
+import Slider from "./slider";
 
 interface Slide {
   id: number;
@@ -22,6 +24,7 @@ const slides = [
     title: "Safe & Reliable Bus Services For GUB Students",
     subtitle: "Book your ride effortlessly & travel with ease",
     buttonText: "Book Now",
+    link: "/book-trip/book-bus",
   },
   {
     id: 2,
@@ -29,6 +32,7 @@ const slides = [
     title: "Comfortable Journey Every Time",
     subtitle: "Experience premium comfort on every ride",
     buttonText: "Explore Routes",
+    link: "/schedule",
   },
   {
     id: 3,
@@ -36,6 +40,7 @@ const slides = [
     title: "On-Time Delivery Guaranteed",
     subtitle: "We value your time and commitment",
     buttonText: "Get Started",
+    link: "/auth/login",
   },
 ];
 
@@ -94,9 +99,11 @@ export default function HeroSlider() {
                 </p>
 
                 {/* CTA Button */}
-                <button className="px-6 sm:px-8 py-2.5 sm:py-3 bg-accent hover:bg-accent/60 text-white font-semibold rounded-full transition-colors duration-300 text-sm sm:text-base">
-                  {slide.buttonText}
-                </button>
+                <Link href={`${slide.link}`}>
+                  <button className="px-6 sm:px-8 py-2.5 sm:py-3 bg-accent hover:bg-accent/60 text-white font-semibold rounded-full transition-colors duration-300 text-sm sm:text-base">
+                    {slide.buttonText}
+                  </button>
+                </Link>
               </div>
             </div>
           </div>

@@ -83,10 +83,10 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
       </div>
 
       <Button
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/auth/email-verification")}
         className="bg-primary hover:bg-primary/90 text-white"
       >
-        Go To Home Menu
+        Verify Email
       </Button>
     </div>
   );

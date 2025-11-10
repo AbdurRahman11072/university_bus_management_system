@@ -9,8 +9,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Clock, MapPin, GraduationCap, ArrowRight } from "lucide-react";
-import React from "react";
+import {
+  Clock,
+  MapPin,
+  GraduationCap,
+  ArrowRight,
+  RefreshCw,
+} from "lucide-react";
+import React, { useState, useEffect } from "react";
 import { SurveyData } from "./surveyMain";
 
 interface SurveyFormProps {
@@ -20,12 +26,108 @@ interface SurveyFormProps {
   onNextStep: () => void;
 }
 
+interface BusInfo {
+  _id: string;
+  busId: string;
+  busName: string;
+  busRoute: string;
+  busImg: string;
+  busDestination: string[];
+  busDriverId: string;
+  busDepartureTime: string;
+  busArrivalTime: string;
+  busDepartureTime2: string;
+  busArrivalTime2: string;
+  busIpAddress: string;
+  busStatus: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+interface ApiResponse {
+  status: string;
+  message: string;
+  data: BusInfo[];
+}
+
 const SurveyForm: React.FC<SurveyFormProps> = ({
   formData,
   setFormData,
   user,
   onNextStep,
 }) => {
+  const [busRoutes, setBusRoutes] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch bus routes from API
+  const fetchBusRoutes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log("Fetching bus routes from API...");
+      const response = await fetch(
+        "http://localhost:5000/api/v1/bus/get-bus-info",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const apiResponse: ApiResponse = await response.json();
+      console.log("Received API response:", apiResponse);
+
+      if (!apiResponse.data || !Array.isArray(apiResponse.data)) {
+        throw new Error("Invalid data format: expected data array");
+      }
+
+      // Extract unique bus routes from the data array
+      const routes = apiResponse.data
+        .map((bus) => bus.busRoute)
+        .filter((route) => route != null && route.toString().trim() !== "")
+        .map((route) => route.toString());
+
+      const uniqueRoutes = Array.from(new Set(routes)).sort((a, b) => {
+        // Sort routes numerically if they're numbers, otherwise alphabetically
+        const numA = parseInt(a);
+        const numB = parseInt(b);
+        if (!isNaN(numA) && !isNaN(numB)) {
+          return numA - numB;
+        }
+        return a.localeCompare(b);
+      });
+
+      console.log("Extracted unique routes:", uniqueRoutes);
+      setBusRoutes(uniqueRoutes);
+
+      if (uniqueRoutes.length === 0) {
+        setError("No bus routes found in the system.");
+      }
+    } catch (err) {
+      console.error("Error fetching bus routes:", err);
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      setError(`Failed to load bus routes: ${errorMessage}`);
+      setBusRoutes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBusRoutes();
+  }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -49,6 +151,11 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
       "classEndTime",
     ];
     return requiredFields.every((field) => formData[field as keyof SurveyData]);
+  };
+
+  // Retry function
+  const handleRetry = () => {
+    fetchBusRoutes();
   };
 
   return (
@@ -79,7 +186,7 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
         </Select>
       </div>
 
-      {/* Destination */}
+      {/* Destination - Updated to use Select with bus routes */}
       <div className="space-y-3">
         <Label
           htmlFor="destination"
@@ -88,16 +195,51 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
           <MapPin className="h-4 w-4 text-green-600" />
           Preferred Bus Route
         </Label>
-        <Input
-          type="text"
-          required
-          name="destination"
-          id="destination"
-          value={formData.destination}
-          onChange={handleInputChange}
-          placeholder="Enter your preferred destination.. (ecg. Route 1)"
-          className="w-full"
-        />
+
+        {loading ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <RefreshCw className="h-4 w-4 animate-spin" />
+            Loading bus routes...
+          </div>
+        ) : error ? (
+          <div className="space-y-2">
+            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+              {error}
+            </div>
+            <Button
+              type="button"
+              onClick={handleRetry}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Try Again
+            </Button>
+          </div>
+        ) : (
+          <Select
+            value={formData.destination}
+            onValueChange={(value) => handleSelectChange("destination", value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select your preferred bus route" />
+            </SelectTrigger>
+            <SelectContent>
+              {busRoutes.length > 0 ? (
+                busRoutes.map((route) => (
+                  <SelectItem key={route} value={route}>
+                    Route {route}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="no-routes" disabled>
+                  No bus routes available
+                </SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       {/* Class Times */}

@@ -22,6 +22,7 @@ export interface User {
   bloodGroup: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
   batchNo?: string;
   avatar_url?: string;
+  isVerified: boolean;
   verificationImage?: string;
   phone_number?: string;
   driverLicence?: string;

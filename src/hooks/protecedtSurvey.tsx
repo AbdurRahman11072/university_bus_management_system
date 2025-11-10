@@ -32,8 +32,10 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
   console.log("  - pathname:", pathname);
   console.log("  - isPublicRoute:", isPublicRoute);
   console.log("  - isAuthRoute:", isAuthRoute);
+
   console.log("  - user:", user);
   console.log("  - user role:", user?.roles);
+  console.log("  - user isVerified:", user?.isVerified);
   console.log("  - hasCompletedSurvey:", hasCompletedSurvey);
   console.log("  - isAdmin:", isAdmin);
   console.log("  - isDriver:", isDriver);
@@ -66,10 +68,17 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
       return;
     }
 
-    // If user has special role, allow access to all routes
+    // Check email verification for all authenticated users (except special roles)
+    if (user && !user.isVerified && !hasSpecialRole) {
+      console.log("📧 User not verified, redirecting to email verification");
+      router.push("/auth/email-verification");
+      return;
+    }
+
+    // If user has special role, allow access to all routes (bypass email verification)
     if (hasSpecialRole) {
       console.log(
-        "⭐ Special role user (Admin/Driver) - allowing access to all routes"
+        "⭐ Special role user (Admin/Driver) - allowing access to all routes (bypasses email verification)"
       );
       // Special role users can access everything, no redirects needed
       return;
@@ -78,7 +87,7 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
     console.log("👤 Regular user - applying survey rules");
 
     // Regular user exists but no survey - only allow survey route
-    if (!hasCompletedSurvey && !isSurveyRoute) {
+    if (!hasCompletedSurvey && !isSurveyRoute && user.isVerified) {
       console.log(
         "📝 Regular user hasn't completed survey, redirecting to survey"
       );
@@ -87,7 +96,7 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
     }
 
     // Regular USER CAN NEVER USE SURVEY ROUTE AGAIN AFTER COMPLETION
-    if (hasCompletedSurvey && isSurveyRoute) {
+    if (hasCompletedSurvey && isSurveyRoute && user.isVerified) {
       console.log("🚫 Survey already completed - permanent redirect to home");
       router.push("/");
       return;
@@ -132,7 +141,13 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
     return null;
   }
 
-  // If user has special role, allow access to all routes
+  // Check email verification in the render logic as well
+  if (user && !user.isVerified && !hasSpecialRole) {
+    console.log("📧 Render blocking - user not verified");
+    return null;
+  }
+
+  // If user has special role, allow access to all routes (bypass email verification)
   if (hasSpecialRole) {
     console.log("⭐ Special role user - allowing access to all routes");
     return <>{children}</>;

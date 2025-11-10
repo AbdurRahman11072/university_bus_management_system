@@ -1,566 +1,458 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
-import React, { useState, useEffect } from "react";
-import {
-  Bus,
-  Calendar,
-  MapPin,
-  Users,
-  BookOpen,
-  Clock,
-  Shield,
-  CheckCircle,
-  X,
-  Clock4,
-} from "lucide-react";
-import { toast } from "sonner";
 
-// Define the form data type based on your schema
-interface BusBookingFormData {
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+
+interface BusBooking {
+  uId: string;
+  userEmail: string;
+  userName: string;
   bookingSubject: string;
   bookingDescription: string;
-  bookingDate: string;
   bookingTime: string;
-  studentCount: string;
-  destination: string;
-  additionalRequirements: string;
+  bookingDate: string;
+  feedback?: string;
+  status: "Accepted" | "Rejected" | "Pending";
 }
 
-interface ApiResponse {
-  status: string;
-  message: string;
-  data: any;
-}
-
-const BookTripPage = () => {
+const BusBookingDetails = () => {
   const { user } = useAuth();
-  const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
-  const [submittedData, setSubmittedData] = useState<any>(null);
-  const [formData, setFormData] = useState<BusBookingFormData>({
-    bookingSubject: "",
-    bookingDescription: "",
-    bookingDate: "",
-    bookingTime: "",
-    studentCount: "",
-    destination: "",
-    additionalRequirements: "",
-  });
+  const [bookings, setBookings] = useState<BusBooking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedFeedback, setSelectedFeedback] = useState<string | null>(null);
 
-  // Use useEffect for redirect to avoid rendering issues
   useEffect(() => {
-    if (!user) {
-      router.push("/auth/login");
-    }
-  }, [user, router]);
+    const fetchBusBookings = async () => {
+      if (!user?.uId) {
+        setError("User not authenticated");
+        setLoading(false);
+        return;
+      }
 
-  // Don't render if user is not authenticated
-  if (!user) {
-    return null;
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch(
+          "http://localhost:5000/api/v1/bus-booking/get-bus-booking-by-uId",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ uId: user.uId }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch bookings: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setBookings(data.data || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBusBookings();
+  }, [user?.uId]);
+
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case "Accepted":
+        return {
+          bg: "bg-emerald-50 dark:bg-emerald-950/20",
+          text: "text-emerald-700 dark:text-emerald-300",
+          border: "border-emerald-200 dark:border-emerald-800",
+          icon: (
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+          ),
+        };
+      case "Rejected":
+        return {
+          bg: "bg-rose-50 dark:bg-rose-950/20",
+          text: "text-rose-700 dark:text-rose-300",
+          border: "border-rose-200 dark:border-rose-800",
+          icon: (
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          ),
+        };
+      case "Pending":
+        return {
+          bg: "bg-amber-50 dark:bg-amber-950/20",
+          text: "text-amber-700 dark:text-amber-300",
+          border: "border-amber-200 dark:border-amber-800",
+          icon: (
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                clipRule="evenodd"
+              />
+            </svg>
+          ),
+        };
+      default:
+        return {
+          bg: "bg-gray-50 dark:bg-gray-800",
+          text: "text-gray-700 dark:text-gray-300",
+          border: "border-gray-200 dark:border-gray-700",
+          icon: null,
+        };
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const formatTime = (timeString: string) => {
+    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-lg font-medium text-foreground">
+            Loading your bookings
+          </p>
+          <p className="text-muted-foreground mt-2">
+            Please wait while we fetch your details
+          </p>
+        </div>
+      </div>
+    );
   }
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  if (error) {
+    return (
+      <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-6 text-center backdrop-blur-sm">
+        <div className="w-12 h-12 bg-destructive/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg
+            className="w-6 h-6 text-destructive"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <p className="text-lg font-medium text-destructive-foreground mb-2">
+          Error loading bookings
+        </p>
+        <p className="text-sm text-muted-foreground">{error}</p>
+      </div>
+    );
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      // Validate required fields based on your schema
-      if (
-        !formData.bookingSubject ||
-        !formData.bookingDescription ||
-        !formData.bookingDate ||
-        !formData.bookingTime ||
-        !formData.studentCount ||
-        !formData.destination
-      ) {
-        alert("Please fill in all required fields");
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Validate field lengths based on your schema
-      if (
-        formData.bookingSubject.length < 10 ||
-        formData.bookingSubject.length > 60
-      ) {
-        alert("Subject must be between 10 and 60 characters");
-        setIsSubmitting(false);
-        return;
-      }
-
-      if (
-        formData.bookingDescription.length < 10 ||
-        formData.bookingDescription.length > 200
-      ) {
-        alert("Description must be between 10 and 200 characters");
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Prepare the data for API - using the correct field names from your schema
-      const submissionData = {
-        bookingSubject: formData.bookingSubject.trim(),
-        bookingDescription: formData.bookingDescription.trim(),
-        bookingDate: formData.bookingDate,
-        bookingTime: formData.bookingTime,
-        // These fields are not in your schema but might be needed
-        studentCount: parseInt(formData.studentCount) || 0,
-        destination: formData.destination.trim(),
-        additionalRequirements: formData.additionalRequirements.trim(),
-        userId: user.uId || "unknown-user",
-        userEmail: user.email || "unknown@example.com",
-        userName: user.name || user.email || "Unknown User",
-        status: false, // Your schema expects boolean, not string
-        createdAt: new Date().toISOString(),
-      };
-
-      console.log("📤 Submitting form data:", submissionData);
-
-      const response = await fetch(
-        "http://localhost:5000/api/v1/bus-booking/post-bus-booking",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(submissionData),
-        }
-      );
-
-      console.log("📨 API Response status:", response.status);
-
-      if (!response.ok) {
-        let errorMessage = `HTTP error! status: ${response.status}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-          console.error("❌ API Error details:", errorData);
-        } catch (parseError) {
-          console.error("❌ Failed to parse error response:", parseError);
-        }
-        throw new Error(errorMessage);
-      }
-
-      const result = await response.json();
-
-      // Handle successful submission
-      console.log("✅ Booking submitted successfully:", result);
-      toast.success("✅ Booking submitted successfully");
-
-      // Store the response and submitted data
-      setApiResponse(result);
-      setSubmittedData(submissionData);
-      setShowSuccess(true);
-
-      // Reset form after successful submission
-      setFormData({
-        bookingSubject: "",
-        bookingDescription: "",
-        bookingDate: "",
-        bookingTime: "",
-        studentCount: "",
-        destination: "",
-        additionalRequirements: "",
-      });
-    } catch (error) {
-      console.error("❌ Error submitting booking:", error);
-      alert(
-        `Failed to submit booking request: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const closeSuccessModal = () => {
-    setShowSuccess(false);
-    setApiResponse(null);
-    setSubmittedData(null);
-  };
+  if (bookings.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <div className="w-24 h-24 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg
+            className="w-10 h-10 text-muted-foreground"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+            />
+          </svg>
+        </div>
+        <h3 className="text-xl font-semibold text-foreground mb-3">
+          No bookings found
+        </h3>
+        <p className="text-muted-foreground max-w-sm mx-auto">
+          You haven't made any bus bookings yet. Start by creating your first
+          booking.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-background py-4 px-4">
-      {/* Success Modal */}
-      {showSuccess && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-green-600">
-                Booking Successful!
+    <>
+      {/* Feedback Modal */}
+      {selectedFeedback && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm fade-in">
+          <div className="bg-card border border-border rounded-2xl p-6 max-w-md w-full shadow-xl slide-in-right">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-card-foreground">
+                Feedback
               </h3>
               <button
-                onClick={closeSuccessModal}
-                className="text-gray-500 hover:text-gray-700"
+                onClick={() => setSelectedFeedback(null)}
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
               >
-                <X className="w-5 h-5" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
               </button>
             </div>
-
-            <div className="space-y-3">
-              <div className="p-3 bg-green-50 rounded-md">
-                <p className="text-sm text-green-800">
-                  <strong>Status:</strong> {apiResponse?.status}
-                </p>
-                <p className="text-sm text-green-800">
-                  <strong>Message:</strong> {apiResponse?.message}
-                </p>
-                <p className="text-sm text-green-800">
-                  <strong>Booking ID:</strong> {apiResponse?.data?._id}
-                </p>
-              </div>
-
-              <div className="p-3 bg-blue-50 rounded-md">
-                <h4 className="font-medium text-sm mb-2">Submitted Data:</h4>
-                <div className="text-xs space-y-1">
-                  <p>
-                    <strong>Subject:</strong> {submittedData?.bookingSubject}
-                  </p>
-                  <p>
-                    <strong>Description:</strong>{" "}
-                    {submittedData?.bookingDescription}
-                  </p>
-                  <p>
-                    <strong>Date:</strong> {submittedData?.bookingDate}
-                  </p>
-                  <p>
-                    <strong>Time:</strong> {submittedData?.bookingTime}
-                  </p>
-                  <p>
-                    <strong>Students:</strong> {submittedData?.studentCount}
-                  </p>
-                  <p>
-                    <strong>Destination:</strong> {submittedData?.destination}
-                  </p>
-                  {submittedData?.additionalRequirements && (
-                    <p>
-                      <strong>Additional Requirements:</strong>{" "}
-                      {submittedData?.additionalRequirements}
-                    </p>
-                  )}
-                </div>
-              </div>
+            <p className="text-card-foreground leading-relaxed">
+              {selectedFeedback}
+            </p>
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={() => setSelectedFeedback(null)}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                Close
+              </button>
             </div>
-
-            <Button onClick={closeSuccessModal} className="w-full mt-4">
-              Close
-            </Button>
           </div>
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto h-[85vh]">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
-          {/* Left Side - Form */}
-          <div className="lg:col-span-2">
-            <Card className="h-full border shadow-sm">
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                    <Bus className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl font-semibold">
-                      Book a School Trip
-                    </CardTitle>
-                    <CardDescription>
-                      Reserve a bus for educational excursions
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="h-[calc(100%-80px)]">
-                <form onSubmit={handleSubmit} className="h-full flex flex-col">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto pr-2">
-                    {/* Booking Subject */}
-                    <div className="space-y-2 md:col-span-2">
-                      <label className="text-sm font-medium text-foreground">
-                        Trip Subject *
-                        <span className="text-xs text-muted-foreground ml-1">
-                          (10-60 characters)
-                        </span>
-                      </label>
-                      <input
-                        type="text"
-                        name="bookingSubject"
-                        placeholder="e.g., Science Museum Visit - Grade 5 Field Trip"
-                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
-                        required
-                        minLength={10}
-                        maxLength={60}
-                        value={formData.bookingSubject}
-                        onChange={handleInputChange}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        {formData.bookingSubject.length}/60 characters
-                      </p>
-                    </div>
-
-                    {/* Booking Description */}
-                    <div className="space-y-2 md:col-span-2">
-                      <label className="text-sm font-medium text-foreground">
-                        Description *
-                        <span className="text-xs text-muted-foreground ml-1">
-                          (10-200 characters)
-                        </span>
-                      </label>
-                      <textarea
-                        name="bookingDescription"
-                        placeholder="Describe the purpose, objectives, and educational value of this trip..."
-                        rows={3}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary resize-none"
-                        required
-                        minLength={10}
-                        maxLength={200}
-                        value={formData.bookingDescription}
-                        onChange={handleInputChange}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        {formData.bookingDescription.length}/200 characters
-                      </p>
-                    </div>
-
-                    {/* Booking Date */}
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">
-                        Trip Date *
-                      </label>
-                      <input
-                        type="date"
-                        name="bookingDate"
-                        min={new Date().toISOString().split("T")[0]}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
-                        required
-                        value={formData.bookingDate}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-
-                    {/* Booking Time */}
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">
-                        Trip Time *
-                      </label>
-                      <input
-                        type="time"
-                        name="bookingTime"
-                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
-                        required
-                        value={formData.bookingTime}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-
-                    {/* Number of Students */}
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">
-                        Students Count *
-                      </label>
-                      <input
-                        type="number"
-                        name="studentCount"
-                        placeholder="0"
-                        min="1"
-                        max="100"
-                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
-                        required
-                        value={formData.studentCount}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-
-                    {/* Destination */}
-                    <div className="space-y-2 md:col-span-2">
-                      <label className="text-sm font-medium text-foreground">
-                        Destination *
-                      </label>
-                      <input
-                        type="text"
-                        name="destination"
-                        placeholder="Enter destination address"
-                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
-                        required
-                        value={formData.destination}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-
-                    {/* Additional Information */}
-                    <div className="space-y-2 md:col-span-2">
-                      <label className="text-sm font-medium text-foreground">
-                        Additional Requirements
-                      </label>
-                      <textarea
-                        name="additionalRequirements"
-                        placeholder="Any special requirements or additional information..."
-                        rows={2}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary resize-none"
-                        value={formData.additionalRequirements}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Submit Button */}
-                  <div className="pt-4 mt-4 border-t border-border">
-                    <Button
-                      type="submit"
-                      className="w-full h-10"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Processing Request...
-                        </div>
-                      ) : (
-                        "Request Bus"
-                      )}
-                    </Button>
-                    <p className="text-xs text-muted-foreground text-center mt-2">
-                      You'll receive confirmation within 24-48 hours
-                    </p>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
+      <div className="space-y-6 container mx-auto h-[90vh] py-10">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-foreground bg-gradient-to-r from-primary to-primary/60 bg-clip-text ">
+              My Bus Bookings
+            </h2>
+            <p className="text-muted-foreground mt-2">
+              Manage and view your bus booking requests
+            </p>
           </div>
+          <div className=" flex gap-2">
+            <div className="px-4 py-2 bg-muted/50 rounded-full space-x-2">
+              <span className="text-sm font-medium text-foreground">
+                {bookings.length} booking{bookings.length !== 1 ? "s" : ""}
+              </span>
+            </div>
 
-          {/* Right Side - Information */}
-          <div className="lg:col-span-1">
-            <Card className="h-full border shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">
-                  Trip Information
-                </CardTitle>
-                <CardDescription>
-                  Important details about bus reservations
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                {/* Process Steps */}
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm text-foreground">
-                    Booking Process
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3 p-2 bg-blue-50 rounded-md">
-                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">1</span>
-                      </div>
-                      <span className="text-sm">Submit request form</span>
-                    </div>
-                    <div className="flex items-center gap-3 p-2 bg-blue-50 rounded-md">
-                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">2</span>
-                      </div>
-                      <span className="text-sm">Admin approval</span>
-                    </div>
-                    <div className="flex items-center gap-3 p-2 bg-blue-50 rounded-md">
-                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">3</span>
-                      </div>
-                      <span className="text-sm">Confirmation email</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Requirements */}
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm text-foreground">
-                    Requirements
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span className="text-sm">
-                        Minimum 1 day advance notice
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span className="text-sm">
-                        Educational purpose required
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span className="text-sm">
-                        Faculty supervision needed
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bus Info */}
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm text-foreground">
-                    Bus Details
-                  </h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="text-center p-2 bg-muted rounded-md">
-                      <Users className="w-4 h-4 text-primary mx-auto mb-1" />
-                      <p className="text-xs font-medium">20-50 Seats</p>
-                    </div>
-                    <div className="text-center p-2 bg-muted rounded-md">
-                      <Shield className="w-4 h-4 text-primary mx-auto mb-1" />
-                      <p className="text-xs font-medium">Safety Certified</p>
-                    </div>
-                    <div className="text-center p-2 bg-muted rounded-md">
-                      <Clock className="w-4 h-4 text-primary mx-auto mb-1" />
-                      <p className="text-xs font-medium">24/7 Support</p>
-                    </div>
-                    <div className="text-center p-2 bg-muted rounded-md">
-                      <Bus className="w-4 h-4 text-primary mx-auto mb-1" />
-                      <p className="text-xs font-medium">AC & Comfort</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Info */}
-                <div className="pt-4 border-t border-border">
-                  <h4 className="font-medium text-sm text-foreground mb-2">
-                    Need Help?
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Contact transportation office:
-                    <br />
-                    <span className="font-medium">transport@gub.edu.bd</span>
-                    <br />
-                    <span className="font-medium">+880 XXXX-XXXXXX</span>
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <Link href="/book-bus">
+              <Button variant={"default"} className="">
+                {" "}
+                <PlusCircle />
+                Book a Bus
+              </Button>
+            </Link>
           </div>
         </div>
+
+        <div className="grid gap-6">
+          {bookings.map((booking, index) => {
+            const statusConfig = getStatusConfig(booking.status);
+
+            return (
+              <div
+                key={booking.uId + index}
+                className="group relative bg-card/50 backdrop-blur-sm border border-border rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+              >
+                {/* Gradient border effect on hover */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
+
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                  <div className="flex-1 space-y-4">
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-semibold text-card-foreground leading-tight">
+                          {booking.bookingSubject}
+                        </h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {booking.bookingDescription}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${statusConfig.bg} ${statusConfig.border} ${statusConfig.text}`}
+                        >
+                          {statusConfig.icon}
+                          <span className="text-sm font-medium">
+                            {booking.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Details Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl">
+                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <svg
+                            className="w-4 h-4 text-primary"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">
+                            Passenger
+                          </p>
+                          <p className="text-sm font-medium text-card-foreground">
+                            {booking.userName}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl">
+                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <svg
+                            className="w-4 h-4 text-primary"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Email</p>
+                          <p className="text-sm font-medium text-card-foreground truncate">
+                            {booking.userEmail}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl">
+                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <svg
+                            className="w-4 h-4 text-primary"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Date</p>
+                          <p className="text-sm font-medium text-card-foreground">
+                            {formatDate(booking.bookingDate)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl">
+                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <svg
+                            className="w-4 h-4 text-primary"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Time</p>
+                          <p className="text-sm font-medium text-card-foreground">
+                            {formatTime(booking.bookingTime)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Feedback Button for Rejected Bookings */}
+                    {booking.status === "Rejected" && booking.feedback && (
+                      <div className="flex items-center gap-3 pt-4 border-t border-border">
+                        <button
+                          onClick={() => setSelectedFeedback(booking.feedback!)}
+                          className="flex items-center gap-2 px-4 py-2 text-sm bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-300 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/30 transition-colors border border-rose-200 dark:border-rose-800"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+                          View Feedback
+                        </button>
+                        <span className="text-xs text-muted-foreground">
+                          Read the reason for rejection
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export default BookTripPage;
+export default BusBookingDetails;
