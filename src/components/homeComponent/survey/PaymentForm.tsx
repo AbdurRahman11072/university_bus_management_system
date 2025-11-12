@@ -9,14 +9,8 @@ import {
   Play,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { SurveyData, PaymentStatus } from "./surveyMain";
+import { SurveyData, PaymentStatus, BKashData } from "./surveyMain";
 import { useAuth } from "@/hooks/useAuth";
-
-interface BKashData {
-  phoneNumber?: string;
-  transactionId: string;
-  amount: number;
-}
 
 interface PaymentFormProps {
   formData: SurveyData;
@@ -71,7 +65,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   // Update amount and ensure userName is populated when formData or user changes
   useEffect(() => {
     const calculatedAmount = calculateAmount();
-    const userPhoneNumber = user?.phone_number;
+    const userPhoneNumber = user?.phone_number || "";
     const userName = getUserName();
 
     setBKashData((prev) => ({

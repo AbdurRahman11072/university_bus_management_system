@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
   Search,
-  Filter,
   X,
   Trash2,
   RefreshCw,
@@ -17,29 +16,73 @@ import {
   MapPin,
   Clock,
   Download,
+  UserCircle,
+  Filter,
+  ChevronDown,
+  ChevronUp,
+  SlidersHorizontal,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+
+interface ClassSchedule {
+  id: string;
+  day: string;
+  startTime: string;
+  endTime: string;
+}
 
 interface SurveyData {
   _id: string;
   userId: string;
-  department: string;
+  userName: string;
+  userRole: "Student" | "Teacher";
+  userDepartment: string;
   userSemester: string;
+  classSchedules: ClassSchedule[];
   destination: string;
-  classTime: string;
-  submittedAt: string;
+  acBus: string;
+  payment: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const semesterColors: Record<string, string> = {
-  "1st": "bg-blue-100 text-blue-800 border-blue-200",
-  "2nd": "bg-green-100 text-green-800 border-green-200",
-  "3rd": "bg-purple-100 text-purple-800 border-purple-200",
-  "4th": "bg-orange-100 text-orange-800 border-orange-200",
-  "5th": "bg-pink-100 text-pink-800 border-pink-200",
-  "6th": "bg-indigo-100 text-indigo-800 border-indigo-200",
-  "7th": "bg-cyan-100 text-cyan-800 border-cyan-200",
-  "8th": "bg-red-100 text-red-800 border-red-200",
+  "Semester 1": "bg-blue-100 text-blue-800 border-blue-200",
+  "Semester 2": "bg-green-100 text-green-800 border-green-200",
+  "Semester 3": "bg-purple-100 text-purple-800 border-purple-200",
+  "Semester 4": "bg-orange-100 text-orange-800 border-orange-200",
+  "Semester 5": "bg-pink-100 text-pink-800 border-pink-200",
+  "Semester 6": "bg-indigo-100 text-indigo-800 border-indigo-200",
+  "Semester 7": "bg-cyan-100 text-cyan-800 border-cyan-200",
+  "Semester 8": "bg-red-100 text-red-800 border-red-200",
+};
+
+const roleColors: Record<string, string> = {
+  Student: "bg-blue-100 text-blue-800 border-blue-200",
+  Teacher: "bg-green-100 text-green-800 border-green-200",
+};
+
+const dayColors: Record<string, string> = {
+  Monday: "bg-blue-50 text-blue-700 border-blue-200",
+  Tuesday: "bg-green-50 text-green-700 border-green-200",
+  Wednesday: "bg-purple-50 text-purple-700 border-purple-200",
+  Thursday: "bg-orange-50 text-orange-700 border-orange-200",
+  Friday: "bg-red-50 text-red-700 border-red-200",
+  Saturday: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  Sunday: "bg-gray-50 text-gray-700 border-gray-200",
 };
 
 const SurveyTable = () => {
@@ -50,20 +93,21 @@ const SurveyTable = () => {
   const [filters, setFilters] = useState({
     semester: "",
     department: "",
-    classTime: "",
+    role: "",
+    day: "",
+    startTime: "",
+    endTime: "",
     search: "",
+    destination: "",
+    busType: "",
+    paymentStatus: "",
   });
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
+  const [activeFilterCount, setActiveFilterCount] = useState(0);
 
-  useEffect(() => {
-    fetchSurveyData();
-  }, []);
-
-  useEffect(() => {
-    filterData();
-  }, [surveyData, filters]);
-
+  // Fetch survey data from API
   const fetchSurveyData = async () => {
     try {
       setLoading(true);
@@ -123,10 +167,55 @@ const SurveyTable = () => {
     }
   };
 
+  useEffect(() => {
+    fetchSurveyData();
+  }, []);
+
+  useEffect(() => {
+    filterData();
+  }, [surveyData, filters]);
+
+  // Calculate active filter count
+  useEffect(() => {
+    const count = Object.values(filters).filter(
+      (value) => value !== "" && value !== "all"
+    ).length;
+    setActiveFilterCount(count);
+  }, [filters]);
+
+  // Helper function to convert time to minutes for comparison
+  const timeToMinutes = (time: string): number => {
+    if (!time) return 0;
+    const [hours, minutes] = time.split(":").map(Number);
+    return hours * 60 + minutes;
+  };
+
+  // Helper function to check if time range matches filter
+  const matchesTimeFilter = (
+    startTime: string,
+    endTime: string,
+    filterTime: string,
+    filterType: "start" | "end"
+  ): boolean => {
+    if (!filterTime) return true;
+
+    const filterMinutes = timeToMinutes(filterTime);
+    const startMinutes = timeToMinutes(startTime);
+    const endMinutes = timeToMinutes(endTime);
+
+    if (filterType === "start") {
+      // For start time filter: show classes that start at or after this time
+      return startMinutes >= filterMinutes;
+    } else {
+      // For end time filter: show classes that end at or before this time
+      return endMinutes <= filterMinutes;
+    }
+  };
+
   const filterData = () => {
     let filtered = surveyData;
 
-    if (filters.semester) {
+    if (filters.semester && filters.semester !== "all") {
       filtered = filtered.filter((item) =>
         item.userSemester
           ?.toLowerCase()
@@ -134,17 +223,70 @@ const SurveyTable = () => {
       );
     }
 
-    if (filters.department) {
+    if (filters.department && filters.department !== "all") {
       filtered = filtered.filter((item) =>
-        item.department
+        item.userDepartment
           ?.toLowerCase()
           .includes(filters.department.toLowerCase())
       );
     }
 
-    if (filters.classTime) {
+    if (filters.role && filters.role !== "all") {
       filtered = filtered.filter((item) =>
-        item.classTime?.toLowerCase().includes(filters.classTime.toLowerCase())
+        item.userRole?.toLowerCase().includes(filters.role.toLowerCase())
+      );
+    }
+
+    if (filters.day && filters.day !== "all") {
+      filtered = filtered.filter((item) =>
+        item.classSchedules?.some((schedule) =>
+          schedule.day?.toLowerCase().includes(filters.day.toLowerCase())
+        )
+      );
+    }
+
+    if (filters.destination && filters.destination !== "all") {
+      filtered = filtered.filter((item) =>
+        item.destination
+          ?.toLowerCase()
+          .includes(filters.destination.toLowerCase())
+      );
+    }
+
+    if (filters.busType && filters.busType !== "all") {
+      filtered = filtered.filter((item) =>
+        item.acBus?.toLowerCase().includes(filters.busType.toLowerCase())
+      );
+    }
+
+    if (filters.paymentStatus && filters.paymentStatus !== "all") {
+      const paymentBool = filters.paymentStatus === "paid";
+      filtered = filtered.filter((item) => item.payment === paymentBool);
+    }
+
+    if (filters.startTime) {
+      filtered = filtered.filter((item) =>
+        item.classSchedules?.some((schedule) =>
+          matchesTimeFilter(
+            schedule.startTime,
+            schedule.endTime,
+            filters.startTime,
+            "start"
+          )
+        )
+      );
+    }
+
+    if (filters.endTime) {
+      filtered = filtered.filter((item) =>
+        item.classSchedules?.some((schedule) =>
+          matchesTimeFilter(
+            schedule.startTime,
+            schedule.endTime,
+            filters.endTime,
+            "end"
+          )
+        )
       );
     }
 
@@ -153,10 +295,17 @@ const SurveyTable = () => {
       filtered = filtered.filter(
         (item) =>
           item.userId?.toLowerCase().includes(searchLower) ||
-          item.destination?.toLowerCase().includes(searchLower) ||
+          item.userName?.toLowerCase().includes(searchLower) ||
+          item.userDepartment?.toLowerCase().includes(searchLower) ||
           item.userSemester?.toLowerCase().includes(searchLower) ||
-          item.department?.toLowerCase().includes(searchLower) ||
-          item.classTime?.toLowerCase().includes(searchLower)
+          item.destination?.toLowerCase().includes(searchLower) ||
+          item.acBus?.toLowerCase().includes(searchLower) ||
+          item.classSchedules?.some(
+            (schedule) =>
+              schedule.day?.toLowerCase().includes(searchLower) ||
+              schedule.startTime?.toLowerCase().includes(searchLower) ||
+              schedule.endTime?.toLowerCase().includes(searchLower)
+          )
       );
     }
 
@@ -174,9 +323,79 @@ const SurveyTable = () => {
     setFilters({
       semester: "",
       department: "",
-      classTime: "",
+      role: "",
+      day: "",
+      startTime: "",
+      endTime: "",
       search: "",
+      destination: "",
+      busType: "",
+      paymentStatus: "",
     });
+    setFiltersExpanded(false);
+  };
+
+  const clearSingleFilter = (filterKey: keyof typeof filters) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterKey]: "",
+    }));
+  };
+
+  // Get unique values for filter dropdowns
+  const getUniqueValues = (key: keyof SurveyData) => {
+    const values = surveyData
+      .map((item) => item[key])
+      .filter(
+        (value): value is string => typeof value === "string" && value !== ""
+      );
+    return Array.from(new Set(values)).sort();
+  };
+
+  const getUniqueDays = () => {
+    const allDays = surveyData.flatMap(
+      (item) => item.classSchedules?.map((schedule) => schedule.day) || []
+    );
+    return Array.from(new Set(allDays)).sort();
+  };
+
+  const getUniqueDestinations = () => {
+    return getUniqueValues("destination");
+  };
+
+  const getUniqueBusTypes = () => {
+    return getUniqueValues("acBus");
+  };
+
+  // Get unique time slots from actual table data
+  const getUniqueStartTimes = () => {
+    const allStartTimes = surveyData.flatMap(
+      (item) => item.classSchedules?.map((schedule) => schedule.startTime) || []
+    );
+    const uniqueTimes = Array.from(new Set(allStartTimes)).sort((a, b) => {
+      return timeToMinutes(a) - timeToMinutes(b);
+    });
+    return uniqueTimes;
+  };
+
+  const getUniqueEndTimes = () => {
+    const allEndTimes = surveyData.flatMap(
+      (item) => item.classSchedules?.map((schedule) => schedule.endTime) || []
+    );
+    const uniqueTimes = Array.from(new Set(allEndTimes)).sort((a, b) => {
+      return timeToMinutes(a) - timeToMinutes(b);
+    });
+    return uniqueTimes;
+  };
+
+  // Format time for display in 12-hour format
+  const formatTimeForDisplay = (time: string) => {
+    if (!time) return "";
+    const [hours, minutes] = time.split(":");
+    const hour = parseInt(hours);
+    const period = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${period}`;
   };
 
   const handleDeleteAllSurveys = async () => {
@@ -226,20 +445,34 @@ const SurveyTable = () => {
     try {
       const headers = [
         "User ID",
+        "User Name",
+        "Role",
         "Department",
         "Semester",
         "Destination",
-        "Class Time",
+        "Bus Type",
+        "Payment Status",
+        "Class Schedules",
         "Submitted Date",
       ];
+
       const csvData = filteredData.map((survey) => [
         survey.userId || "N/A",
-        survey.department || "N/A",
+        survey.userName || "N/A",
+        survey.userRole || "N/A",
+        survey.userDepartment || "N/A",
         survey.userSemester || "N/A",
         survey.destination || "N/A",
-        survey.classTime || "N/A",
-        survey.submittedAt
-          ? new Date(survey.submittedAt).toLocaleDateString()
+        survey.acBus || "N/A",
+        survey.payment ? "Paid" : "Unpaid",
+        survey.classSchedules
+          ?.map(
+            (schedule) =>
+              `${schedule.day} (${schedule.startTime}-${schedule.endTime})`
+          )
+          .join("; ") || "N/A",
+        survey.createdAt
+          ? new Date(survey.createdAt).toLocaleDateString()
           : "N/A",
       ]);
 
@@ -268,15 +501,338 @@ const SurveyTable = () => {
     }
   };
 
-  // Debug: Log current state
-  useEffect(() => {
-    console.log("Current surveyData:", surveyData);
-    console.log("Current filteredData:", filteredData);
-  }, [surveyData, filteredData]);
+  // Filter badges component
+  const FilterBadges = () => {
+    const activeFilters = Object.entries(filters).filter(
+      ([key, value]) => value && value !== "all" && key !== "search"
+    );
+
+    if (activeFilters.length === 0) return null;
+
+    return (
+      <div className="flex flex-wrap gap-2 mb-4">
+        {activeFilters.map(([key, value]) => (
+          <Badge
+            key={key}
+            variant="secondary"
+            className="flex items-center gap-1 py-1 text-xs"
+          >
+            <span className="capitalize">
+              {key.replace(/([A-Z])/g, " $1").toLowerCase()}:
+            </span>
+            <span className="font-medium">
+              {key === "startTime" || key === "endTime"
+                ? formatTimeForDisplay(value)
+                : value}
+            </span>
+            <button
+              onClick={() => clearSingleFilter(key as keyof typeof filters)}
+              className="ml-1 hover:bg-muted rounded-full p-0.5"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </Badge>
+        ))}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={clearFilters}
+          className="h-6 px-2 text-xs text-muted-foreground hover:text-destructive"
+        >
+          Clear all
+        </Button>
+      </div>
+    );
+  };
+
+  // Enhanced Time Filter Component
+  const TimeFilterSection = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t">
+      <div className="space-y-2">
+        <Label className="text-sm font-medium flex items-center gap-2">
+          <Clock className="h-3 w-3" />
+          Class Start Time
+        </Label>
+        <Select
+          value={filters.startTime}
+          onValueChange={(value) => handleFilterChange("startTime", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="All start times" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Start Times</SelectItem>
+            {getUniqueStartTimes().map((time) => (
+              <SelectItem key={time} value={time}>
+                {formatTimeForDisplay(time)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground">
+          Shows classes starting from this time
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-sm font-medium flex items-center gap-2">
+          <Clock className="h-3 w-3" />
+          Class End Time
+        </Label>
+        <Select
+          value={filters.endTime}
+          onValueChange={(value) => handleFilterChange("endTime", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="All end times" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All End Times</SelectItem>
+            {getUniqueEndTimes().map((time) => (
+              <SelectItem key={time} value={time}>
+                {formatTimeForDisplay(time)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground">
+          Shows classes ending by this time
+        </p>
+      </div>
+    </div>
+  );
+
+  // Enhanced filter section JSX
+  const EnhancedFilterSection = () => (
+    <div className="space-y-4 mb-6">
+      {/* Main Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search across all fields (name, ID, department, schedules, etc.)..."
+          value={filters.search}
+          onChange={(e) => handleFilterChange("search", e.target.value)}
+          className="pl-10 border-border focus:ring-2 focus:ring-primary"
+        />
+      </div>
+
+      {/* Quick Filters Bar */}
+      <div className="flex flex-wrap items-center gap-4 p-4 bg-muted/30 rounded-lg border">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Quick Filters:</span>
+        </div>
+
+        <Select
+          value={filters.role}
+          onValueChange={(value) => handleFilterChange("role", value)}
+        >
+          <SelectTrigger className="w-32 h-8 text-xs">
+            <SelectValue placeholder="Role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Roles</SelectItem>
+            <SelectItem value="Student">Student</SelectItem>
+            <SelectItem value="Teacher">Teacher</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={filters.paymentStatus}
+          onValueChange={(value) => handleFilterChange("paymentStatus", value)}
+        >
+          <SelectTrigger className="w-32 h-8 text-xs">
+            <SelectValue placeholder="Payment" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Payments</SelectItem>
+            <SelectItem value="paid">Paid</SelectItem>
+            <SelectItem value="unpaid">Unpaid</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Collapsible
+          open={filtersExpanded}
+          onOpenChange={setFiltersExpanded}
+          className="w-full"
+        >
+          <div className="flex items-center justify-between">
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-2">
+                <Filter className="h-4 w-4" />
+                Advanced Filters
+                {activeFilterCount > 0 && (
+                  <Badge variant="secondary" className="h-5 px-1.5 text-xs">
+                    {activeFilterCount}
+                  </Badge>
+                )}
+                {filtersExpanded ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </Button>
+            </CollapsibleTrigger>
+
+            {activeFilterCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="text-xs text-muted-foreground hover:text-destructive"
+              >
+                <X className="h-3 w-3 mr-1" />
+                Clear all
+              </Button>
+            )}
+          </div>
+
+          <CollapsibleContent className="mt-4 space-y-4">
+            {/* Advanced Filters Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {/* Semester Filter */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Building className="h-3 w-3" />
+                  Semester
+                </Label>
+                <Select
+                  value={filters.semester}
+                  onValueChange={(value) =>
+                    handleFilterChange("semester", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Semesters" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Semesters</SelectItem>
+                    {getUniqueValues("userSemester").map((semester) => (
+                      <SelectItem key={semester} value={semester}>
+                        {semester}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Department Filter */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Building className="h-3 w-3" />
+                  Department
+                </Label>
+                <Select
+                  value={filters.department}
+                  onValueChange={(value) =>
+                    handleFilterChange("department", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Departments" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Departments</SelectItem>
+                    {getUniqueValues("userDepartment").map((dept) => (
+                      <SelectItem key={dept} value={dept}>
+                        {dept}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Day Filter */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="h-3 w-3" />
+                  Class Day
+                </Label>
+                <Select
+                  value={filters.day}
+                  onValueChange={(value) => handleFilterChange("day", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Days" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Days</SelectItem>
+                    {getUniqueDays().map((day) => (
+                      <SelectItem key={day} value={day}>
+                        {day}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Destination Filter */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <MapPin className="h-3 w-3" />
+                  Destination
+                </Label>
+                <Select
+                  value={filters.destination}
+                  onValueChange={(value) =>
+                    handleFilterChange("destination", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Destinations" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Destinations</SelectItem>
+                    {getUniqueDestinations().map((destination) => (
+                      <SelectItem key={destination} value={destination}>
+                        {destination}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Bus Type Filter */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <MapPin className="h-3 w-3" />
+                  Bus Type
+                </Label>
+                <Select
+                  value={filters.busType}
+                  onValueChange={(value) =>
+                    handleFilterChange("busType", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Bus Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Bus Types</SelectItem>
+                    {getUniqueBusTypes().map((busType) => (
+                      <SelectItem key={busType} value={busType}>
+                        {busType}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Time Filters */}
+            <TimeFilterSection />
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+
+      {/* Active Filter Badges */}
+      <FilterBadges />
+    </div>
+  );
 
   if (loading) {
     return (
-      <Card className="w-full max-w-6xl mx-auto my-6 border-border bg-card">
+      <Card className="w-full max-w-7xl mx-auto my-6 border-border bg-card">
         <CardContent className="py-12">
           <div className="text-center text-muted-foreground space-y-3">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -289,7 +845,7 @@ const SurveyTable = () => {
 
   if (error) {
     return (
-      <Card className="w-full max-w-6xl mx-auto my-6 border-border bg-card">
+      <Card className="w-full max-w-7xl mx-auto my-6 border-border bg-card">
         <CardContent className="py-8">
           <div className="text-center text-destructive space-y-3">
             <div className="w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center mx-auto">
@@ -315,7 +871,7 @@ const SurveyTable = () => {
 
   return (
     <>
-      <Card className="w-full max-w-6xl mx-auto my-6 border-border bg-card shadow-sm">
+      <Card className="w-full max-w-7xl mx-auto my-6 border-border bg-card shadow-sm">
         <CardHeader>
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -352,7 +908,7 @@ const SurveyTable = () => {
                 disabled={surveyData.length === 0}
               >
                 <Trash2 className="h-4 w-4" />
-                Delete All Surveys
+                Delete All
               </Button>
               <Button
                 onClick={fetchSurveyData}
@@ -368,93 +924,8 @@ const SurveyTable = () => {
         </CardHeader>
 
         <CardContent>
-          {/* Search and Filters */}
-          <div className="space-y-4 mb-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search across all fields..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange("search", e.target.value)}
-                className="pl-10 border-border focus:ring-2 focus:ring-primary"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="semester-filter"
-                  className="text-sm font-medium text-card-foreground flex items-center gap-2"
-                >
-                  <Building className="h-3 w-3" />
-                  Semester
-                </Label>
-                <Input
-                  id="semester-filter"
-                  placeholder="Filter by semester"
-                  value={filters.semester}
-                  onChange={(e) =>
-                    handleFilterChange("semester", e.target.value)
-                  }
-                  className="border-border"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="department-filter"
-                  className="text-sm font-medium text-card-foreground flex items-center gap-2"
-                >
-                  <Building className="h-3 w-3" />
-                  Department
-                </Label>
-                <Input
-                  id="department-filter"
-                  placeholder="Filter by department"
-                  value={filters.department}
-                  onChange={(e) =>
-                    handleFilterChange("department", e.target.value)
-                  }
-                  className="border-border"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="time-filter"
-                  className="text-sm font-medium text-card-foreground flex items-center gap-2"
-                >
-                  <Clock className="h-3 w-3" />
-                  Class Time
-                </Label>
-                <Input
-                  id="time-filter"
-                  placeholder="Filter by time"
-                  value={filters.classTime}
-                  onChange={(e) =>
-                    handleFilterChange("classTime", e.target.value)
-                  }
-                  className="border-border"
-                />
-              </div>
-            </div>
-
-            {(filters.semester ||
-              filters.department ||
-              filters.classTime ||
-              filters.search) && (
-              <div className="flex justify-end">
-                <Button
-                  onClick={clearFilters}
-                  variant="outline"
-                  className="gap-2"
-                >
-                  <X className="h-4 w-4" />
-                  Clear Filters
-                </Button>
-              </div>
-            )}
-          </div>
+          {/* Enhanced Filter Section */}
+          <EnhancedFilterSection />
 
           {/* Results Count */}
           <div className="flex items-center justify-between mb-4">
@@ -468,15 +939,28 @@ const SurveyTable = () => {
                 {surveyData.length}
               </span>{" "}
               records
+              {activeFilterCount > 0 && (
+                <span className="ml-2 text-xs text-blue-600">
+                  ({activeFilterCount} filter
+                  {activeFilterCount !== 1 ? "s" : ""} active)
+                </span>
+              )}
             </div>
-            {(filters.semester ||
-              filters.department ||
-              filters.classTime ||
-              filters.search) && (
-              <Badge variant="secondary" className="text-xs">
-                Filters Active
-              </Badge>
-            )}
+
+            {/* Quick Actions */}
+            <div className="flex items-center gap-2">
+              {activeFilterCount > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="gap-2 h-8"
+                >
+                  <X className="h-3 w-3" />
+                  Clear Filters
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Table */}
@@ -486,34 +970,19 @@ const SurveyTable = () => {
                 <thead className="bg-muted/50">
                   <tr>
                     <th className="px-4 py-3 text-left font-medium text-muted-foreground text-xs uppercase tracking-wide">
-                      <div className="flex items-center gap-2">
-                        <User className="h-3 w-3" />
-                        User ID
-                      </div>
+                      User Details
                     </th>
                     <th className="px-4 py-3 text-left font-medium text-muted-foreground text-xs uppercase tracking-wide">
-                      <div className="flex items-center gap-2">
-                        <Building className="h-3 w-3" />
-                        Department
-                      </div>
+                      Academic Info
                     </th>
                     <th className="px-4 py-3 text-left font-medium text-muted-foreground text-xs uppercase tracking-wide">
-                      Semester
+                      Class Schedule
                     </th>
                     <th className="px-4 py-3 text-left font-medium text-muted-foreground text-xs uppercase tracking-wide">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-3 w-3" />
-                        Destination
-                      </div>
+                      Bus Details
                     </th>
                     <th className="px-4 py-3 text-left font-medium text-muted-foreground text-xs uppercase tracking-wide">
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-3 w-3" />
-                        Class Time
-                      </div>
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground text-xs uppercase tracking-wide">
-                      Submitted
+                      Submitted Date
                     </th>
                   </tr>
                 </thead>
@@ -525,56 +994,95 @@ const SurveyTable = () => {
                         className="hover:bg-muted/30 transition-colors group"
                       >
                         <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <User className="h-3 w-3 text-muted-foreground" />
-                            <span className="font-medium text-card-foreground text-sm">
-                              {survey.userId || "N/A"}
-                            </span>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <User className="h-3 w-3 text-muted-foreground" />
+                              <span className="font-medium text-card-foreground text-sm">
+                                {survey.userName || "N/A"}
+                              </span>
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              ID: {survey.userId || "N/A"}
+                            </div>
+                            <Badge
+                              variant="secondary"
+                              className={`${
+                                roleColors[survey.userRole] ||
+                                "bg-gray-100 text-gray-800 border-gray-200"
+                              } border font-medium text-xs`}
+                            >
+                              {survey.userRole || "N/A"}
+                            </Badge>
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-card-foreground">
-                            {survey.department || "N/A"}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <Badge
-                            variant="secondary"
-                            className={`${
-                              semesterColors[survey.userSemester] ||
-                              "bg-gray-100 text-gray-800 border-gray-200"
-                            } border font-medium text-xs`}
-                          >
-                            {survey.userSemester || "N/A"}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-3 w-3 text-muted-foreground" />
-                            <span className="text-card-foreground">
-                              {survey.destination || "N/A"}
-                            </span>
+                          <div className="space-y-1">
+                            <div className="text-card-foreground font-medium">
+                              {survey.userDepartment || "N/A"}
+                            </div>
+                            <Badge
+                              variant="secondary"
+                              className={`${
+                                semesterColors[survey.userSemester] ||
+                                "bg-gray-100 text-gray-800 border-gray-200"
+                              } border font-medium text-xs`}
+                            >
+                              {survey.userSemester || "N/A"}
+                            </Badge>
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <Clock className="h-3 w-3 text-muted-foreground" />
-                            <span className="text-card-foreground">
-                              {survey.classTime || "N/A"}
-                            </span>
+                          <div className="space-y-1 max-w-xs">
+                            {survey.classSchedules?.length > 0 ? (
+                              survey.classSchedules.map((schedule, idx) => (
+                                <div
+                                  key={schedule.id || idx}
+                                  className="flex items-center gap-2 text-xs"
+                                >
+                                  <Badge
+                                    variant="outline"
+                                    className={`${
+                                      dayColors[schedule.day] ||
+                                      "bg-gray-50 text-gray-700 border-gray-200"
+                                    } border font-medium`}
+                                  >
+                                    {schedule.day?.substring(0, 3)}
+                                  </Badge>
+                                  <span className="text-card-foreground">
+                                    {formatTimeForDisplay(schedule.startTime)} -{" "}
+                                    {formatTimeForDisplay(schedule.endTime)}
+                                  </span>
+                                </div>
+                              ))
+                            ) : (
+                              <span className="text-muted-foreground text-xs">
+                                No schedules
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-3 w-3 text-muted-foreground" />
+                              <span className="text-card-foreground font-medium">
+                                {survey.destination || "N/A"}
+                              </span>
+                            </div>
+                            <Badge variant="outline" className="text-xs">
+                              {survey.acBus || "N/A"}
+                            </Badge>
                           </div>
                         </td>
                         <td className="px-4 py-3">
                           <div className="text-xs text-muted-foreground">
-                            {survey.submittedAt
-                              ? new Date(survey.submittedAt).toLocaleDateString(
+                            {survey.createdAt
+                              ? new Date(survey.createdAt).toLocaleDateString(
                                   "en-US",
                                   {
                                     year: "numeric",
                                     month: "short",
                                     day: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
                                   }
                                 )
                               : "N/A"}
@@ -585,7 +1093,7 @@ const SurveyTable = () => {
                   ) : (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={5}
                         className="px-4 py-12 text-center text-muted-foreground"
                       >
                         <div className="space-y-3">
@@ -599,12 +1107,15 @@ const SurveyTable = () => {
                           </p>
                           <p className="text-sm">
                             {surveyData.length === 0
-                              ? "Survey submissions will appear here when students complete the survey."
+                              ? "Survey submissions will appear here when users complete the survey."
                               : "Try adjusting your search or filters."}
                           </p>
                           {(filters.semester ||
                             filters.department ||
-                            filters.classTime ||
+                            filters.role ||
+                            filters.day ||
+                            filters.startTime ||
+                            filters.endTime ||
                             filters.search) && (
                             <Button
                               variant="outline"

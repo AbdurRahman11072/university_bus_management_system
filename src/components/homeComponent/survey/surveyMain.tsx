@@ -16,12 +16,18 @@ import ConfirmationStep from "./ConfirmationStep";
 export type FormStep = "survey" | "payment" | "confirmation";
 export type PaymentStatus = "pending" | "success" | "failed";
 
-// Alternative: Make some fields optional in the type
+// Define BKashData type here to ensure consistency
+export type BKashData = {
+  phoneNumber: string;
+  transactionId: string;
+  amount: number;
+};
+
 export type SurveyData = {
   userId?: string;
   userName?: string;
   userRole: "Student" | "Teacher";
-  userDepartment?: string; // Make optional
+  userDepartment?: string;
   userSemester: string;
   classTime: string;
   classEndTime: string;
@@ -29,7 +35,7 @@ export type SurveyData = {
   acBus: string;
   payment: boolean;
   paymentId?: string;
-  submittedAt?: string; // Add this line
+  submittedAt?: string;
   transactionId: string;
 };
 
@@ -67,7 +73,8 @@ const SurveyMain = () => {
     transactionId: "",
   });
 
-  const [bKashData, setBKashData] = useState({
+  // Use the BKashData type here to ensure consistency
+  const [bKashData, setBKashData] = useState<BKashData>({
     phoneNumber: "",
     transactionId: "",
     amount: 50,
