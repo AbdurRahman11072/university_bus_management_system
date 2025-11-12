@@ -40,6 +40,48 @@ export default function DriverTable() {
     fetchDrivers();
   }, []);
 
+  // Function to check if licence is near expiry (within 30 days)
+  const isLicenceNearExpiry = (expiryDate: string) => {
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    const timeDiff = expiry.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return daysDiff <= 30 && daysDiff >= 0;
+  };
+
+  // Function to check if licence is expired
+  const isLicenceExpired = (expiryDate: string) => {
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    return expiry < today;
+  };
+
+  // Function to get status class based on expiry date
+  const getLicenceStatusClass = (expiryDate: string) => {
+    if (isLicenceExpired(expiryDate)) {
+      return "bg-red-100 text-red-800";
+    } else if (isLicenceNearExpiry(expiryDate)) {
+      return "bg-red-100 text-red-800";
+    } else {
+      return "bg-green-100 text-green-800";
+    }
+  };
+
+  // Function to get status text based on expiry date
+  const getLicenceStatusText = (expiryDate: string) => {
+    if (isLicenceExpired(expiryDate)) {
+      return "Expired";
+    } else if (isLicenceNearExpiry(expiryDate)) {
+      const today = new Date();
+      const expiry = new Date(expiryDate);
+      const timeDiff = expiry.getTime() - today.getTime();
+      const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+      return `Expires in ${daysDiff} days`;
+    } else {
+      return "Valid";
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
@@ -127,7 +169,18 @@ export default function DriverTable() {
                   </p>
                 </td>
                 <td className="py-4 px-6">
-                  <p className="text-foreground">{driver.licenceExpire}</p>
+                  <div className="flex flex-col gap-1">
+                    <span
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getLicenceStatusClass(
+                        driver.licenceExpire
+                      )}`}
+                    >
+                      {new Date(driver.licenceExpire).toLocaleDateString()}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {getLicenceStatusText(driver.licenceExpire)}
+                    </span>
+                  </div>
                 </td>
                 <td className="py-4 px-6">
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">

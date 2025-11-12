@@ -10,11 +10,14 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-  Clock,
   MapPin,
   GraduationCap,
   ArrowRight,
   RefreshCw,
+  Calendar,
+  Clock,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { SurveyData } from "./surveyMain";
@@ -51,6 +54,23 @@ interface ApiResponse {
   data: BusInfo[];
 }
 
+interface ClassSchedule {
+  id: string;
+  day: string;
+  startTime: string;
+  endTime: string;
+}
+
+const daysOfWeek = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
 const SurveyForm: React.FC<SurveyFormProps> = ({
   formData,
   setFormData,
@@ -60,6 +80,7 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
   const [busRoutes, setBusRoutes] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [classSchedules, setClassSchedules] = useState<ClassSchedule[]>([]);
 
   // Fetch bus routes from API
   const fetchBusRoutes = async () => {
@@ -128,6 +149,14 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
     fetchBusRoutes();
   }, []);
 
+  // Update form data when class schedules change
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      classSchedules: classSchedules,
+    }));
+  }, [classSchedules, setFormData]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -143,19 +172,62 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
     }));
   };
 
+  // Add new class schedule
+  const addClassSchedule = () => {
+    const newSchedule: ClassSchedule = {
+      id: Date.now().toString(),
+      day: "",
+      startTime: "",
+      endTime: "",
+    };
+    setClassSchedules((prev) => [...prev, newSchedule]);
+  };
+
+  // Remove class schedule
+  const removeClassSchedule = (id: string) => {
+    setClassSchedules((prev) => prev.filter((schedule) => schedule.id !== id));
+  };
+
+  // Update class schedule
+  const updateClassSchedule = (
+    id: string,
+    field: keyof ClassSchedule,
+    value: string
+  ) => {
+    setClassSchedules((prev) =>
+      prev.map((schedule) =>
+        schedule.id === id ? { ...schedule, [field]: value } : schedule
+      )
+    );
+  };
+
   const validateSurveyForm = (): boolean => {
-    const requiredFields = [
-      "userSemester",
-      "destination",
-      "classTime",
-      "classEndTime",
-    ];
-    return requiredFields.every((field) => formData[field as keyof SurveyData]);
+    const requiredFields = ["userSemester", "destination"];
+
+    const hasValidClassSchedules =
+      classSchedules.length > 0 &&
+      classSchedules.every(
+        (schedule) => schedule.day && schedule.startTime && schedule.endTime
+      );
+
+    return (
+      requiredFields.every((field) => formData[field as keyof SurveyData]) &&
+      hasValidClassSchedules
+    );
   };
 
   // Retry function
   const handleRetry = () => {
     fetchBusRoutes();
+  };
+
+  // Get available days (days not already selected in other schedules)
+  const getAvailableDays = (currentScheduleId: string) => {
+    const selectedDays = classSchedules
+      .filter((schedule) => schedule.id !== currentScheduleId)
+      .map((schedule) => schedule.day);
+
+    return daysOfWeek.filter((day) => !selectedDays.includes(day));
   };
 
   return (
@@ -242,45 +314,163 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
         )}
       </div>
 
-      {/* Class Times */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-3">
-          <Label
-            htmlFor="classTime"
-            className="text-sm font-semibold flex items-center gap-2"
-          >
-            <Clock className="h-4 w-4 text-purple-600" />
-            Class Start Time
+      {/* Class Schedules */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label className="text-sm font-semibold flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-purple-600" />
+            Class Schedule
           </Label>
-          <Input
-            type="time"
-            required
-            name="classTime"
-            id="classTime"
-            value={formData.classTime}
-            onChange={handleInputChange}
-            className="w-full"
-          />
+          <Button
+            type="button"
+            onClick={addClassSchedule}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Add Class
+          </Button>
         </div>
 
-        <div className="space-y-3">
-          <Label
-            htmlFor="classEndTime"
-            className="text-sm font-semibold flex items-center gap-2"
-          >
-            <Clock className="h-4 w-4 text-purple-600" />
-            Class End Time
-          </Label>
-          <Input
-            type="time"
-            required
-            name="classEndTime"
-            id="classEndTime"
-            value={formData.classEndTime}
-            onChange={handleInputChange}
-            className="w-full"
-          />
-        </div>
+        {classSchedules.length === 0 ? (
+          <div className="text-center py-6 border-2 border-dashed border-gray-300 rounded-lg">
+            <Calendar className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-sm text-gray-500">
+              No class schedules added yet
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              Click "Add Class" to add your class schedule
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {classSchedules.map((schedule, index) => {
+              const availableDays = getAvailableDays(schedule.id);
+              const hasAvailableDays = availableDays.length > 0 || schedule.day;
+
+              return (
+                <div
+                  key={schedule.id}
+                  className="p-4 border border-gray-200 rounded-lg space-y-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-sm">Class {index + 1}</h4>
+                    {classSchedules.length > 1 && (
+                      <Button
+                        type="button"
+                        onClick={() => removeClassSchedule(schedule.id)}
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {/* Day Selection */}
+                    <div className="space-y-2">
+                      <Label htmlFor={`day-${schedule.id}`} className="text-xs">
+                        Day
+                      </Label>
+                      <Select
+                        value={schedule.day}
+                        onValueChange={(value) =>
+                          updateClassSchedule(schedule.id, "day", value)
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select day" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {hasAvailableDays ? (
+                            daysOfWeek.map((day) => (
+                              <SelectItem
+                                key={day}
+                                value={day}
+                                disabled={
+                                  !availableDays.includes(day) &&
+                                  day !== schedule.day
+                                }
+                              >
+                                {day}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="no-days" disabled>
+                              All days selected
+                            </SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Start Time */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor={`startTime-${schedule.id}`}
+                        className="text-xs"
+                      >
+                        Start Time
+                      </Label>
+                      <div className="relative">
+                        <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          type="time"
+                          id={`startTime-${schedule.id}`}
+                          value={schedule.startTime}
+                          onChange={(e) =>
+                            updateClassSchedule(
+                              schedule.id,
+                              "startTime",
+                              e.target.value
+                            )
+                          }
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+
+                    {/* End Time */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor={`endTime-${schedule.id}`}
+                        className="text-xs"
+                      >
+                        End Time
+                      </Label>
+                      <div className="relative">
+                        <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          type="time"
+                          id={`endTime-${schedule.id}`}
+                          value={schedule.endTime}
+                          onChange={(e) =>
+                            updateClassSchedule(
+                              schedule.id,
+                              "endTime",
+                              e.target.value
+                            )
+                          }
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {classSchedules.length > 0 && (
+          <div className="text-xs text-gray-500">
+            💡 Tip: Add all your classes for the week to get the best bus
+            schedule recommendations
+          </div>
+        )}
       </div>
 
       {/* Bus Preference */}
