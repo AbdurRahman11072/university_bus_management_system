@@ -1,12 +1,32 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Download, CreditCard, User, Phone, Hash, Calendar, DollarSign, Building, X, RefreshCw } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Download,
+  CreditCard,
+  User,
+  Phone,
+  Hash,
+  Calendar,
+  DollarSign,
+  Building,
+  X,
+  RefreshCw,
+} from "lucide-react";
 import { toast } from "sonner";
+import { API_BASE } from "@/lib/config";
 
 interface Transaction {
   _id: string;
@@ -38,7 +58,7 @@ export function TransactionsTable() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch("http://localhost:5000/api/v1/payment", {
+      const response = await fetch(`${API_BASE}/payment`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

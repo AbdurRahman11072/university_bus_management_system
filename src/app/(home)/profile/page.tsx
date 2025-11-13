@@ -1,9 +1,21 @@
 "use client";
 
+import { API_BASE } from "@/lib/config";
+
 import { useAuth } from "@/hooks/useAuth";
 import ProfileCard from "@/components/homeComponent/profile/profile-card";
 import EditProfileDialog from "@/components/homeComponent/profile/edit-profile";
-import { User as UserIcon, Settings, RefreshCw, Phone, Droplets, Building, Calendar, Badge, Camera } from "lucide-react";
+import {
+  User as UserIcon,
+  Settings,
+  RefreshCw,
+  Phone,
+  Droplets,
+  Building,
+  Calendar,
+  Badge,
+  Camera,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
@@ -21,7 +33,7 @@ export default function ProfilePage() {
   const handleUpdateProfile = async (updatedUserData: any) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/user/update-user/${user?._id}`,
+        `${API_BASE}/user/update-user/${user?._id}`,
         {
           method: "PUT",
           headers: {

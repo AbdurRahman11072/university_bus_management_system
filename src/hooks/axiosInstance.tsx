@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { toast } from "sonner";
+import { API_BASE } from "@/lib/config";
 
 // Simple in-memory cache for GET responses
 type CacheEntry = { expiry: number; data: any };
@@ -15,7 +16,7 @@ const getCacheKey = (config: AxiosRequestConfig) => {
 // We'll implement caching via interceptors rather than replacing axios adapter
 // because some bundlers/environments may not expose axios.defaults.adapter.
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api/v1",
+  baseURL: API_BASE,
   headers: {
     "Content-Type": "application/json",
   },

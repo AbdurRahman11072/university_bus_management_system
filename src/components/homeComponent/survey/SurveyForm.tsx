@@ -1,10 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { MapPin, GraduationCap, ArrowRight, RefreshCw, Calendar, Clock, Plus, Trash2 } from "lucide-react";
+import {
+  MapPin,
+  GraduationCap,
+  ArrowRight,
+  RefreshCw,
+  Calendar,
+  Clock,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { API_BASE } from "@/lib/config";
 import { SurveyData } from "./surveyMain";
 
 interface SurveyFormProps {
@@ -74,15 +90,12 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
       setError(null);
 
       console.log("Fetching bus routes from API...");
-      const response = await fetch(
-        "http://localhost:5000/api/v1/bus/get-bus-info",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE}/bus/get-bus-info`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       console.log("Response status:", response.status);
 

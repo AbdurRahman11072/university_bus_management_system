@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { API_BASE } from "@/lib/config";
 
 interface BusBooking {
   _id: string;
@@ -42,7 +43,7 @@ const BusBookingTable: React.FC = () => {
       setError(null);
 
       const response = await fetch(
-        "http://localhost:5000/api/v1/bus-booking/get-all-bus-booking"
+        `${API_BASE}/bus-booking/get-all-bus-booking`
       );
 
       if (!response.ok) {
@@ -74,7 +75,7 @@ const BusBookingTable: React.FC = () => {
       console.log("Sending update data:", updateData);
 
       const response = await fetch(
-        `http://localhost:5000/api/v1/bus-booking/update-bus-booking/${booking._id}`,
+        `${API_BASE}/bus-booking/update-bus-booking/${booking._id}`,
         {
           method: "PUT",
           headers: {
@@ -145,7 +146,7 @@ const BusBookingTable: React.FC = () => {
       console.log("Sending update data:", updateData);
 
       const response = await fetch(
-        `http://localhost:5000/api/v1/bus-booking/update-bus-booking/${selectedBooking._id}`,
+        `${API_BASE}/bus-booking/update-bus-booking/${selectedBooking._id}`,
         {
           method: "PUT",
           headers: {

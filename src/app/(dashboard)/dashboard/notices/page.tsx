@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { Notice } from "@/components/dashboard/notices/noticeType";
+import { API_BASE } from "@/lib/config";
 
 import AddNoticeDialog from "@/components/dashboard/notices/add-notice";
 import NoticeCard from "@/components/dashboard/notices/notice-card";
@@ -22,9 +23,7 @@ export default function NoticesPage() {
   const fetchNotices = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        "http://localhost:5000/api/v1/notice/get-all-notice"
-      );
+      const response = await fetch(`${API_BASE}/notice/get-all-notice`);
       const data = await response.json();
       console.log("notice", data.data);
       setNotices(data.data);

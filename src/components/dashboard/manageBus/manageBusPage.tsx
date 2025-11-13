@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { API_BASE } from "@/lib/config";
 import BusTable from "./busTable";
 import { BusModal } from "./bus-form";
 import { Button } from "@/components/ui/button";
@@ -43,9 +44,7 @@ export default function ManageBusPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(
-        "http://localhost:5000/api/v1/bus/get-bus-info"
-      );
+      const response = await fetch(`${API_BASE}/bus/get-bus-info`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch buses");
@@ -72,12 +71,9 @@ export default function ManageBusPage() {
 
   const handleDelete = async (_id: string) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/v1/bus/delete-bus-info/${_id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${API_BASE}/bus/delete-bus-info/${_id}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to delete bus");
@@ -93,7 +89,7 @@ export default function ManageBusPage() {
   const handleEdit = async (updatedBus: BusData) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/bus/update-bus-info/${updatedBus._id}`,
+        `${API_BASE}/bus/update-bus-info/${updatedBus._id}`,
         {
           method: "PUT",
           headers: {

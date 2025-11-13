@@ -1,14 +1,34 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Notice } from "./noticeType";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { API_BASE } from "@/lib/config";
 
 interface NoticeCardProps {
   notice: Notice;
@@ -51,7 +71,7 @@ export default function NoticeCard({
     setIsDeleteLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/notice/delete-notice/${notice.id}`,
+        `${API_BASE}/notice/delete-notice/${notice.id}`,
         {
           method: "DELETE",
         }
@@ -82,7 +102,7 @@ export default function NoticeCard({
       };
 
       const response = await fetch(
-        `http://localhost:5000/api/v1/notice/update-notice/${notice.id}`,
+        `${API_BASE}/notice/update-notice/${notice.id}`,
         {
           method: "PUT",
           headers: {

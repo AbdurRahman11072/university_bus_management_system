@@ -1,6 +1,7 @@
 "use client";
 import { useAuth } from "@/hooks/useAuth";
 import React, { useState, useEffect } from "react";
+import { API_BASE } from "@/lib/config";
 
 interface Transaction {
   _id: string;
@@ -39,9 +40,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
         setLoading(true);
         setError(null);
 
-        const response = await fetch(
-          `http://localhost:5000/api/v1/payment/${user.uId}`
-        );
+        const response = await fetch(`${API_BASE}/payment/${user.uId}`);
 
         if (!response.ok) {
           throw new Error(`Failed to fetch transactions: ${response.status}`);

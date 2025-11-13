@@ -1,4 +1,5 @@
 import ScheduleDetails from "@/components/scheduleDetails";
+import { API_BASE } from "@/lib/config";
 
 const ScheduleDetailsPage = async ({
   params,
@@ -7,7 +8,7 @@ const ScheduleDetailsPage = async ({
 }) => {
   const { slug } = await params;
 
-  const response = await fetch(`http://localhost:5000/api/v1/bus/${slug}`);
+  const response = await fetch(`${API_BASE}/bus/${slug}`);
 
   const data = await response.json();
   const busData = data.data;

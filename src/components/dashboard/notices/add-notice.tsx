@@ -5,9 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Bell, X, Users, FileText, MessageSquare, Send, User, GraduationCap, Bus, Eye } from "lucide-react";
+import {
+  Bell,
+  X,
+  Users,
+  FileText,
+  MessageSquare,
+  Send,
+  User,
+  GraduationCap,
+  Bus,
+  Eye,
+} from "lucide-react";
 import { Notice } from "./noticeType";
 import { toast } from "sonner";
+import { API_BASE } from "@/lib/config";
 
 interface AddNoticeDialogProps {
   onAddNotice: (notice: Notice) => void;
@@ -56,16 +68,13 @@ export default function AddNoticeDialog({
         noticeFor: formData.noticeFor,
       };
 
-      const response = await fetch(
-        "http://localhost:5000/api/v1/notice/post-notice",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(noticeData),
-        }
-      );
+      const response = await fetch(`${API_BASE}/notice/post-notice`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(noticeData),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

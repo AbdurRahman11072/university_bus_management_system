@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE } from "@/lib/config";
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
@@ -39,7 +41,7 @@ const BusBookingDetails = () => {
 
         // Try fetching all bookings and filter client-side (safer if backend endpoint differs)
         const response = await fetch(
-          "http://localhost:5000/api/v1/bus-booking/get-all-bus-booking"
+          `${API_BASE}/bus-booking/get-all-bus-booking`
         );
 
         if (!response.ok) {

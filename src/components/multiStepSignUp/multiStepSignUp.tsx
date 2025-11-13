@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UserFormData, FormStep1Data, UserRole, BloodGroup } from "@/lib/userType";
+import {
+  UserFormData,
+  FormStep1Data,
+  UserRole,
+  BloodGroup,
+} from "@/lib/userType";
 
 import Logo from "../../../public/GUBLogo.svg";
 import Image from "next/image";
@@ -14,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Cookies from "js-cookie";
+import { API_BASE } from "@/lib/config";
 
 export function MultiStepSignUp() {
   const { isAuthenticated, user } = useAuth();
@@ -54,16 +60,13 @@ export function MultiStepSignUp() {
     console.log("Final form data:", finalData);
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/v1/auth/create-user",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(finalData),
-        }
-      );
+      const response = await fetch(`${API_BASE}/auth/create-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(finalData),
+      });
       const { email } = finalData;
       if (response.ok) {
         toast.success("🎉 Account created successfully!");

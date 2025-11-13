@@ -5,9 +5,22 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X, Plus, ChevronDown, Bus, Clock, MapPin, User, Route, Wifi, IdCard, Hash } from "lucide-react";
+import {
+  X,
+  Plus,
+  ChevronDown,
+  Bus,
+  Clock,
+  MapPin,
+  User,
+  Route,
+  Wifi,
+  IdCard,
+  Hash,
+} from "lucide-react";
 import { ImageUpload } from "../image-upload";
 import axios from "axios";
+import { API_BASE } from "@/lib/config";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -92,9 +105,7 @@ export function BusModal({ isOpen, onClose }: BusModalProps) {
   const fetchDrivers = async () => {
     setIsLoadingDrivers(true);
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/v1/user/get-all-driver"
-      );
+      const response = await axios.get(`${API_BASE}/user/get-all-driver`);
       if (response.status === 400) {
         console.log("Failed");
       }
@@ -181,7 +192,7 @@ export function BusModal({ isOpen, onClose }: BusModalProps) {
       };
 
       const response = await axios.post(
-        "http://localhost:5000/api/v1/bus/post-bus-info",
+        `${API_BASE}/bus/post-bus-info`,
         formData
       );
 

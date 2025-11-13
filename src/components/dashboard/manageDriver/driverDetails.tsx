@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { API_BASE } from "@/lib/config";
 
 interface Driver {
   _id: string;
@@ -20,9 +21,7 @@ export default function DriverTable() {
   useEffect(() => {
     const fetchDrivers = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/v1/user/get-all-driver"
-        );
+        const response = await fetch(`${API_BASE}/user/get-all-driver`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch drivers");

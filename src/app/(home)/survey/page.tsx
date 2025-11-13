@@ -1,8 +1,15 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import React, { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { API_BASE } from "@/lib/config";
 import { useRouter } from "next/navigation";
 import SurveyMain from "@/components/homeComponent/survey/surveyMain";
 
@@ -61,16 +68,13 @@ const Survey = () => {
       };
       console.log("SurveyData: ", surveyData);
 
-      const response = await fetch(
-        "http://localhost:5000/api/v1/survey/post-Survey",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(surveyData),
-        }
-      );
+      const response = await fetch(`${API_BASE}/survey/post-Survey`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(surveyData),
+      });
 
       if (response.ok) {
         alert("Survey submitted successfully! Thank you for your feedback.");

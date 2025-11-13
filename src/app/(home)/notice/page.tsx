@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { API_BASE } from "@/lib/config";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
@@ -72,9 +73,7 @@ export default function NoticeComponent({
   const fetchNotices = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        "http://localhost:5000/api/v1/notice/get-all-notice"
-      );
+      const response = await fetch(`${API_BASE}/notice/get-all-notice`);
       const data = await response.json();
       setNotices(data.data || []);
     } catch (err) {

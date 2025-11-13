@@ -2,15 +2,36 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Edit2, User, Phone, Droplets, Building, Calendar, Camera } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Edit2,
+  User,
+  Phone,
+  Droplets,
+  Building,
+  Calendar,
+  Camera,
+} from "lucide-react";
 import { ImageUpload } from "@/components/multiStepSignUp/ImageUpload";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
+import { API_BASE } from "@/lib/config";
 
 interface EditProfileDialogProps {
   user: any;
@@ -38,15 +59,12 @@ export default function EditProfileDialog({
     try {
       console.log("Fetching updated user data for ID:", userId);
 
-      const response = await fetch(
-        `http://localhost:5000/api/v1/user/get-user/${userId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE}/user/get-user/${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       console.log("Fetch response status:", response.status);
 
@@ -118,7 +136,7 @@ export default function EditProfileDialog({
 
       // Make the PUT request to update the user
       const updateResponse = await fetch(
-        `http://localhost:5000/api/v1/user/update-user/${user._id}`,
+        `${API_BASE}/user/update-user/${user._id}`,
         {
           method: "PUT",
           headers: {

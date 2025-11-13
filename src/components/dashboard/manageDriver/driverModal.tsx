@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { API_BASE } from "@/lib/config";
 
 interface DriverFormData {
   driverName: string;
@@ -37,13 +38,10 @@ export function DriverModal() {
       console.log("Form submitted:", data);
 
       // Add API call here
-      const response = await axios.post(
-        "http://localhost:5000/api/v1/driver/post-driver-info",
-        {
-          ...data,
-          driverImg: "/driver-profile.png", // or handle image upload separately
-        }
-      );
+      const response = await axios.post(`${API_BASE}/driver/post-driver-info`, {
+        ...data,
+        driverImg: "/driver-profile.png", // or handle image upload separately
+      });
 
       console.log("API Response:", response.data);
 

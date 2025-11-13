@@ -2,11 +2,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
+import { API_BASE } from "@/lib/config";
 import Logo from "../../../../public/GUBLogo.svg";
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { SearchIcon } from "lucide-react";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../../ui/dialog";
 import { Button } from "../../ui/button";
 import Profile from "./profile";
 import { useAuth } from "@/hooks/useAuth";
@@ -83,9 +94,7 @@ const TopNavbar = () => {
   const fetchAllBuses = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(
-        "http://localhost:5000/api/v1/bus/get-bus-info"
-      );
+      const response = await fetch(`${API_BASE}/bus/get-bus-info`);
 
       if (!response.ok) {
         throw new Error(`Failed to fetch data: ${response.status}`);
@@ -139,9 +148,7 @@ const TopNavbar = () => {
       try {
         // Server-side search
         const response = await fetch(
-          `http://localhost:5000/api/v1/bus/search/${encodeURIComponent(
-            searchQuery
-          )}`
+          `${API_BASE}/bus/search/${encodeURIComponent(searchQuery)}`
         );
 
         if (!response.ok) {

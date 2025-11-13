@@ -1,10 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreditCard, CheckCircle2, ArrowLeft, ExternalLink, Play } from "lucide-react";
+import {
+  CreditCard,
+  CheckCircle2,
+  ArrowLeft,
+  ExternalLink,
+  Play,
+} from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { SurveyData, PaymentStatus, BKashData } from "./surveyMain";
 import { useAuth } from "@/hooks/useAuth";
+import { API_BASE } from "@/lib/config";
 
 interface PaymentFormProps {
   formData: SurveyData;
@@ -90,16 +97,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     try {
       console.log("Storing payment record with data:", paymentData);
 
-      const response = await fetch(
-        "http://localhost:5000/api/v1/payment/post-payment",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(paymentData),
-        }
-      );
+      const response = await fetch(`${API_BASE}/payment/post-payment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paymentData),
+      });
 
       if (response.ok) {
         const result = await response.json();
@@ -122,16 +126,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     try {
       console.log("Submitting survey data:", surveyData);
 
-      const response = await fetch(
-        "http://localhost:5000/api/v1/survey/post-Survey",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(surveyData),
-        }
-      );
+      const response = await fetch(`${API_BASE}/survey/post-Survey`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(surveyData),
+      });
 
       if (response.ok) {
         return true;

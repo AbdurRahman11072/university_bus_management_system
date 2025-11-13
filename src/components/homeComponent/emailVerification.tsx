@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { API_BASE } from "@/lib/config";
 
 interface EmailVerificationProps {
   onVerificationSuccess?: () => void;
@@ -65,19 +66,16 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
     console.log("Sending verification request...", { email, code });
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/v1/auth/verify-email",
-        {
-          method: "PUT", // Changed to PUT
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: email,
-            verificationCode: code,
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE}/auth/verify-email`, {
+        method: "PUT", // Changed to PUT
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          verificationCode: code,
+        }),
+      });
 
       console.log("Response status:", response.status);
 
@@ -125,18 +123,15 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
     console.log("Resending code to:", email);
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/v1/auth/new-code",
-        {
-          method: "PUT", // Changed to PUT
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: email,
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE}/auth/new-code`, {
+        method: "PUT", // Changed to PUT
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+        }),
+      });
 
       console.log("Resend response status:", response.status);
 

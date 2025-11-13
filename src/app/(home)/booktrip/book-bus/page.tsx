@@ -1,11 +1,18 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { Bus, Users, Clock, Shield, CheckCircle, X } from "lucide-react";
 import { toast } from "sonner";
+import { API_BASE } from "@/lib/config";
 
 // Define the form data type based on your schema
 interface BusBookingFormData {
@@ -137,16 +144,13 @@ const BookTripPage = () => {
       console.log("📤 Submitting form data:", submissionData);
       console.log("👤 User object:", user);
 
-      const response = await fetch(
-        "http://localhost:5000/api/v1/bus-booking/post-bus-booking",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(submissionData),
-        }
-      );
+      const response = await fetch(`${API_BASE}/bus-booking/post-bus-booking`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(submissionData),
+      });
 
       console.log("📨 API Response status:", response.status);
 

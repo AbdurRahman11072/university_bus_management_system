@@ -4,10 +4,24 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X, Plus, ChevronDown, Bus, Clock, MapPin, User, Route, Wifi, IdCard, Hash, Calendar } from "lucide-react";
+import {
+  X,
+  Plus,
+  ChevronDown,
+  Bus,
+  Clock,
+  MapPin,
+  User,
+  Route,
+  Wifi,
+  IdCard,
+  Hash,
+  Calendar,
+} from "lucide-react";
 import { ImageUpload } from "../image-upload";
 import { BusData } from "./busTable";
 import axios from "axios";
+import { API_BASE } from "@/lib/config";
 import { toast } from "sonner";
 
 interface Driver {
@@ -66,9 +80,7 @@ export default function EditBusDialog({
   const fetchDrivers = async () => {
     setIsLoadingDrivers(true);
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/v1/user/get-all-driver"
-      );
+      const response = await axios.get(`${API_BASE}/user/get-all-driver`);
       setDrivers(response.data.data);
 
       // Set selected driver if bus has a driver ID

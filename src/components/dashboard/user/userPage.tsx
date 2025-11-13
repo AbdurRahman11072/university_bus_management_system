@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 
 import { Spinner } from "@/components/ui/spinner";
+import { API_BASE } from "@/lib/config";
 import { UserData } from "./userType";
 import UserTable from "./userTable";
 
@@ -19,14 +20,11 @@ export default function UsersPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(
-        "http://localhost:5000/api/v1/user/get-all-user",
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE}/user/get-all-user`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         throw new Error(
@@ -65,7 +63,7 @@ export default function UsersPage() {
 
       // Use MongoDB _id for deletion
       const response = await fetch(
-        `http://localhost:5000/api/v1/user/delete-user/${userToDelete._id}`,
+        `${API_BASE}/user/delete-user/${userToDelete._id}`,
         {
           method: "DELETE",
         }
@@ -87,7 +85,7 @@ export default function UsersPage() {
     try {
       // Use MongoDB _id for update
       const response = await fetch(
-        `http://localhost:5000/api/v1/user/update-user/${updatedUser._id}`,
+        `${API_BASE}/user/update-user/${updatedUser._id}`,
         {
           method: "PUT",
           headers: {

@@ -3,11 +3,25 @@
 import React from "react";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { API_BASE } from "@/lib/config";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { UserData } from "./userType";
 
 interface EditUserDialogProps {
@@ -48,7 +62,7 @@ export default function EditUserDialog({
     try {
       // Use the backend API with MongoDB _id
       const response = await fetch(
-        `http://localhost:5000/api/v1/user/update-user/${formData._id}`,
+        `${API_BASE}/user/update-user/${formData._id}`,
         {
           method: "PUT",
           headers: {
