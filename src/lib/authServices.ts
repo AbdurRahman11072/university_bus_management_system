@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import fetchWithToast from "@/hooks/fetchWrapper";
 import {
   AuthResponse,
   LoginCredentials,
@@ -10,7 +11,7 @@ const API_BASE_URL =
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetchWithToast(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,7 +34,7 @@ export const authService = {
   },
 
   async register(credentials: RegisterCredentials): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    const response = await fetchWithToast(`${API_BASE_URL}/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +74,16 @@ export const authService = {
   },
 
   setUser(user: any): void {
-    Cookies.set("user_data", JSON.stringify(user), {
+    // Normalize isVerified to boolean to avoid type mismatches across code
+    const normalized = { ...user } as any;
+    const v: any = normalized?.isVerified;
+    if (v === true || v === 1 || v === "1" || v === "true" || v === "yes") {
+      normalized.isVerified = true;
+    } else {
+      normalized.isVerified = false;
+    }
+
+    Cookies.set("user_data", JSON.stringify(normalized), {
       expires: 7, // 7 days
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -82,7 +92,20 @@ export const authService = {
 
   getUser(): any {
     const userData = Cookies.get("user_data");
-    return userData ? JSON.parse(userData) : null;
+    if (!userData) return null;
+    try {
+      const parsed = JSON.parse(userData);
+      // Ensure isVerified is boolean
+      const v: any = parsed?.isVerified;
+      if (v === true || v === 1 || v === "1" || v === "true" || v === "yes") {
+        parsed.isVerified = true;
+      } else {
+        parsed.isVerified = false;
+      }
+      return parsed;
+    } catch (e) {
+      return null;
+    }
   },
 
   isAuthenticated(): boolean {

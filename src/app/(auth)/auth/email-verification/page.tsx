@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -14,6 +15,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
   redirectUrl = "/",
 }) => {
   const { user } = useAuth();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [verificationCode, setVerificationCode] = useState([
@@ -61,6 +63,17 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
 
     getEmailFromCookies();
   }, [user]);
+
+  // If the user is already verified, redirect to home (or redirectUrl)
+  useEffect(() => {
+    const v: any = (user as any)?.isVerified;
+    const isVerified =
+      v === true || v === 1 || v === "1" || v === "true" || v === "yes";
+    if (isVerified) {
+      toast.info("Email already verified. Redirecting to home...");
+      router.push(redirectUrl || "/");
+    }
+  }, [user, router, redirectUrl]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;

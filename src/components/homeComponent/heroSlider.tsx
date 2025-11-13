@@ -24,7 +24,7 @@ const slides = [
     title: "Safe & Reliable Bus Services For GUB Students",
     subtitle: "Book your ride effortlessly & travel with ease",
     buttonText: "Book Now",
-    link: "/book-trip/book-bus",
+    link: "/booktrip/book-bus",
   },
   {
     id: 2,

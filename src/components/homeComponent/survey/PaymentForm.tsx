@@ -35,7 +35,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   onPreviousStep,
   onConfirmation,
 }) => {
-  const { user } = useAuth();
+  const { user, markSurveyAsCompleted, fetchSurveyData } = useAuth();
   const [isInitializingPayment, setIsInitializingPayment] = useState(false);
   const [paymentInitiated, setPaymentInitiated] = useState(false);
 
@@ -193,6 +193,24 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         const surveySubmitted = await submitSurveyData(finalSurveyData);
 
         if (surveySubmitted) {
+          // Update auth context so protected routes know survey is completed
+          try {
+            // Force-refresh server survey status to avoid cached GET showing stale result
+            try {
+              await fetchSurveyData(formData.userId, true);
+            } catch (err) {
+              console.warn("Failed to force-refresh survey data:", err);
+            }
+
+            // markSurveyAsCompleted is provided by AuthContext (destructured at top)
+            markSurveyAsCompleted(finalSurveyData);
+          } catch (err) {
+            console.warn(
+              "Could not mark survey as completed via context:",
+              err
+            );
+          }
+
           setTimeout(() => {
             onConfirmation();
           }, 1500);

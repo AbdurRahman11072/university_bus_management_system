@@ -24,7 +24,7 @@ interface AuthContextType extends ExtendedAuthState {
   logout: () => void;
   clearError: () => void;
   updateUser: (userData: User) => void;
-  fetchSurveyData: () => Promise<void>;
+  fetchSurveyData: (userId?: string, forceRefresh?: boolean) => Promise<void>;
   markSurveyAsCompleted: (surveyData?: any) => void;
 }
 
@@ -59,7 +59,8 @@ const authReducer = (
         isAuthenticated: true,
         user: action.payload.user,
         token: action.payload.token,
-        initialCheckComplete: true,
+        // initialCheckComplete will be set after we finish initial async checks (like fetching survey)
+        initialCheckComplete: false,
       };
     case "AUTH_FAILURE":
       return {
@@ -144,7 +145,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Function to fetch survey data - accepts userId as parameter
   // Function to fetch survey data - accepts userId as parameter
-  const fetchSurveyData = async (userId?: string) => {
+  const fetchSurveyData = async (
+    userId?: string,
+    forceRefresh: boolean = false
+  ) => {
     const userToCheck = userId || state.user?.uId;
 
     if (!userToCheck) {
@@ -158,7 +162,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       console.log("📡 Fetching survey data for user:", userToCheck);
       const response = await axiosInstance.get(
-        `survey/get-user/${userToCheck}`
+        `survey/get-user/${userToCheck}`,
+        {
+          headers: {
+            // When forceRefresh is true, opt-out of axios in-memory cache
+            ...(forceRefresh ? { "x-use-cache": "false" } : {}),
+          },
+        }
       );
 
       console.log("📊 Full Survey API Response:", response);
@@ -212,6 +222,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           // Then fetch survey data with the user ID we know exists
           console.log("🕒 Fetching initial survey data for:", user.uId);
           await fetchSurveyData(user.uId);
+
+          // Now we've completed initial async checks
+          dispatch({ type: "INITIAL_CHECK_COMPLETE" });
         } else {
           console.log("❌ No user found in storage");
           dispatch({ type: "INITIAL_CHECK_COMPLETE" });

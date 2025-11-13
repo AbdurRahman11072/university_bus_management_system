@@ -37,3 +37,9 @@ export interface AuthState {
   isLoading: boolean;
   initialCheckComplete: boolean;
 }
+
+export interface AuthResponse {
+  success?: boolean;
+  message?: string;
+  data?: any;
+}

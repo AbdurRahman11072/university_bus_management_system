@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   UserFormData,
   FormStep1Data,
@@ -21,15 +21,18 @@ import Link from "next/link";
 import Cookies from "js-cookie";
 
 export function MultiStepSignUp() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  if (isAuthenticated) {
-    router.push("/");
-    toast.info("You're already logged in");
-  }
+  // Redirect verified or already authenticated users to home
+  useEffect(() => {
+    if (isAuthenticated || user?.isVerified) {
+      router.push("/");
+      toast.info("You're already logged in");
+    }
+  }, [isAuthenticated, user, router]);
 
   const [formData, setFormData] = useState<UserFormData>({
     uId: 0,

@@ -10,18 +10,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import {
-  Bus,
-  Calendar,
-  MapPin,
-  Users,
-  BookOpen,
-  Clock,
-  Shield,
-  CheckCircle,
-  X,
-  Clock4,
-} from "lucide-react";
+import { Bus, Users, Clock, Shield, CheckCircle, X } from "lucide-react";
 import { toast } from "sonner";
 
 // Define the form data type based on your schema
@@ -216,6 +205,7 @@ const BookTripPage = () => {
     setShowSuccess(false);
     setApiResponse(null);
     setSubmittedData(null);
+    router.push("/booktrip");
   };
 
   return (

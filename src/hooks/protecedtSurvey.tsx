@@ -24,6 +24,17 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
   const isDriver = user?.roles === "Driver";
   const hasSpecialRole = isAdmin || isDriver;
 
+  // Normalize verification flag - backend may store boolean, string, or number
+  const userIsVerified = (() => {
+    const v: any = (user as any)?.isVerified;
+    if (v === true || v === 1) return true;
+    if (typeof v === "string") {
+      const s = v.toLowerCase();
+      return s === "true" || s === "1" || s === "yes";
+    }
+    return false;
+  })();
+
   // User should NOT access survey if they've already completed it AND don't have special role
   const shouldBlockSurveyAccess =
     user && hasCompletedSurvey && isSurveyRoute && !hasSpecialRole;
@@ -35,7 +46,12 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
 
   console.log("  - user:", user);
   console.log("  - user role:", user?.roles);
-  console.log("  - user isVerified:", user?.isVerified);
+  console.log(
+    "  - user isVerified:",
+    user?.isVerified,
+    "-> normalized:",
+    userIsVerified
+  );
   console.log("  - hasCompletedSurvey:", hasCompletedSurvey);
   console.log("  - isAdmin:", isAdmin);
   console.log("  - isDriver:", isDriver);
@@ -69,7 +85,7 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
     }
 
     // Check email verification for all authenticated users (except special roles)
-    if (user && !user.isVerified && !hasSpecialRole) {
+    if (user && !userIsVerified && !hasSpecialRole) {
       console.log("📧 User not verified, redirecting to email verification");
       router.push("/auth/email-verification");
       return;
@@ -87,7 +103,7 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
     console.log("👤 Regular user - applying survey rules");
 
     // Regular user exists but no survey - only allow survey route
-    if (!hasCompletedSurvey && !isSurveyRoute && user.isVerified) {
+    if (!hasCompletedSurvey && !isSurveyRoute && userIsVerified) {
       console.log(
         "📝 Regular user hasn't completed survey, redirecting to survey"
       );
@@ -96,7 +112,7 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
     }
 
     // Regular USER CAN NEVER USE SURVEY ROUTE AGAIN AFTER COMPLETION
-    if (hasCompletedSurvey && isSurveyRoute && user.isVerified) {
+    if (hasCompletedSurvey && isSurveyRoute && userIsVerified) {
       console.log("🚫 Survey already completed - permanent redirect to home");
       router.push("/");
       return;
@@ -142,7 +158,7 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
   }
 
   // Check email verification in the render logic as well
-  if (user && !user.isVerified && !hasSpecialRole) {
+  if (user && !userIsVerified && !hasSpecialRole) {
     console.log("📧 Render blocking - user not verified");
     return null;
   }

@@ -37,15 +37,9 @@ const BusBookingDetails = () => {
         setLoading(true);
         setError(null);
 
+        // Try fetching all bookings and filter client-side (safer if backend endpoint differs)
         const response = await fetch(
-          "http://localhost:5000/api/v1/bus-booking/get-bus-booking-by-uId",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ uId: user.uId }),
-          }
+          "http://localhost:5000/api/v1/bus-booking/get-all-bus-booking"
         );
 
         if (!response.ok) {
@@ -53,7 +47,13 @@ const BusBookingDetails = () => {
         }
 
         const data = await response.json();
-        setBookings(data.data || []);
+        const allBookings: any[] = data.data || data || [];
+        const myBookings = allBookings.filter(
+          (b: any) =>
+            String(b.uId) === String(user.uId) ||
+            String(b.userEmail) === String(user.email)
+        );
+        setBookings(myBookings);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -200,10 +200,28 @@ const BusBookingDetails = () => {
         <h3 className="text-xl font-semibold text-foreground mb-3">
           No bookings found
         </h3>
-        <p className="text-muted-foreground max-w-sm mx-auto">
+        <p className="text-muted-foreground max-w-sm mx-auto mb-6">
           You haven't made any bus bookings yet. Start by creating your first
           booking.
         </p>
+
+        <div className="flex items-center justify-center gap-3">
+          <Link href="/booktrip/book-bus">
+            <Button
+              variant={"default"}
+              className="inline-flex items-center gap-2"
+            >
+              <PlusCircle />
+              Book a Bus
+            </Button>
+          </Link>
+
+          <Link href="/schedule">
+            <button className="px-4 py-2 rounded-md border border-border text-sm text-foreground hover:bg-muted/30 transition-colors">
+              Browse Schedules
+            </button>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -269,7 +287,7 @@ const BusBookingDetails = () => {
               </span>
             </div>
 
-            <Link href="/book-bus">
+            <Link href="/booktrip/book-bus">
               <Button variant={"default"} className="">
                 {" "}
                 <PlusCircle />
