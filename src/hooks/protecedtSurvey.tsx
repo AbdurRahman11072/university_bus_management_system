@@ -15,7 +15,8 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
 
   // Define ALL public routes that don't require authentication
   const publicRoutes = ["/", "/schedule", "/contact-us"];
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const isPublicRoute =
+    publicRoutes.includes(pathname) || pathname.startsWith("/schedule/");
   const isAuthRoute = pathname.startsWith("/auth");
   const isSurveyRoute = pathname === "/survey";
 
