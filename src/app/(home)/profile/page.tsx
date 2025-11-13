@@ -3,21 +3,10 @@
 import { useAuth } from "@/hooks/useAuth";
 import ProfileCard from "@/components/homeComponent/profile/profile-card";
 import EditProfileDialog from "@/components/homeComponent/profile/edit-profile";
-import {
-  User as UserIcon,
-  Settings,
-  RefreshCw,
-  Phone,
-  Droplets,
-  Building,
-  Calendar,
-  Badge,
-  Camera,
-} from "lucide-react";
+import { User as UserIcon, Settings, RefreshCw, Phone, Droplets, Building, Calendar, Badge, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import Link from "next/link";
 
 export default function ProfilePage() {

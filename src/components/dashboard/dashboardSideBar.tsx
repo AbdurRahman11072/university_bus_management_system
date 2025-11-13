@@ -1,28 +1,9 @@
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
-import {
-  BarChart,
-  BellPlus,
-  BookCopy,
-  Bus,
-  BusIcon,
-  Calendar,
-  FileText,
-  Home,
-  Icon,
-  LogOut,
-  Map,
-  Navigation,
-  PiIcon,
-  Settings,
-  User,
-  UserCheck,
-  Users,
-} from "lucide-react";
+import { BarChart, BellPlus, BookCopy, Bus, BusIcon, Calendar, FileText, Home, Icon, LogOut, Map, Navigation, PiIcon, Settings, User, UserCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
 
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: Home, link: "/dashboard" },

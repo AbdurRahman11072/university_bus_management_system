@@ -1,6 +1,4 @@
 import Image from "next/image";
-import React from "react";
-import ErrorSvg from "../../public/images/404.svg";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 const notfound = () => {

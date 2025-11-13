@@ -1,13 +1,5 @@
 import React, { useRef, useLayoutEffect, useState } from 'react';
-import {
-  motion,
-  useScroll,
-  useSpring,
-  useTransform,
-  useMotionValue,
-  useVelocity,
-  useAnimationFrame
-} from 'motion/react';
+import { motion, useScroll, useSpring, useTransform, useMotionValue, useVelocity, useAnimationFrame } from 'motion/react';
 
 interface VelocityMapping {
   input: [number, number];

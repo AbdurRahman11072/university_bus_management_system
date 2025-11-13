@@ -1,6 +1,4 @@
-import React from "react";
-import Title from "../ui/title";
-import { Bus, Clock, Earth, Eye, Hourglass, Shield, Zap } from "lucide-react";
+import { Bus, Clock, Eye, Shield, Zap } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
 
 const Details = [

@@ -5,19 +5,7 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-  X,
-  Plus,
-  ChevronDown,
-  Bus,
-  Clock,
-  MapPin,
-  User,
-  Route,
-  Wifi,
-  IdCard,
-  Hash,
-} from "lucide-react";
+import { X, Plus, ChevronDown, Bus, Clock, MapPin, User, Route, Wifi, IdCard, Hash } from "lucide-react";
 import { ImageUpload } from "../image-upload";
 import axios from "axios";
 import { toast } from "sonner";

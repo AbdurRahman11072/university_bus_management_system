@@ -1,11 +1,9 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "./ui/card";
 import axiosInstance from "@/hooks/axiosInstance";
 import { Spinner } from "./ui/spinner";
-import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
 import { Bus, Clock, MapPin, Route, Users } from "lucide-react";
 
 const Schedule = () => {

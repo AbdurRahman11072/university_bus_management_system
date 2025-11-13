@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import Logo from "../../../../public/GUBLogo.svg";
 import { GraduationCap, UserCheck } from "lucide-react";
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import SurveyForm from "./SurveyForm";

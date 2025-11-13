@@ -1,8 +1,5 @@
 "use client";
-import React, { useState } from "react";
-import { Button } from "../../ui/button";
-import { Card, CardContent } from "../../ui/card";
-import { DriverModal } from "./driverModal";
+import { useState } from "react";
 import DriverCards from "./driverDetails";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";

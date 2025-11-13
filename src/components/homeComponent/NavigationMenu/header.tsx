@@ -1,4 +1,3 @@
-import React from "react";
 import TopNavbar from "./topNavbar";
 import BottomNavbar from "./bottomNavbar";
 

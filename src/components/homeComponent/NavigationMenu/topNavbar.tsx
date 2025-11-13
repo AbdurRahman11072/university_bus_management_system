@@ -3,20 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import Logo from "../../../../public/GUBLogo.svg";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group";
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
 import { SearchIcon } from "lucide-react";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../../ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../ui/dialog";
 import { Button } from "../../ui/button";
 import Profile from "./profile";
 import { useAuth } from "@/hooks/useAuth";

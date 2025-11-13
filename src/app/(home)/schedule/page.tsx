@@ -1,5 +1,4 @@
 import Schdule from "@/components/schedule";
-import React from "react";
 
 const SchedulePage = () => {
   return (

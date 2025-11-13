@@ -1,5 +1,4 @@
 import DashboardSchdule from "@/components/dashboard/dashbaordSchedule";
-import React from "react";
 
 const SchedulePage = () => {
   return (

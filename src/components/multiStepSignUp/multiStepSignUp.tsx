@@ -1,12 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  UserFormData,
-  FormStep1Data,
-  UserRole,
-  BloodGroup,
-} from "@/lib/userType";
+import { UserFormData, FormStep1Data, UserRole, BloodGroup } from "@/lib/userType";
 
 import Logo from "../../../public/GUBLogo.svg";
 import Image from "next/image";

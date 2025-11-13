@@ -4,38 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import {
-  Search,
-  X,
-  Trash2,
-  RefreshCw,
-  AlertTriangle,
-  User,
-  Building,
-  Calendar,
-  MapPin,
-  Clock,
-  Download,
-  UserCircle,
-  Filter,
-  ChevronDown,
-  ChevronUp,
-  SlidersHorizontal,
-} from "lucide-react";
+import { Search, X, Trash2, RefreshCw, AlertTriangle, User, Building, Calendar, MapPin, Clock, Download, UserCircle, Filter, ChevronDown, ChevronUp, SlidersHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface ClassSchedule {
   id: string;

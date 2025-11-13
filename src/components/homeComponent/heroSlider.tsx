@@ -5,9 +5,7 @@ import Image from "next/image";
 import bg1 from "@/assets/bg-1.jpg";
 import bg2 from "@/assets/bg-2.jpg";
 import bg3 from "@/assets/bg-3.jpg";
-import bg4 from "@/assets/bg-4.jpg";
 import Link from "next/link";
-import Slider from "./slider";
 
 interface Slide {
   id: number;

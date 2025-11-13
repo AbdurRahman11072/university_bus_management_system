@@ -1,14 +1,6 @@
-import React from "react";
 
 import Link from "next/link";
-import {
-  History,
-  HomeIcon,
-  icons,
-  MessageSquare,
-  PhoneOutgoing,
-  User2Icon,
-} from "lucide-react";
+import { History, HomeIcon, icons, MessageSquare, PhoneOutgoing, User2Icon } from "lucide-react";
 
 const menu = [
   {

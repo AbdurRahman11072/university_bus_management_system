@@ -1,12 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useReducer, useEffect } from "react";
-import {
-  AuthState,
-  LoginCredentials,
-  RegisterCredentials,
-  User,
-} from "./authType";
+import { AuthState, LoginCredentials, RegisterCredentials, User } from "./authType";
 import { authService } from "./authServices";
 import axiosInstance from "@/hooks/axiosInstance";
 import { useRouter } from "next/navigation";

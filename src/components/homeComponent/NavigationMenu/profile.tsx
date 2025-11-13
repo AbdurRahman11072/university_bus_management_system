@@ -1,32 +1,10 @@
 "use client";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
-import { UserTypes } from "@/lib/userType";
-import {
-  BadgeDollarSign,
-  CircleUser,
-  Cog,
-  HandCoins,
-  LayoutDashboard,
-  LogOut,
-  User,
-  Settings,
-  CreditCard,
-  Shield,
-  Bell,
-  HelpCircle,
-  NotebookPen,
-} from "lucide-react";
+import { BadgeDollarSign, CircleUser, Cog, HandCoins, LayoutDashboard, LogOut, User, Settings, CreditCard, Shield, Bell, HelpCircle, NotebookPen } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
 
 const Profile = () => {
   const { user, logout } = useAuth();

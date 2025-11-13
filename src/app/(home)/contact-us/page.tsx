@@ -1,15 +1,7 @@
 "use client";
-import React from "react";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import { AlertCircle, Bus, MapPin } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/hooks/axiosInstance";
 import { toast } from "sonner";

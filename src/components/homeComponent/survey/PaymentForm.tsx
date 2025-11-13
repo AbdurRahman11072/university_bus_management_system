@@ -1,13 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  CreditCard,
-  CheckCircle2,
-  ArrowLeft,
-  ExternalLink,
-  Play,
-} from "lucide-react";
+import { CreditCard, CheckCircle2, ArrowLeft, ExternalLink, Play } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { SurveyData, PaymentStatus, BKashData } from "./surveyMain";
 import { useAuth } from "@/hooks/useAuth";

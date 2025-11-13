@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import BusTable from "./busTable";
-import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
 import { BusModal } from "./bus-form";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";

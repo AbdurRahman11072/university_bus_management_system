@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "@/hooks/axiosInstance";
 import { Spinner } from "../ui/spinner";
 import { Card, CardContent } from "../ui/card";

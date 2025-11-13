@@ -1,24 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  ChevronDown,
-  ChevronUp,
-  Mail,
-  Trash,
-  Search,
-  User,
-  BookOpen,
-  MessageSquare,
-  Calendar,
-} from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ChevronDown, ChevronUp, Mail, Trash, Search, User, BookOpen, MessageSquare, Calendar } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

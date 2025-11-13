@@ -1,8 +1,6 @@
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
-import DashboardHader from "@/components/dashboard/dashboardHeader";
-import DashboardSideBar from "@/components/dashboard/dashboardSideBar";
 import { AuthProvider } from "@/lib/AuthContext";
 
 const geistSans = Geist({

@@ -4,20 +4,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-  X,
-  Plus,
-  ChevronDown,
-  Bus,
-  Clock,
-  MapPin,
-  User,
-  Route,
-  Wifi,
-  IdCard,
-  Hash,
-  Calendar,
-} from "lucide-react";
+import { X, Plus, ChevronDown, Bus, Clock, MapPin, User, Route, Wifi, IdCard, Hash, Calendar } from "lucide-react";
 import { ImageUpload } from "../image-upload";
 import { BusData } from "./busTable";
 import axios from "axios";

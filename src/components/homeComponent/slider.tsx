@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import bg1 from "@/assets/bg-1.jpg";
 import bg2 from "@/assets/gub-bg2.jpg";
 import bg3 from "@/assets/bg-3.jpg";

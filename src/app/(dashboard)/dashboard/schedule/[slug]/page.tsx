@@ -1,6 +1,4 @@
 import ScheduleDetails from "@/components/scheduleDetails";
-import axiosInstance from "@/hooks/axiosInstance";
-import React from "react";
 
 const ScheduleDetailsPage = async ({
   params,

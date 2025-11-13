@@ -1,6 +1,5 @@
 "use client";
-import React from "react";
-import { Bell, Bus, LogOut, Search } from "lucide-react";
+import { Bell, LogOut, Search } from "lucide-react";
 import Logo from "../../../public/GUBLogo.svg";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
