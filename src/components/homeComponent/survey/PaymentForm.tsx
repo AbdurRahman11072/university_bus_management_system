@@ -11,7 +11,6 @@ import {
 import React, { useState, useEffect } from "react";
 import { SurveyData, PaymentStatus, BKashData } from "./surveyMain";
 import { useAuth } from "@/hooks/useAuth";
-import { API_BASE } from "@/lib/config";
 
 interface PaymentFormProps {
   formData: SurveyData;
@@ -36,7 +35,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   onPreviousStep,
   onConfirmation,
 }) => {
-  const { user, markSurveyAsCompleted, fetchSurveyData } = useAuth();
+  const { user } = useAuth();
   const [isInitializingPayment, setIsInitializingPayment] = useState(false);
   const [paymentInitiated, setPaymentInitiated] = useState(false);
 
@@ -97,13 +96,16 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     try {
       console.log("Storing payment record with data:", paymentData);
 
-      const response = await fetch(`${API_BASE}/payment/post-payment`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(paymentData),
-      });
+      const response = await fetch(
+        "http://localhost:5000/api/v1/payment/post-payment",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(paymentData),
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -126,13 +128,16 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     try {
       console.log("Submitting survey data:", surveyData);
 
-      const response = await fetch(`${API_BASE}/survey/post-Survey`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(surveyData),
-      });
+      const response = await fetch(
+        "http://localhost:5000/api/v1/survey/post-Survey",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(surveyData),
+        }
+      );
 
       if (response.ok) {
         return true;
@@ -188,24 +193,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         const surveySubmitted = await submitSurveyData(finalSurveyData);
 
         if (surveySubmitted) {
-          // Update auth context so protected routes know survey is completed
-          try {
-            // Force-refresh server survey status to avoid cached GET showing stale result
-            try {
-              await fetchSurveyData(formData.userId, true);
-            } catch (err) {
-              console.warn("Failed to force-refresh survey data:", err);
-            }
-
-            // markSurveyAsCompleted is provided by AuthContext (destructured at top)
-            markSurveyAsCompleted(finalSurveyData);
-          } catch (err) {
-            console.warn(
-              "Could not mark survey as completed via context:",
-              err
-            );
-          }
-
           setTimeout(() => {
             onConfirmation();
           }, 1500);

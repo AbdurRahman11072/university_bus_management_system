@@ -103,9 +103,9 @@ export function MaintenancePage() {
     const daysSinceService =
       (Date.now() - lastServiceDate.getTime()) / (1000 * 60 * 60 * 24);
 
-    if (repairs === 0 && daysSinceService < 30) return "Good";
-    if (repairs <= 3 && daysSinceService < 60) return "Poor";
-    return "Critical";
+    if (repairs === 5 && daysSinceService < 30) return "poor";
+    if (repairs >= 7 && daysSinceService < 60) return "Critical";
+    return "Good";
   };
 
   const getConditionColor = (condition: string): string => {

@@ -213,6 +213,11 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
     }, 250);
   };
 
+  const handleGoHome = () => {
+    // Force reload and navigate to home page
+    window.location.href = "/";
+  };
+
   return (
     <div className="text-center space-y-6">
       {/* Hidden receipt content for printing */}
@@ -321,7 +326,7 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Button
-          onClick={() => router.push("/")}
+          onClick={handleGoHome}
           className="bg-primary hover:bg-primary/90 text-white"
         >
           Go Home

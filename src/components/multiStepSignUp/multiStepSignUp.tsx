@@ -69,7 +69,9 @@ export function MultiStepSignUp() {
       });
       const { email } = finalData;
       if (response.ok) {
-        toast.success("🎉 Account created successfully!");
+        toast.success(
+          "🎉 Account created successfully! Please verify your email please"
+        );
         Cookies.set("verification-email", email);
 
         router.push(`/auth/email-verification`);

@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import { useAuth } from "./useAuth";
 import { useRouter, usePathname } from "next/navigation";
+import { toast } from "sonner";
 
 interface ProtectedSurveyProps {
   children: React.ReactNode;
@@ -15,8 +16,7 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
 
   // Define ALL public routes that don't require authentication
   const publicRoutes = ["/", "/schedule", "/contact-us"];
-  const isPublicRoute =
-    publicRoutes.includes(pathname) || pathname.startsWith("/schedule/");
+  const isPublicRoute = publicRoutes.includes(pathname);
   const isAuthRoute = pathname.startsWith("/auth");
   const isSurveyRoute = pathname === "/survey";
 
@@ -97,7 +97,20 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
       console.log(
         "⭐ Special role user (Admin/Driver) - allowing access to all routes (bypasses email verification)"
       );
-      // Special role users can access everything, no redirects needed
+
+      // NEW: Admin users should not access survey route
+      if (isAdmin && isSurveyRoute) {
+        console.log(
+          "🚫 Admin user trying to access survey - redirecting to home"
+        );
+        toast.info(
+          "Admins don't need to complete the survey. You have full access to the platform."
+        );
+        router.push("/");
+        return;
+      }
+
+      // Special role users can access everything except survey for Admin
       return;
     }
 
@@ -131,6 +144,8 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
     isAuthRoute,
     isPublicRoute,
     hasSpecialRole,
+    isAdmin,
+    userIsVerified,
   ]);
 
   // Show loading only for protected routes (not public or auth routes)
@@ -167,6 +182,13 @@ const ProtectedSurvey = ({ children }: ProtectedSurveyProps) => {
   // If user has special role, allow access to all routes (bypass email verification)
   if (hasSpecialRole) {
     console.log("⭐ Special role user - allowing access to all routes");
+
+    // NEW: Block Admin from survey route in render logic too
+    if (isAdmin && isSurveyRoute) {
+      console.log("🚫 Render blocking - Admin cannot access survey");
+      return null;
+    }
+
     return <>{children}</>;
   }
 

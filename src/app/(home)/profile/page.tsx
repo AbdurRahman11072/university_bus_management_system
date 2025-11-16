@@ -20,10 +20,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function ProfilePage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+
+  const surverHandler = () => {
+    if (user?.roles === "Admin") {
+      toast.info("Admin Can't Add Survery");
+      return;
+    }
+    window.location.href = "/survey";
+  };
 
   console.log("ProfilePage - User data:", user); // Debug log
   console.log("ProfilePage - Auth loading:", isLoading); // Debug log
@@ -163,9 +172,10 @@ export default function ProfilePage() {
                   onUpdateProfile={handleUpdateProfile}
                 />
               </div>
-              <Link href="/survey">
-                <Button variant="default">Add Survey</Button>
-              </Link>
+
+              <Button variant="default" onClick={surverHandler}>
+                Add Survey
+              </Button>
             </div>
           </div>
         </div>

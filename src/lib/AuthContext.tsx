@@ -1,10 +1,16 @@
 "use client";
 
 import React, { createContext, useContext, useReducer, useEffect } from "react";
-import { AuthState, LoginCredentials, RegisterCredentials, User } from "./authType";
+import {
+  AuthState,
+  LoginCredentials,
+  RegisterCredentials,
+  User,
+} from "./authType";
 import { authService } from "./authServices";
 import axiosInstance from "@/hooks/axiosInstance";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 // Extend AuthState to include survey data
 interface ExtendedAuthState extends AuthState {
@@ -20,7 +26,7 @@ interface AuthContextType extends ExtendedAuthState {
   clearError: () => void;
   updateUser: (userData: User) => void;
   fetchSurveyData: (userId?: string, forceRefresh?: boolean) => Promise<void>;
-  markSurveyAsCompleted: (surveyData?: any) => void;
+  markSurveyAsCompleted: (surveyData?: any, shouldRedirect?: boolean) => void; // Add shouldRedirect parameter
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -139,7 +145,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const router = useRouter();
 
   // Function to fetch survey data - accepts userId as parameter
-  // Function to fetch survey data - accepts userId as parameter
   const fetchSurveyData = async (
     userId?: string,
     forceRefresh: boolean = false
@@ -190,13 +195,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Function to mark survey as completed
-  const markSurveyAsCompleted = (surveyData?: any) => {
+  // Function to mark survey as completed - UPDATED with shouldRedirect parameter
+  const markSurveyAsCompleted = (
+    surveyData?: any,
+    shouldRedirect: boolean = true
+  ) => {
     console.log("🎉 Marking survey as completed with data:", surveyData);
+    console.log("🔀 Should redirect:", shouldRedirect);
+
     dispatch({
       type: "SURVEY_COMPLETED",
       payload: surveyData,
     });
+
+    // Only redirect if explicitly requested (default is true for backward compatibility)
+    if (shouldRedirect) {
+      console.log("🔄 Redirecting to home page after survey completion");
+      router.push("/");
+    } else {
+      console.log("⏸️ Skipping redirect to home page");
+    }
   };
 
   useEffect(() => {
@@ -258,10 +276,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log("🔍 Checking survey status after login for:", user.uId);
       const surveyData = await fetchSurveyData(user.uId);
 
+      if (user.roles === "Admin") {
+        console.log("user is : ", user.roles);
+        toast.success("Login successful. Welcome back Sir");
+        window.location.href = "/dashboard";
+      }
+
       // Redirect based on survey status
       if (surveyData) {
         console.log("✅ Survey completed, redirecting to home");
-        router.push("/");
+        toast.success(
+          "Login successful. Welcome to Green University Bus Management System"
+        );
+        window.location.href = "/";
       } else {
         console.log("❌ Survey not completed, redirecting to survey page");
         router.push("/survey");

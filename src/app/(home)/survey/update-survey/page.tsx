@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,15 +19,40 @@ import {
   Clock,
   Plus,
   Trash2,
+  Save,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { SurveyData } from "./surveyMain";
+
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
+
+// Explicit interface definitions - don't rely on external SurveyData
+interface ClassSchedule {
+  id: string;
+  day: string;
+  startTime: string;
+  endTime: string;
+}
+
+interface SurveyFormData {
+  userId?: string;
+  userName?: string;
+  userRole?: "Student" | "Teacher";
+  userDepartment?: string;
+  userSemester: string;
+  destination: string;
+  acBus: string;
+  payment?: boolean;
+  classSchedules: ClassSchedule[];
+}
 
 interface SurveyFormProps {
-  formData: SurveyData;
-  setFormData: React.Dispatch<React.SetStateAction<SurveyData>>;
-  user: any;
-  onNextStep: () => void;
+  formData?: SurveyFormData;
+  setFormData?: React.Dispatch<React.SetStateAction<SurveyFormData>>;
+  user?: any;
+  onNextStep?: () => void;
+  isUpdateMode?: boolean;
+  onUpdateSuccess?: () => void;
 }
 
 interface BusInfo {
@@ -54,13 +80,6 @@ interface ApiResponse {
   data: BusInfo[];
 }
 
-interface ClassSchedule {
-  id: string;
-  day: string;
-  startTime: string;
-  endTime: string;
-}
-
 const daysOfWeek = [
   "Sunday",
   "Monday",
@@ -73,16 +92,36 @@ const daysOfWeek = [
 
 const semesters = ["Fall", "Spring", "Summer"];
 
-const SurveyForm: React.FC<SurveyFormProps> = ({
-  formData,
-  setFormData,
+// Default form data
+const defaultFormData: SurveyFormData = {
+  userSemester: "",
+  destination: "",
+  acBus: "",
+  classSchedules: [],
+  payment: false,
+};
+
+const UpdateSurveyForm: React.FC<SurveyFormProps> = ({
+  formData: propFormData,
+  setFormData: propSetFormData,
   user,
   onNextStep,
+  isUpdateMode = false,
+  onUpdateSuccess,
 }) => {
+  const { user: AuthUser } = useAuth();
+
+  const [internalFormData, setInternalFormData] =
+    useState<SurveyFormData>(defaultFormData);
   const [busRoutes, setBusRoutes] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [updating, setUpdating] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [classSchedules, setClassSchedules] = useState<ClassSchedule[]>([]);
+
+  // Use prop form data if provided, otherwise use internal state
+  const formData = propFormData || internalFormData;
+  const setFormData = propSetFormData || setInternalFormData;
 
   // Fetch bus routes from API
   const fetchBusRoutes = async () => {
@@ -147,9 +186,71 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
     }
   };
 
+  // Fetch user's existing survey data
+  const fetchUserSurvey = async () => {
+    if (!AuthUser?.uId) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `http://localhost:5000/api/v1/survey/get-user/${AuthUser?.uId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const surveyData = await response.json();
+
+      if (surveyData && surveyData.data) {
+        // Update form data with existing survey data
+        const updatedFormData: SurveyFormData = {
+          ...defaultFormData,
+          userSemester: surveyData.data.userSemester || "",
+          destination: surveyData.data.destination || "",
+          acBus: surveyData.data.acBus || "",
+          payment: surveyData.data.payment || false,
+        };
+
+        setFormData(updatedFormData);
+
+        // Update class schedules
+        if (
+          surveyData.data.classSchedules &&
+          Array.isArray(surveyData.data.classSchedules)
+        ) {
+          setClassSchedules(
+            surveyData.data.classSchedules.map(
+              (schedule: any, index: number) => ({
+                id: schedule.id || `schedule-${index}`,
+                day: schedule.day || "",
+                startTime: schedule.startTime || "",
+                endTime: schedule.endTime || "",
+              })
+            )
+          );
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching user survey:", err);
+      toast.error("Failed to load your existing survey data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchBusRoutes();
-  }, []);
+    if (isUpdateMode) {
+      fetchUserSurvey();
+    }
+  }, [isUpdateMode, AuthUser?.uId]);
 
   // Update form data when class schedules change
   useEffect(() => {
@@ -204,7 +305,7 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
   };
 
   const validateSurveyForm = (): boolean => {
-    const requiredFields = ["userSemester", "destination"];
+    const requiredFields = ["userSemester", "destination", "acBus"];
 
     const hasValidClassSchedules =
       classSchedules.length > 0 &&
@@ -213,12 +314,81 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
       );
 
     return (
-      requiredFields.every((field) => formData[field as keyof SurveyData]) &&
-      hasValidClassSchedules
+      requiredFields.every(
+        (field) =>
+          formData[field as keyof SurveyFormData] &&
+          formData[field as keyof SurveyFormData] !== ""
+      ) && hasValidClassSchedules
     );
   };
 
-  // Retry function
+  // Update survey information
+  const handleUpdateSurvey = async () => {
+    if (!AuthUser?.uId) {
+      toast.error("User not authenticated");
+      return;
+    }
+
+    if (!validateSurveyForm()) {
+      toast.error(
+        "Please fill all required fields and add valid class schedules"
+      );
+      return;
+    }
+
+    try {
+      setUpdating(true);
+
+      const updateData = {
+        userSemester: formData.userSemester,
+        destination: formData.destination,
+        classSchedules: classSchedules,
+        acBus: formData.acBus,
+        // Include user information for the update
+        userId: AuthUser.uId,
+        userName: user?.name || AuthUser.name,
+        userRole: user?.roles || "Student",
+        userDepartment: user?.department || "",
+      };
+
+      const response = await fetch(
+        `http://localhost:5000/api/v1/survey/update-survey/${AuthUser?.uId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updateData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
+      }
+
+      const result = await response.json();
+
+      toast.success("Survey information updated successfully");
+
+      if (onUpdateSuccess) {
+        onUpdateSuccess();
+      }
+    } catch (err) {
+      console.error("Error updating survey:", err);
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Failed to update survey information"
+      );
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  // Retry function for bus routes
   const handleRetry = () => {
     fetchBusRoutes();
   };
@@ -232,8 +402,17 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
     return daysOfWeek.filter((day) => !selectedDays.includes(day));
   };
 
+  if (loading && isUpdateMode) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <RefreshCw className="h-6 w-6 animate-spin mr-2" />
+        <span>Loading your survey data...</span>
+      </div>
+    );
+  }
+
   return (
-    <form className="space-y-6">
+    <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
       {/* Semester */}
       <div className="space-y-3">
         <Label
@@ -475,47 +654,67 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
         )}
       </div>
 
-      {/* Bus Preference */}
-      {user?.roles === "Teacher" && (
-        <div className="space-y-3">
-          <Label className="text-sm font-semibold flex items-center gap-2">
-            <span className="text-orange-600">🚌</span>
-            Bus Type Preference
-          </Label>
-          <RadioGroup
-            value={formData.acBus}
-            onValueChange={(value) => handleSelectChange("acBus", value)}
-            className="flex gap-4"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="AC" id="ac" />
-              <Label htmlFor="ac" className="cursor-pointer font-normal">
-                AC Bus
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Non-AC" id="non-ac" />
-              <Label htmlFor="non-ac" className="cursor-pointer font-normal">
-                Non-AC Bus
-              </Label>
-            </div>
-          </RadioGroup>
-        </div>
-      )}
+      {/* Bus Preference - Required for all users based on your schema */}
+      <div className="space-y-3">
+        <Label className="text-sm font-semibold flex items-center gap-2">
+          <span className="text-orange-600">🚌</span>
+          Bus Type Preference
+        </Label>
+        <RadioGroup
+          value={formData.acBus}
+          onValueChange={(value) => handleSelectChange("acBus", value)}
+          className="flex gap-4"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="AC" id="ac" />
+            <Label htmlFor="ac" className="cursor-pointer font-normal">
+              AC Bus
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="Non-AC" id="non-ac" />
+            <Label htmlFor="non-ac" className="cursor-pointer font-normal">
+              Non-AC Bus
+            </Label>
+          </div>
+        </RadioGroup>
+      </div>
 
-      {/* Next Button */}
-      <Button
-        type="button"
-        onClick={onNextStep}
-        className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-        disabled={!validateSurveyForm()}
-        size="lg"
-      >
-        Continue to Payment
-        <ArrowRight className="ml-2 h-4 w-4" />
-      </Button>
+      {/* Action Buttons */}
+      {isUpdateMode ? (
+        <Button
+          type="button"
+          onClick={handleUpdateSurvey}
+          className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          disabled={!validateSurveyForm() || updating}
+          size="lg"
+        >
+          {updating ? (
+            <>
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+              Updating...
+            </>
+          ) : (
+            <>
+              <Save className="mr-2 h-4 w-4" />
+              Update Survey Information
+            </>
+          )}
+        </Button>
+      ) : (
+        <Button
+          type="button"
+          onClick={onNextStep}
+          className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          disabled={!validateSurveyForm()}
+          size="lg"
+        >
+          Continue to Payment
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      )}
     </form>
   );
 };
 
-export default SurveyForm;
+export default UpdateSurveyForm;

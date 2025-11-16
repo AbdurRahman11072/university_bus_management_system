@@ -633,7 +633,7 @@ const SurveyTable = () => {
           </SelectContent>
         </Select>
 
-        <Select
+        {/* <Select
           value={filters.paymentStatus}
           onValueChange={(value) => handleFilterChange("paymentStatus", value)}
         >
@@ -645,7 +645,7 @@ const SurveyTable = () => {
             <SelectItem value="paid">Paid</SelectItem>
             <SelectItem value="unpaid">Unpaid</SelectItem>
           </SelectContent>
-        </Select>
+        </Select> */}
 
         <Collapsible
           open={filtersExpanded}
@@ -713,7 +713,7 @@ const SurveyTable = () => {
               </div>
 
               {/* Department Filter */}
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Label className="text-sm font-medium flex items-center gap-2">
                   <Building className="h-3 w-3" />
                   Department
@@ -736,7 +736,7 @@ const SurveyTable = () => {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
 
               {/* Day Filter */}
               <div className="space-y-2">
