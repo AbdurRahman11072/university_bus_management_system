@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { SurveyData } from "./surveyMain";
+import { API_BASE } from "@/lib/config";
 
 interface SurveyFormProps {
   formData: SurveyData;
@@ -91,15 +92,12 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
       setError(null);
 
       console.log("Fetching bus routes from API...");
-      const response = await fetch(
-        "http://localhost:5000/api/v1/bus/get-bus-info",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE}/bus/get-bus-info`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       console.log("Response status:", response.status);
 

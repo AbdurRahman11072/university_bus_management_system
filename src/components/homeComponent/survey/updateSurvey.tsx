@@ -24,6 +24,7 @@ import React, { useState, useEffect } from "react";
 import { SurveyData } from "./surveyMain";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { API_BASE } from "@/lib/config";
 
 interface SurveyFormProps {
   formData: SurveyData;
@@ -101,15 +102,12 @@ const UpdateSurveyForm: React.FC<SurveyFormProps> = ({
       setError(null);
 
       console.log("Fetching bus routes from API...");
-      const response = await fetch(
-        "http://localhost:5000/api/v1/bus/get-bus-info",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE}/bus/get-bus-info`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       console.log("Response status:", response.status);
 
@@ -164,7 +162,7 @@ const UpdateSurveyForm: React.FC<SurveyFormProps> = ({
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/v1/survey/get-user/${AuthUser?.uId}`,
+        `${API_BASE}/survey/get-user/${AuthUser?.uId}`,
         {
           method: "GET",
           headers: {
@@ -310,7 +308,7 @@ const UpdateSurveyForm: React.FC<SurveyFormProps> = ({
       };
 
       const response = await fetch(
-        `http://localhost:5000/api/v1/survey/update-survey/${AuthUser?.uId}`,
+        `${API_BASE}/survey/update-survey/${AuthUser?.uId}`,
         {
           method: "PATCH",
           headers: {

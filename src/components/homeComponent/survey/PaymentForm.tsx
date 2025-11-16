@@ -11,6 +11,7 @@ import {
 import React, { useState, useEffect } from "react";
 import { SurveyData, PaymentStatus, BKashData } from "./surveyMain";
 import { useAuth } from "@/hooks/useAuth";
+import { API_BASE } from "@/lib/config";
 
 interface PaymentFormProps {
   formData: SurveyData;
@@ -96,16 +97,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     try {
       console.log("Storing payment record with data:", paymentData);
 
-      const response = await fetch(
-        "http://localhost:5000/api/v1/payment/post-payment",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(paymentData),
-        }
-      );
+      const response = await fetch(`${API_BASE}/payment/post-payment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paymentData),
+      });
 
       if (response.ok) {
         const result = await response.json();
@@ -128,16 +126,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     try {
       console.log("Submitting survey data:", surveyData);
 
-      const response = await fetch(
-        "http://localhost:5000/api/v1/survey/post-Survey",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(surveyData),
-        }
-      );
+      const response = await fetch(`${API_BASE}/survey/post-Survey`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(surveyData),
+      });
 
       if (response.ok) {
         return true;
@@ -233,7 +228,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       // Generate a unique transaction ID for bKash payment (6 digits)
       const transactionId = generateTransactionId();
 
-      const response = await fetch("http://localhost:5000/api/bkash/create", {
+      const response = await fetch(`${API_BASE}/bkash/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -287,7 +282,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         if (userId === formData.userId) {
           try {
             const verifyResponse = await fetch(
-              `http://localhost:5000/api/bkash/execute/${orderId}`
+              `${API_BASE}/bkash/execute/${orderId}`
             );
             const verifyData = await verifyResponse.json();
 
