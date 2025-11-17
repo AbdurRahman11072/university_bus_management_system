@@ -1,7 +1,28 @@
 "use client";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
-import { BadgeDollarSign, CircleUser, Cog, HandCoins, LayoutDashboard, LogOut, User, Settings, CreditCard, Shield, Bell, HelpCircle, NotebookPen } from "lucide-react";
+import {
+  BadgeDollarSign,
+  CircleUser,
+  Cog,
+  HandCoins,
+  LayoutDashboard,
+  LogOut,
+  User,
+  Settings,
+  CreditCard,
+  Shield,
+  Bell,
+  HelpCircle,
+  NotebookPen,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -169,15 +190,15 @@ const Profile = () => {
 
           {/* Admin Dashboard */}
           {LoginUser?.roles === "Admin" && (
-            <DropdownMenuItem className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-accent hover:text-white transition-all duration-200 group">
-              <Link href="/dashboard" className="flex items-center w-full">
+            <Link href="/dashboard">
+              <DropdownMenuItem className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-accent hover:text-white transition-all duration-200 group">
                 <Shield className="h-4 w-4 mr-3 text-gray-600 group-hover:text-white" />
                 <span className="font-medium">Admin Dashboard</span>
                 <span className="ml-auto bg-red-100 text-red-800 text-xs rounded-full px-2 py-1">
                   Admin
                 </span>
-              </Link>
-            </DropdownMenuItem>
+              </DropdownMenuItem>
+            </Link>
           )}
 
           {/* Driver Specific Menu */}

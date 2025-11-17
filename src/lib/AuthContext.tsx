@@ -276,12 +276,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log("🔍 Checking survey status after login for:", user.uId);
       const surveyData = await fetchSurveyData(user.uId);
 
-      if (user.roles === "Admin") {
-        console.log("user is : ", user.roles);
-        toast.success("Login successful. Welcome back Sir");
-        window.location.href = "/dashboard";
-      }
-
       // Redirect based on survey status
       if (surveyData) {
         console.log("✅ Survey completed, redirecting to home");
