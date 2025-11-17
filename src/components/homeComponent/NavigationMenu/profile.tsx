@@ -25,11 +25,13 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const Profile = () => {
   const { user, logout } = useAuth();
   const [LoginUser, setLoginUser] = useState<any>(user);
+  const router = useRouter();
 
   const handleLogout = async () => {
     try {
@@ -190,15 +192,16 @@ const Profile = () => {
 
           {/* Admin Dashboard */}
           {LoginUser?.roles === "Admin" && (
-            <Link href="/dashboard">
-              <DropdownMenuItem className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-accent hover:text-white transition-all duration-200 group">
-                <Shield className="h-4 w-4 mr-3 text-gray-600 group-hover:text-white" />
-                <span className="font-medium">Admin Dashboard</span>
-                <span className="ml-auto bg-red-100 text-red-800 text-xs rounded-full px-2 py-1">
-                  Admin
-                </span>
-              </DropdownMenuItem>
-            </Link>
+            <DropdownMenuItem
+              className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-accent hover:text-white transition-all duration-200 group"
+              onClick={() => router.push("/admin")}
+            >
+              <Shield className="h-4 w-4 mr-3 text-gray-600 group-hover:text-white" />
+              <span className="font-medium">Admin Dashboard</span>
+              <span className="ml-auto bg-red-100 text-red-800 text-xs rounded-full px-2 py-1">
+                Admin
+              </span>
+            </DropdownMenuItem>
           )}
 
           {/* Driver Specific Menu */}

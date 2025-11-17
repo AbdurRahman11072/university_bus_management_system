@@ -1,61 +1,79 @@
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
-import { BarChart, BellPlus, BookCopy, Bus, BusIcon, Calendar, FileText, Home, Icon, LogOut, Map, Navigation, PiIcon, Settings, User, UserCheck, Users } from "lucide-react";
+import {
+  BarChart,
+  BellPlus,
+  BookCopy,
+  Bus,
+  BusIcon,
+  Calendar,
+  FileText,
+  Home,
+  Icon,
+  LogOut,
+  Map,
+  Navigation,
+  PiIcon,
+  Settings,
+  User,
+  UserCheck,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const menuItems = [
-  { id: "dashboard", label: "Dashboard", icon: Home, link: "/dashboard" },
-  { id: "user", label: "User", icon: User, link: "/dashboard/user" },
-  { id: "survey", label: "Survey", icon: BookCopy, link: "/dashboard/survey" },
+  { id: "admin", label: "admin", icon: Home, link: "/admin" },
+  { id: "user", label: "User", icon: User, link: "/admin/user" },
+  { id: "survey", label: "Survey", icon: BookCopy, link: "/admin/survey" },
   {
     id: "schedule",
     label: "Schedule",
     icon: Calendar,
-    link: "/dashboard/schedule",
+    link: "/admin/schedule",
   },
   {
     id: "contact",
     label: "Contact",
     icon: FileText,
-    link: "/dashboard/contact",
+    link: "/admin/contact",
   },
   {
     id: "manage-buses",
     label: "Manage Buses",
     icon: Bus,
-    link: "/dashboard/manage-buses",
+    link: "/admin/manage-buses",
   },
   {
     id: "manage-drivers",
     label: "Manage Drivers",
     icon: UserCheck,
-    link: "/dashboard/manage-drivers",
+    link: "/admin/manage-drivers",
   },
   {
     id: "maintenance",
     label: "Maintenance",
     icon: Settings,
-    link: "/dashboard/maintenance",
+    link: "/admin/maintenance",
   },
   {
     id: "booktrip",
     label: "Trip Request",
     icon: BusIcon,
-    link: "/dashboard/book-trip",
+    link: "/admin/book-trip",
   },
   {
     id: "notices",
     label: "Notices",
     icon: BellPlus,
-    link: "/dashboard/notices",
+    link: "/admin/notices",
   },
   {
     id: "transaction",
     label: "All Transaction",
     icon: BellPlus,
-    link: "/dashboard/transaction",
+    link: "/admin/transaction",
   },
 ];
 
@@ -64,8 +82,8 @@ const DashboardSideBar = () => {
   const pathname = usePathname();
 
   const isActive = (link: string) => {
-    if (link === "/dashboard") {
-      return pathname === "/dashboard";
+    if (link === "/admin") {
+      return pathname === "/admin";
     }
     return pathname.startsWith(link);
   };
@@ -95,13 +113,13 @@ const DashboardSideBar = () => {
       <div className="px-4 py-4 border-t border-border">
         <button
           className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-            pathname === "/dashboard/profile"
+            pathname === "/admin/profile"
               ? "bg-primary text-primary-foreground shadow-md"
               : "text-foreground hover:bg-secondary/50"
           }`}
         >
           <Users className="w-5 h-5" />
-          <Link href="/dashboard/profile" className="font-medium">
+          <Link href="/admin/profile" className="font-medium">
             Profile
           </Link>
         </button>

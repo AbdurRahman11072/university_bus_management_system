@@ -1,9 +1,12 @@
 import Cookies from "js-cookie";
 import fetchWithToast from "@/hooks/fetchWrapper";
-import { AuthResponse, LoginCredentials, RegisterCredentials } from "./authType";
+import {
+  AuthResponse,
+  LoginCredentials,
+  RegisterCredentials,
+} from "./authType";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {

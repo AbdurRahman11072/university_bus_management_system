@@ -4,7 +4,7 @@ import "@/app/globals.css";
 import DashboardHader from "@/components/dashboard/dashboardHeader";
 import DashboardSideBar from "@/components/dashboard/dashboardSideBar";
 import { AuthProvider } from "@/lib/AuthContext";
-import ProtectedRote from "@/hooks/protectedRote";
+import ProtectedRoute from "@/hooks/protectedRote";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased  mb-10 lg:mb-0`}
       >
         <AuthProvider>
-          <ProtectedRote>
+          <ProtectedRoute>
             <DashboardHader />
             <main className="mx-auto flex ">
               <DashboardSideBar />
@@ -40,7 +40,7 @@ export default function RootLayout({
                 {children}
               </div>
             </main>
-          </ProtectedRote>
+          </ProtectedRoute>
         </AuthProvider>
       </body>
     </html>

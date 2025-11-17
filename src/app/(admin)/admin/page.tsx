@@ -1,5 +1,3 @@
-"use client";
-
 import { StatCard } from "@/components/dashboard/star-card";
 import UsersPage from "@/components/dashboard/user/userPage";
 
