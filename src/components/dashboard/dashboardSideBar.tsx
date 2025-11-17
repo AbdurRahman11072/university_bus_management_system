@@ -24,7 +24,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const menuItems = [
-  { id: "admin", label: "admin", icon: Home, link: "/admin" },
+  { id: "admin", label: "Dashboard", icon: Home, link: "/admin" },
   { id: "user", label: "User", icon: User, link: "/admin/user" },
   { id: "survey", label: "Survey", icon: BookCopy, link: "/admin/survey" },
   {
