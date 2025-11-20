@@ -111,18 +111,6 @@ const DashboardSideBar = () => {
       </nav>
 
       <div className="px-4 py-4 border-t border-border">
-        <button
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-            pathname === "/admin/profile"
-              ? "bg-primary text-primary-foreground shadow-md"
-              : "text-foreground hover:bg-secondary/50"
-          }`}
-        >
-          <Users className="w-5 h-5" />
-          <Link href="/admin/profile" className="font-medium">
-            Profile
-          </Link>
-        </button>
         <Link href={"/"}>
           <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg  hover:bg-accent/30 transition-all mt-2">
             <Home className="w-5 h-5" />

@@ -321,7 +321,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log("🚪 Logging out user");
     authService.logout();
     dispatch({ type: "AUTH_LOGOUT" });
-    router.push("/");
+    window.location.href = "/";
   };
 
   const clearError = () => {
