@@ -2,7 +2,7 @@
 
 A modern, full-featured bus management platform designed specifically for Green University of Bangladesh (GUB) students and faculty. This Next.js application provides real-time bus tracking, online booking, route scheduling, and comprehensive transportation management.
 
-[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)]([https://green-university.vercel.app](https://green-university-five.vercel.app/))
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://green-university-five.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
