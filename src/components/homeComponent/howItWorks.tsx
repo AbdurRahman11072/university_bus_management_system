@@ -1,4 +1,4 @@
-import { Bus, BusFront, BusIcon, ChevronRight, Earth, Hourglass, LogIn } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
 
 const Details = [
@@ -9,14 +9,15 @@ const Details = [
   },
   {
     step: 2,
-    title: "Select Bus",
-    description: "Choose your preferred bus route",
+    title: "Give Survey",
+    description: "For better bus distribution",
   },
   {
     step: 3,
-    title: "Make Payment",
-    description: "Secure payment processing",
+    title: "Select Bus",
+    description: "Choose your preferred bus route",
   },
+
   {
     step: 4,
     title: "Start Tracking",
