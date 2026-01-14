@@ -5,9 +5,6 @@ const nextConfig: NextConfig = {
 
   // Disable ESLint during production builds per user request
   // (this prevents ESLint rules from failing the build)
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
 
   images: {
     remotePatterns: [
