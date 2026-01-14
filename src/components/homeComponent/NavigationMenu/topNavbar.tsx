@@ -1,28 +1,28 @@
 "use client";
-import Image from "next/image";
-import Link from "next/link";
-import React, { useState, useEffect } from "react";
-import { API_BASE } from "@/lib/config";
-import Logo from "../../../../public/GUBLogo.svg";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { API_BASE } from "@/lib/config";
 import { SearchIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import Logo from "../../../../public/gublogo.jpg";
 
+import { useAuth } from "@/hooks/useAuth";
+import { usePathname } from "next/navigation";
+import { Button } from "../../ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "../../ui/dialog";
-import { Button } from "../../ui/button";
-import Profile from "./profile";
-import { useAuth } from "@/hooks/useAuth";
-import { usePathname } from "next/navigation";
 import TextMarquee from "../text-marquee";
+import Profile from "./profile";
 
 const menu = [
   {
@@ -235,9 +235,9 @@ const TopNavbar = () => {
             <Image
               src={Logo}
               alt="logo"
-              width={100}
+              width={50}
               height={50}
-              className="w-48 h-12 -ml-5 lg:ml-0"
+              className="w-15 h-15 -ml-5 rounded-full lg:ml-0"
               priority
             />
           </div>

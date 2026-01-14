@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
 import bg1 from "@/assets/bg-1.jpg";
 import bg2 from "@/assets/bg-2.jpg";
 import bg3 from "@/assets/bg-3.jpg";
+import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface Slide {
   id: number;
@@ -35,7 +35,7 @@ const slides = [
   {
     id: 3,
     image: bg3,
-    title: "On-Time Delivery Guaranteed",
+    title: "Know Your Bus, Save Your Time",
     subtitle: "We value your time and commitment",
     buttonText: "Get Started",
     link: "/auth/login",
