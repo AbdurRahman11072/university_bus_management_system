@@ -37,7 +37,7 @@ const slides = [
     image: bg3,
     title: "Know Your Bus, Save Your Time",
     subtitle: "We value your time and commitment",
-    buttonText: "Get Started",
+    buttonText: "See Routes",
     link: "/auth/login",
   },
 ];
