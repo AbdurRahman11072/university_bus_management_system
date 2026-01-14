@@ -1,39 +1,44 @@
 "use client";
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import Link from "next/link";
 
 export default function FAQsTwo() {
   const faqItems = [
     {
       id: "item-1",
-      question: "How long does shipping take?",
+      question: "How can I see the bus schedule?",
       answer:
-        "Standard shipping takes 3-5 business days, depending on your location. Express shipping options are available at checkout for 1-2 business day delivery.",
+        "You can view the complete bus schedule from the Bus Schedule section. It shows route, time, and bus number.",
     },
     {
       id: "item-2",
-      question: "What payment methods do you accept?",
+      question: "Do I need to log in to see bus information?",
       answer:
-        "We accept all major credit cards (Visa, Mastercard, American Express), PayPal, Apple Pay, and Google Pay. For enterprise customers, we also offer invoicing options.",
+        "No. Basic information like routes and schedules is available without login.Login is required for profile features.",
     },
     {
       id: "item-3",
-      question: "Can I change or cancel my order?",
+      question: "Is the bus service free for students?",
       answer:
-        "You can modify or cancel your order within 1 hour of placing it. After this window, please contact our customer support team who will assist you with any changes.",
+        "Yes, the bus service is provided by Green University for registered students only.",
     },
     {
       id: "item-4",
-      question: "Do you ship internationally?",
+      question: "What should I do if I miss my bus?",
       answer:
-        "Yes, we ship to over 50 countries worldwide. International shipping typically takes 7-14 business days. Additional customs fees may apply depending on your country's import regulations.",
+        "If you miss your bus, please wait for the next available schedule or contact the transport office.",
     },
     {
       id: "item-5",
-      question: "What is your return policy?",
+      question: "Can teachers and staff use the same system?",
       answer:
-        "We offer a 30-day return policy for most items. Products must be in original condition with tags attached. Some specialty items may have different return terms, which will be noted on the product page.",
+        "Yes, teachers and staff can use the system with their valid university credentials.",
     },
   ];
 
