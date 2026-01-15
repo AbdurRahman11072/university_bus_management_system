@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { API_BASE } from "@/lib/config";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface EmailVerificationProps {
   onVerificationSuccess?: () => void;
@@ -88,7 +88,9 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
       console.log("Response data:", data);
 
       if (data.status === "success" || response.ok) {
-        toast.success("🎉 Email verified successfully! Welcome aboard!");
+        toast.success(
+          "🎉 Email verified successfully! Welcome aboard! Now you can login to your account."
+        );
 
         if (onVerificationSuccess) {
           onVerificationSuccess();
@@ -310,6 +312,11 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
                 type="submit"
                 disabled={
                   isLoading || verificationCode.some((digit) => digit === "")
+                }
+                onSubmit={() =>
+                  toast.success(
+                    "🎉 Email verified successfully! Welcome aboard! Now you can login to your account."
+                  )
                 }
                 className="w-full max-w-xs py-4 px-6 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none transform hover:scale-[1.02] active:scale-[0.98]"
               >

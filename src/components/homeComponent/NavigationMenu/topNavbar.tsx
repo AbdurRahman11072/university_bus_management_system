@@ -231,13 +231,13 @@ const TopNavbar = () => {
     <>
       <nav className="w-full flex bg-white justify-between items-center p-4 border-b-[1px] border-slate-500/20 z-50">
         <div className="flex gap-5 justify-center items-center">
-          <div className="logo-container">
+          <div className="logo-container w-10 ">
             <Image
               src={Logo}
               alt="logo"
-              width={50}
-              height={50}
-              className="w-15 h-15 -ml-5 rounded-full lg:ml-0"
+              width={60}
+              height={60}
+              className=" w-12 h-10   rounded-full lg:ml-0"
               priority
             />
           </div>
@@ -268,7 +268,7 @@ const TopNavbar = () => {
             </InputGroup>
           </form>
         </div>
-        <div className="w-[40vw] overflow-hidden">
+        <div className="w-[40vw] md:w-[60vw] lg:w-[25vw] overflow-hidden">
           <TextMarquee texts={announcementTexts} />
         </div>
 
@@ -281,7 +281,7 @@ const TopNavbar = () => {
             />
           </button>
 
-          <ul className="gap-4 hidden font-sans lg:flex">
+          <ul className="gap-4 hidden font-sans lg:flex lg:gap-1">
             {menu.map((item) => (
               <Link
                 key={item.name}
