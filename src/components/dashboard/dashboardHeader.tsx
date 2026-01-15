@@ -1,8 +1,8 @@
 "use client";
-import { Bell, LogOut, Search } from "lucide-react";
-import Logo from "../../../public/GUBLogo.svg";
-import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
+import { LogOut } from "lucide-react";
+import Image from "next/image";
+import Logo from "../../../public/GUBLogo.svg";
 
 const DashboardHader = () => {
   const { logout } = useAuth();
@@ -22,15 +22,15 @@ const DashboardHader = () => {
 
         <div className="flex items-center gap-2 sm:gap-4">
           {/* Search Icon */}
-          <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors">
+          {/* <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors">
             <Search className="w-5 h-5 text-foreground" />
           </button>
 
           {/* Notification Icon */}
-          <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors relative">
+          {/* <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors relative">
             <Bell className="w-5 h-5 text-foreground" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full"></span>
-          </button>
+          </button> */}
 
           {/* Desktop Profile Menu - Visible on lg+ */}
           <div
