@@ -9,19 +9,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import {
-  BadgeDollarSign,
-  CircleUser,
-  Cog,
-  HandCoins,
-  LayoutDashboard,
-  LogOut,
-  User,
-  Settings,
   CreditCard,
-  Shield,
-  Bell,
   HelpCircle,
-  NotebookPen,
+  LogOut,
+  Settings,
+  Shield,
+  User,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -194,7 +187,7 @@ const Profile = () => {
           {LoginUser?.roles === "Admin" && (
             <DropdownMenuItem
               className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-accent hover:text-white transition-all duration-200 group"
-              onClick={() => router.push("/admin")}
+              onClick={() => router.push("/admin/user")}
             >
               <Shield className="h-4 w-4 mr-3 text-gray-600 group-hover:text-white" />
               <span className="font-medium">Admin Dashboard</span>

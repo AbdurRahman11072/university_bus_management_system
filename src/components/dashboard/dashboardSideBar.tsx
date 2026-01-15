@@ -2,7 +2,6 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import {
-  BarChart,
   BellPlus,
   BookCopy,
   Bus,
@@ -10,21 +9,15 @@ import {
   Calendar,
   FileText,
   Home,
-  Icon,
   LogOut,
-  Map,
-  Navigation,
-  PiIcon,
   Settings,
   User,
   UserCheck,
-  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const menuItems = [
-  { id: "admin", label: "Dashboard", icon: Home, link: "/admin" },
   { id: "user", label: "User", icon: User, link: "/admin/user" },
   { id: "survey", label: "Survey", icon: BookCopy, link: "/admin/survey" },
   {
