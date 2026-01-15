@@ -19,11 +19,41 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Green University Bus Management System",
-  description: "Book you bus to reach your destination",
+  description: "Book your bus to reach your destination",
   icons: {
-    icon: "/gublogo.jpg",
+    icon: [
+      {
+        url: "/gublogo.jpg",
+        type: "image/jpeg",
+      },
+      // For modern browsers
+      {
+        url: "/gublogo.jpg",
+        type: "image/jpeg",
+        sizes: "32x32",
+      },
+      {
+        url: "/gublogo.jpg",
+        type: "image/jpeg",
+        sizes: "16x16",
+      },
+      // For iOS devices
+      {
+        url: "/gublogo.jpg",
+        type: "image/jpeg",
+        sizes: "180x180",
+        rel: "apple-touch-icon",
+      },
+    ],
+    // Fallbacks for older browsers
     shortcut: "/gublogo.jpg",
     apple: "/gublogo.jpg",
+  },
+  // Optional: For better PWA/device integration
+  appleWebApp: {
+    capable: true,
+    title: "GUB Bus System",
+    statusBarStyle: "black-translucent",
   },
 };
 
