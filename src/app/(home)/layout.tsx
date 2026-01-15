@@ -21,42 +21,57 @@ export const metadata: Metadata = {
   title: "Green University Bus Management System",
   description: "Book your bus to reach your destination",
   icons: {
-    icon: [
+    // Main favicon for browsers
+    icon: "/favicon.ico",
+
+    // Apple devices (iOS)
+    apple: [
+      "/apple-touch-icon.png",
       {
-        url: "/gublogo.jpg",
-        type: "image/jpeg",
-      },
-      // For modern browsers
-      {
-        url: "/gublogo.jpg",
-        type: "image/jpeg",
-        sizes: "32x32",
-      },
-      {
-        url: "/gublogo.jpg",
-        type: "image/jpeg",
-        sizes: "16x16",
-      },
-      // For iOS devices
-      {
-        url: "/gublogo.jpg",
-        type: "image/jpeg",
+        url: "/apple-touch-icon.png",
         sizes: "180x180",
-        rel: "apple-touch-icon",
+        type: "image/png",
       },
     ],
-    // Fallbacks for older browsers
-    shortcut: "/gublogo.jpg",
-    apple: "/gublogo.jpg",
+
+    // Android/Chrome
+    shortcut: "/favicon-16x16.png",
   },
-  // Optional: For better PWA/device integration
+
+  // CRITICAL for mobile shortcuts
+  manifest: "/manifest.json",
+
+  // iOS specific
   appleWebApp: {
     capable: true,
     title: "GUB Bus System",
     statusBarStyle: "black-translucent",
+    startupImage: [
+      {
+        url: "/apple-touch-icon.png",
+        media:
+          "(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)",
+      },
+    ],
+  },
+
+  // Android/Windows specific
+  applicationName: "GUB Bus System",
+  themeColor: "#4CAF50", // Use your brand color
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+  },
+
+  // Additional meta tags for better mobile support
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "apple-mobile-web-app-title": "GUB Bus System",
   },
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
