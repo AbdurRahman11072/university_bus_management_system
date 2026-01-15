@@ -1,9 +1,15 @@
 "use client";
-import { useForm } from "react-hook-form";
-import { AlertCircle, Bus, MapPin } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import axiosInstance from "@/hooks/axiosInstance";
+import { AlertCircle, Bus, MapPin } from "lucide-react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 interface ContactFormData {
@@ -64,12 +70,12 @@ const ContactUsPage = () => {
                     htmlFor="uId"
                     className="text-sm font-semibold text-foreground"
                   >
-                    Name
+                    User id
                   </label>
                   <input
                     id="uId"
                     type="text"
-                    placeholder="Your uId"
+                    placeholder="Enter your user id"
                     className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                     {...register("uId", {
                       required: "Name is required",
@@ -210,7 +216,7 @@ const ContactUsPage = () => {
                   <div>
                     <p className="font-semibold text-foreground">Email</p>
                     <p className="text-sm text-muted-foreground">
-                      support@busmanager.com
+                      gubsupport@busmanager.com
                     </p>
                   </div>
                 </div>
@@ -237,7 +243,7 @@ const ContactUsPage = () => {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-foreground font-medium">Sunday</span>
+                  <span className="text-foreground font-medium">Thursday </span>
                   <span className="text-muted-foreground">Closed</span>
                 </div>
               </CardContent>

@@ -1,6 +1,12 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Button } from "./ui/button";
 import { AlertCircle, Bus, MapPin } from "lucide-react";
+import { Button } from "./ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 
 const ContectForm = () => {
   return (
@@ -27,11 +33,11 @@ const ContectForm = () => {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-foreground">
-                  Name
+                  User id
                 </label>
                 <input
                   type="text"
-                  placeholder="Your name"
+                  placeholder="Enter user id"
                   className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
@@ -109,7 +115,7 @@ const ContectForm = () => {
                   <div>
                     <p className="font-semibold text-foreground">Email</p>
                     <p className="text-sm text-muted-foreground">
-                      support@busmanager.com
+                      gubsupport@busmanager.com
                     </p>
                   </div>
                 </div>
@@ -136,7 +142,7 @@ const ContectForm = () => {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-foreground font-medium">Sunday</span>
+                  <span className="text-foreground font-medium">Thursday </span>
                   <span className="text-muted-foreground">Closed</span>
                 </div>
               </CardContent>
