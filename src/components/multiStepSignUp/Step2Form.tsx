@@ -1,14 +1,20 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { UserFormData, UserRole, BloodGroup } from "@/lib/userType";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ImageUpload } from "./ImageUpload";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { BloodGroup, UserFormData, UserRole } from "@/lib/userType";
 import { motion } from "framer-motion";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { ImageUpload } from "./ImageUpload";
 
 interface Step2FormProps {
   onSubmit: (data: Partial<UserFormData>) => void;
@@ -143,16 +149,29 @@ export function Step2Form({
   };
 
   const departments = [
-    "Computer Science and Engineering",
-    "Electrical and Electronic Engineering",
-    "Business Administration",
-    "Economics",
-    "English",
-    "Law",
-    "Pharmacy",
-    "Public Health",
-    "Architecture",
-    "Environmental Science",
+    "Undergraduate programs",
+    "B.Sc. in Computer Science and Engineering",
+    "B.Sc. in Electrical and Electronics Engineering",
+    "B.Sc. in Textile Engineering",
+    "B.Sc. in Software Engineering",
+    "B.Sc. in Artificial Intelligence and Data Science",
+    "B.Sc. in Robotics and Information Systems (Proposed)",
+    "Faculty of Business",
+    "Undergraduate program",
+    "Bachelor of Business Administration (BBA)",
+    "Graduate program",
+    "Master of Business Administration (MBA)",
+    "Master of Bank Management (MBM)",
+    "Arts & Humanities and Social Sciences",
+    "Undergraduate program",
+    "Bachelor of Arts (Honors) in English",
+    "Bachelor of Laws (LLB-Hon's)",
+    "Bachelor of Laws (LLB-Pass)",
+    "Journalism & Media Communication",
+    "BSS (Hon's) in Sociology",
+    "BSS (Hon's) in Anthropology",
+    "Graduate program",
+    "Master of Laws (LL.M)",
   ];
 
   const isFormDisabled = () => {
