@@ -10,7 +10,7 @@ import { SearchIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import Logo from "../../../../public/gublogo.jpg";
+import Logo from "../../../../public/gublogo.png";
 
 import { useAuth } from "@/hooks/useAuth";
 import { usePathname } from "next/navigation";

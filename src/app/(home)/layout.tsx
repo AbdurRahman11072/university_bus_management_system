@@ -16,30 +16,26 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
 export const metadata: Metadata = {
   title: "Green University Bus Management System",
   description: "Book your bus to reach your destination",
+  manifest: "/manifest.json",
   icons: {
     // Main favicon for browsers
-    icon: "/favicon.ico",
-
+    icon: "/gublogo.png",
     // Apple devices (iOS)
     apple: [
-      "/apple-touch-icon.png",
+      "/gublogo.png",
       {
-        url: "/apple-touch-icon.png",
+        url: "/gublogo.png",
         sizes: "180x180",
         type: "image/png",
       },
     ],
 
     // Android/Chrome
-    shortcut: "/favicon-16x16.png",
+    shortcut: "/gublogo.png",
   },
-
-  // CRITICAL for mobile shortcuts
-  manifest: "/manifest.json",
 
   // iOS specific
   appleWebApp: {
@@ -48,7 +44,7 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     startupImage: [
       {
-        url: "/apple-touch-icon.png",
+        url: "/gublogo.png",
         media:
           "(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)",
       },
@@ -57,14 +53,8 @@ export const metadata: Metadata = {
 
   // Android/Windows specific
   applicationName: "GUB Bus System",
-  themeColor: "#4CAF50", // Use your brand color
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-  },
+  themeColor: "#4CAF50",
 
-  // Additional meta tags for better mobile support
   other: {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
@@ -72,6 +62,7 @@ export const metadata: Metadata = {
     "apple-mobile-web-app-title": "GUB Bus System",
   },
 };
+
 export default function RootLayout({
   children,
 }: Readonly<{
