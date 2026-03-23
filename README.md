@@ -1,6 +1,6 @@
-# 🚌 GUB Bus Management System
+# 🚌 University Bus Management System
 
-A modern, full-featured bus management platform designed specifically for Green University of Bangladesh (GUB) students and faculty. This Next.js application provides real-time bus tracking, online booking, route scheduling, and comprehensive transportation management.
+A modern, full-featured bus management platform designed specifically for university students and faculty. This Next.js application provides real-time bus tracking, online booking, route scheduling, and comprehensive transportation management.
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://green-university-five.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
@@ -35,7 +35,7 @@ A modern, full-featured bus management platform designed specifically for Green 
 ### 🚀 Advanced Features
 - **Live Route Tracking** - Monitor your bus in real-time
 - **Schedule Management** - Accurate arrival and departure times
-- **Student Discount Program** - Special pricing for GUB students
+- **Student Discount Program** - Special pricing for university students
 - **Group Booking** - 20% discount on group reservations
 - **Early Bird Specials** - Save by booking 3 days in advance
 - **Emergency Support** - 24/7 assistance for travelers
@@ -117,7 +117,7 @@ Before you begin, ensure you have the following installed:
 ## 📁 Project Structure
 
 ```
-green_university/
+university-bus-management/
 ├── public/              # Static assets (images, icons, etc.)
 ├── scripts/             # Utility scripts
 ├── src/
@@ -203,12 +203,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-**Green University Bus Management Team**
+**University Bus Management Team**
 
-- 📧 Email: support@gubbus.com
+- 📧 Email: support@ubms.com
 - 📱 Phone: +880 1234-567890
-- 🏢 Address: Green University of Bangladesh, Dhaka
-- 🌐 Website: [green-university.vercel.app](https://green-university.vercel.app)
+- 🏢 Address: Dhaka, Bangladesh
+- 🌐 Website: [university-bus-management.vercel.app](https://green-university-five.vercel.app)
 
 ### Connect With Us
 
@@ -218,13 +218,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- Green University of Bangladesh for supporting this initiative
 - All contributors who have helped improve this project
 - The Next.js and React communities for excellent documentation
 
 ---
 
 <div align="center">
-  <p>Made with ❤️ for Green University of Bangladesh</p>
-  <p>© 2025 Green University Of Bangladesh. All Rights Reserved.</p>
+  <p>Made with ❤️ for University Students & Faculty</p>
+  <p>© 2025 University Bus Management System. All Rights Reserved.</p>
 </div>
