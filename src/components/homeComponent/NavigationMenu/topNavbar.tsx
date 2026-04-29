@@ -1,523 +1,281 @@
-"use client";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-import { API_BASE } from "@/lib/config";
-import { SearchIcon } from "lucide-react";
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import Logo from "../../../../public/gublogo.png";
-
-import { useAuth } from "@/hooks/useAuth";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Button } from "../../ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../../ui/dialog";
-import TextMarquee from "../text-marquee";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Search, 
+  Bell,
+  Bus,
+  ChevronRight,
+  Clock,
+  CheckCircle2,
+  Inbox,
+  X,
+  Megaphone,
+  UserCheck,
+  Calendar,
+  Eye,
+  ArrowRight
+} from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { API_BASE } from "@/lib/config";
+import Logo from "../../../../public/gublogo.png";
 import Profile from "./profile";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
-const menu = [
-  {
-    name: "Home",
-    path: "/",
-  },
-  {
-    name: "Schedule",
-    path: "/schedule",
-  },
-  {
-    name: "Book Trip",
-    path: "/booktrip",
-  },
-  {
-    name: "Contact Us",
-    path: "/contact-us",
-  },
-  {
-    name: "Notice",
-    path: "/notice",
-  },
+const menuItems = [
+  { name: "Home", path: "/" },
+  { name: "Schedule", path: "/schedule" },
+  { name: "Book Trip", path: "/booktrip" },
+  { name: "Contact", path: "/contact-us" },
 ];
 
-interface BusSearchResult {
-  id: string;
-  busNumber: string;
-  busName: string;
-  destination: string;
-  departureTime: string;
-  arrivalTime: string;
-  price: number;
-  availableSeats: number;
-  busImage?: string;
-  busRoute?: string;
-  startingPoint?: string;
-  rating?: number;
-  busDestination: string[];
-  busImg: string;
-}
-
-const announcementTexts = [
+const announcements = [
   "🚌 Book your tickets now! Special discounts available",
   "🌟 New routes added: Downtown Express & Airport Shuttle",
   "📱 Download our mobile app for exclusive offers",
-  "🎫 Group bookings available with 20% discount",
-  "⏰ Early bird special: Book 3 days in advance and save!",
-  "🔒 Safe and comfortable travel guaranteed",
 ];
 
 const TopNavbar = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [allBuses, setAllBuses] = useState<BusSearchResult[]>([]);
-  const [searchResults, setSearchResults] = useState<BusSearchResult[]>([]);
-  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchError, setSearchError] = useState("");
-  const { user, isAuthenticated } = useAuth();
   const pathname = usePathname();
+  const { user, isAuthenticated } = useAuth();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [currentAnnouncement, setCurrentAnnouncement] = useState(0);
+  const [notices, setNotices] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  console.log(user, isAuthenticated);
-
-  // Fetch all buses when component mounts
   useEffect(() => {
-    fetchAllBuses();
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Fetch all buses function
-  const fetchAllBuses = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`${API_BASE}/bus/get-bus-info`);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch data: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("All buses:", data.data);
-      setAllBuses(data.data || []);
-      setSearchResults(data.data || []); // Initialize search results with all buses
-    } catch (error) {
-      console.error("Fetch all buses error:", error);
-      setSearchError("Failed to load buses. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  // Open search dialog and show all buses
-  const openSearchDialog = () => {
-    console.log("Opening search dialog");
-    setIsSearchDialogOpen(true);
-    setSearchQuery("");
-    setSearchError("");
-
-    // If we have buses loaded, show them immediately
-    if (allBuses.length > 0) {
-      setSearchResults(allBuses);
-    } else {
-      // If no buses loaded yet, try to fetch them
-      fetchAllBuses();
-    }
-  };
-
-  // Handle desktop search - ALWAYS open modal
-  const handleDesktopSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Desktop search triggered with query:", searchQuery);
-
-    // Always open the modal first
-    openSearchDialog();
-
-    // If there's a search query, perform search after opening modal
-    if (searchQuery.trim()) {
-      setIsLoading(true);
-      setSearchError("");
-
-      try {
-        // Server-side search
-        const response = await fetch(
-          `${API_BASE}/bus/search/${encodeURIComponent(searchQuery)}`
-        );
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("Search results:", data.data);
-        setSearchResults(data.data);
-      } catch (error) {
-        console.error("Search error:", error);
-        setSearchError("Failed to search. Please try again.");
-        // Fallback to client-side search
-        performClientSideSearch();
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
-  // Client-side search function
-  const performClientSideSearch = () => {
-    const query = searchQuery.toLowerCase().trim();
-
-    if (!query) {
-      setSearchResults(allBuses);
-      return;
-    }
-
-    const filtered = allBuses.filter((bus) => {
-      // Check bus destinations
-      const hasMatchingDestination = bus.busDestination?.some((dest) =>
-        dest.toLowerCase().includes(query)
-      );
-
-      // Check bus name
-      const hasMatchingName = bus.busName?.toLowerCase().includes(query);
-
-      // Check bus number
-      const hasMatchingNumber = bus.busNumber?.toLowerCase().includes(query);
-
-      return hasMatchingDestination || hasMatchingName || hasMatchingNumber;
-    });
-
-    console.log("Client-side filtered results:", filtered);
-    setSearchResults(filtered);
-
-    if (filtered.length === 0) {
-      setSearchError(`No buses found matching "${searchQuery}"`);
-    }
-  };
-
-  const closeSearchDialog = () => {
-    setIsSearchDialogOpen(false);
-    setSearchQuery("");
-    setSearchError("");
-  };
-
-  // Real-time filtering when search query changes and dialog is open
   useEffect(() => {
-    if (isSearchDialogOpen && searchQuery.trim() === "") {
-      // Show all buses when search is empty
-      setSearchResults(allBuses);
-      setSearchError("");
-    } else if (isSearchDialogOpen && searchQuery.trim() !== "") {
-      // Perform real-time client-side filtering
-      performClientSideSearch();
-    }
-  }, [searchQuery, isSearchDialogOpen, allBuses]);
+    const interval = setInterval(() => {
+      setCurrentAnnouncement((prev) => (prev + 1) % announcements.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
-  // Function to check if a menu item is active
-  const isActive = (path: string) => {
-    if (path === "/") {
-      return pathname === "/";
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      fetchNotices();
     }
-    return pathname.startsWith(path);
+  }, [isAuthenticated, user]);
+
+  const fetchNotices = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/notice/get-all-notice`);
+      const data = await response.json();
+      const allNotices = data.data || [];
+      
+      const userRole = (user as any)?.roles;
+      const userId = (user as any)?._id;
+      
+      const filtered = allNotices.filter((n: any) => 
+        n.noticeFor === userRole || n.noticeFor === "All User"
+      );
+      
+      setNotices(filtered);
+      setUnreadCount(filtered.filter((n: any) => !n.seen.includes(userId)).length);
+    } catch (err) {
+      console.error("Error fetching notices:", err);
+    }
+  };
+
+  const getNoticeTheme = (noticeFor: string) => {
+    switch (noticeFor) {
+      case "Student": return "text-blue-600 bg-blue-50 border-blue-100";
+      case "Teacher": return "text-emerald-600 bg-emerald-50 border-emerald-100";
+      case "Driver": return "text-orange-600 bg-orange-50 border-orange-100";
+      case "All User": return "text-purple-600 bg-purple-50 border-purple-100";
+      default: return "text-slate-600 bg-slate-50 border-slate-100";
+    }
   };
 
   return (
     <>
-      <nav className="w-full flex bg-white justify-between items-center p-4 border-b-[1px] border-slate-500/20 z-50">
-        <div className="flex gap-5 justify-center items-center">
-          <div className="logo-container w-10 ">
-            <Image
-              src={Logo}
-              alt="logo"
-              width={60}
-              height={60}
-              className=" w-12 h-10   rounded-full lg:ml-0"
-              priority
-            />
+      {/* Announcement Bar */}
+      <div className="bg-slate-950 text-white py-2 overflow-hidden h-9 flex items-center border-b border-white/10">
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={currentAnnouncement}
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            className="w-full text-center text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400"
+          >
+            {announcements[currentAnnouncement]}
+          </motion.p>
+        </AnimatePresence>
+      </div>
+
+      <nav 
+        className={`sticky top-0 w-full z-50 transition-all duration-500 ${
+          isScrolled 
+          ? "bg-white/90 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-3" 
+          : "bg-white py-6"
+        }`}
+      >
+        <div className="container mx-auto px-6 flex items-center justify-between">
+          
+          <div className="flex items-center gap-12">
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-white shadow-sm border border-slate-100 group-hover:scale-110 transition-transform duration-500">
+                <Image src={Logo} alt="GUB Logo" fill className="object-contain p-1.5" />
+              </div>
+              <span className="text-2xl font-black tracking-tighter text-slate-900 hidden sm:block">
+                GUB<span className="text-primary">BUS</span>
+              </span>
+            </Link>
+
+            <div className="hidden lg:flex items-center gap-1">
+              {menuItems.map((item) => {
+                const active = pathname === item.path;
+                return (
+                  <Link 
+                    key={item.name} 
+                    href={item.path}
+                    className={`relative px-5 py-2 text-sm font-bold transition-all duration-300 rounded-xl ${
+                      active 
+                      ? "text-primary bg-primary/5" 
+                      : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Desktop search field - ALWAYS OPENS MODAL */}
-          <form onSubmit={handleDesktopSearch} className="hidden lg:block">
-            <InputGroup className="rounded-3xl pl-2">
-              <InputGroupInput
-                placeholder="Search by destination..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onClick={openSearchDialog} // Also open modal when clicking on input
-              />
-              <InputGroupAddon></InputGroupAddon>
-              <InputGroupAddon align="inline-end">
-                <InputGroupButton
-                  type="submit"
-                  className="absolute top-1.5 right-2"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-                  ) : (
-                    <SearchIcon />
-                  )}
-                </InputGroupButton>
-              </InputGroupAddon>
-            </InputGroup>
-          </form>
-        </div>
-        <div className="w-[40vw] md:w-[60vw] lg:w-[25vw] overflow-hidden">
-          <TextMarquee texts={announcementTexts} />
-        </div>
-
-        <div className="flex items-center gap-3 text-xl">
-          {/* Mobile search button */}
-          <button onClick={openSearchDialog} className="lg:hidden">
-            <SearchIcon
-              strokeWidth="2px"
-              className="stroke-accent-foreground"
-            />
-          </button>
-
-          <ul className="gap-4 hidden font-sans lg:flex lg:gap-1">
-            {menu.map((item) => (
-              <Link
-                key={item.name}
-                href={item.path}
-                className={`flex justify-center items-center gap-1 text-sm font-semibold transition-all duration-200 px-3 py-2 rounded-md ${
-                  isActive(item.path)
-                    ? "bg-accent text-white shadow-md"
-                    : "text-gray-700 hover:bg-gray-100 hover:text-accent"
-                }`}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link href="/schedule">
+              <button 
+                className="p-2.5 rounded-xl text-slate-500 hover:bg-primary/10 hover:text-primary transition-all duration-300"
+                title="Search Routes"
               >
-                {item.name}
-              </Link>
-            ))}
-          </ul>
-
-          {!isAuthenticated && (
-            <Link href={`/auth/login`}>
-              <button
-                className="px-1 py-1.5 rounded-sm w-18 h-9
-                bg-accent hover:bg-primary-foreground hover:text-black hover:border-2 hover:border-accent text-sm text-primary-foreground font-bold"
-              >
-                Log in
+                <Search size={20} />
               </button>
             </Link>
-          )}
-          {isAuthenticated && <Profile />}
-        </div>
-      </nav>
 
-      {/* Search Dialog */}
-      <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
-          {/* Header */}
-          <div className="p-6 border-b border-gray-200">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-gray-900">
-                Search Buses
-              </DialogTitle>
-            </DialogHeader>
-
-            {/* Search Input */}
-            <div className="mt-4">
-              <div className="relative">
-                <InputGroup className="rounded-xl">
-                  <InputGroupInput
-                    placeholder="Search by destination, bus name, or bus number..."
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    className="pr-12"
-                    autoFocus
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      {isLoading ? (
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                      ) : (
-                        <SearchIcon className="h-5 w-5 text-gray-500" />
-                      )}
-                    </div>
-                  </InputGroupAddon>
-                </InputGroup>
-              </div>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
-            {searchError && (
-              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-700 text-center">{searchError}</p>
-              </div>
-            )}
-
-            {isLoading ? (
-              <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                <p className="ml-3 text-gray-600">Loading buses...</p>
-              </div>
-            ) : searchResults.length > 0 ? (
-              <div className="space-y-4">
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-gray-600">
-                    {searchQuery ? (
-                      <>
-                        Found {searchResults.length} buses matching{" "}
-                        <span className="font-semibold">"{searchQuery}"</span>
-                      </>
-                    ) : (
-                      <>Showing all {searchResults.length} buses</>
-                    )}
-                  </p>
-                  {searchQuery && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSearchQuery("")}
-                    >
-                      Clear Search
-                    </Button>
+            {/* Notifications Side Sheet */}
+            <Sheet>
+              <SheetTrigger asChild>
+                <button 
+                  className={`p-2.5 rounded-xl transition-all duration-300 relative text-slate-500 hover:bg-primary/10 hover:text-primary`}
+                  title="Notifications"
+                >
+                  <Bell size={20} />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full animate-pulse" />
                   )}
+                </button>
+              </SheetTrigger>
+              <SheetContent className="w-full sm:max-w-md p-0 rounded-l-[3rem] border-none shadow-2xl bg-slate-50 overflow-hidden">
+                <div className="p-8 bg-slate-950 text-white relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                  <SheetHeader className="relative z-10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                        <Megaphone size={20} className="text-primary" />
+                      </div>
+                      <SheetTitle className="text-2xl font-black text-white tracking-tight">Bulletin Board</SheetTitle>
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+                      {unreadCount} New announcements for your profile
+                    </p>
+                  </SheetHeader>
                 </div>
 
-                {searchResults.map((bus: BusSearchResult) => (
-                  <div
-                    key={bus.id}
-                    className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex gap-4">
-                      {/* Bus Image */}
-                      <div className="flex-shrink-0">
-                        <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden">
-                          <Image
-                            src={bus.busImg || "/default-bus.jpg"}
-                            alt={bus.busName}
-                            width={80}
-                            height={80}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = "/default-bus.jpg";
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Bus Details */}
-                      <div className="flex-1 min-w-0">
-                        {/* Bus Name and Rating */}
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="font-semibold text-gray-900 text-lg">
-                              {bus.busName || bus.busNumber}
-                            </h3>
-                            <p className="text-sm text-gray-500">
-                              Bus No: {bus.busNumber}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Route */}
-                        <div className="mb-3">
-                          <div className="space-y-2">
-                            <p className="text-xs font-semibold text-muted-foreground uppercase">
-                              Destinations
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              {bus.busDestination?.map(
-                                (dest: string, i: number) => (
-                                  <span
-                                    key={i}
-                                    className={`text-xs px-2 py-1 rounded ${
-                                      searchQuery &&
-                                      dest
-                                        .toLowerCase()
-                                        .includes(searchQuery.toLowerCase())
-                                        ? "bg-blue-100 text-blue-800 border border-blue-200"
-                                        : "bg-secondary/30 text-foreground"
-                                    }`}
-                                  >
-                                    {dest}
-                                  </span>
-                                )
-                              ) || (
-                                <span className="text-xs text-gray-500">
-                                  No destinations available
-                                </span>
+                <div className="p-6 h-[calc(100vh-140px)] overflow-y-auto">
+                  <div className="space-y-4">
+                    {notices.length > 0 ? (
+                      notices.map((notice, index) => {
+                        const isUnseen = !(notice.seen.includes((user as any)?._id));
+                        const theme = getNoticeTheme(notice.noticeFor);
+                        
+                        return (
+                          <motion.div
+                            key={notice.id}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className={`p-6 rounded-[2rem] transition-all duration-300 border ${
+                              isUnseen 
+                              ? 'bg-white shadow-xl shadow-primary/5 border-primary/10 ring-1 ring-primary/5' 
+                              : 'bg-white/50 border-slate-100'
+                            }`}
+                          >
+                            <div className="flex justify-between items-start mb-4">
+                              <span className={`px-3 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest ${theme}`}>
+                                {notice.noticeFor}
+                              </span>
+                              {isUnseen && (
+                                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                               )}
                             </div>
-                          </div>
+                            <h4 className="font-bold text-slate-900 leading-tight mb-2">{notice.subject}</h4>
+                            <p className="text-xs text-slate-500 leading-relaxed mb-6 line-clamp-3">
+                              {notice.description}
+                            </p>
+                            <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                              <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1 text-[9px] font-black text-slate-400 uppercase">
+                                  <Calendar size={10} className="text-primary/50" />
+                                  {new Date(notice.createdAt).toLocaleDateString()}
+                                </div>
+                                <div className="flex items-center gap-1 text-[9px] font-black text-slate-400 uppercase">
+                                  <Eye size={10} className="text-primary/50" />
+                                  {notice.seen.length}
+                                </div>
+                              </div>
+                              <button className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all">
+                                <ArrowRight size={14} />
+                              </button>
+                            </div>
+                          </motion.div>
+                        );
+                      })
+                    ) : (
+                      <div className="py-24 text-center">
+                        <div className="w-20 h-20 bg-white rounded-[2rem] shadow-sm border border-slate-100 flex items-center justify-center mx-auto mb-6">
+                           <Inbox className="text-slate-200" size={32} />
                         </div>
+                        <h3 className="text-lg font-black text-slate-900 mb-1">No announcements</h3>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">You're all caught up!</p>
                       </div>
-                    </div>
-
-                    {/* View Details */}
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <Link
-                        href={`/schedule/${bus.busRoute || bus.id}`}
-                        onClick={() => setIsSearchDialogOpen(false)}
-                      >
-                        <Button className="w-full bg-accent text-white font-semibold py-2.5 rounded-lg">
-                          View Schedule & Book
-                        </Button>
-                      </Link>
-                    </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            ) : (
-              !isLoading && (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                    <SearchIcon className="h-8 w-8 text-gray-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {searchQuery ? "No buses found" : "No buses available"}
-                  </h3>
-                  <p className="text-gray-500 max-w-sm mx-auto">
-                    {searchQuery
-                      ? `No buses found matching "${searchQuery}". Try a different destination or bus name.`
-                      : "There are currently no buses available in the system."}
-                  </p>
-                  {searchQuery && (
-                    <Button
-                      onClick={() => setSearchQuery("")}
-                      variant="outline"
-                      className="mt-4"
-                    >
-                      Show All Buses
-                    </Button>
-                  )}
                 </div>
-              )
+              </SheetContent>
+            </Sheet>
+
+            <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block" />
+
+            {isAuthenticated ? (
+              <Profile />
+            ) : (
+              <Link href="/auth/login">
+                <button className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs uppercase tracking-widest hover:bg-primary transition-all duration-500 shadow-lg shadow-slate-900/10">
+                  Sign In
+                  <ChevronRight size={14} />
+                </button>
+              </Link>
             )}
           </div>
 
-          {/* Footer */}
-          {searchResults.length > 0 && (
-            <div className="p-4 border-t border-gray-200 bg-gray-50">
-              <div className="flex justify-between items-center">
-                <p className="text-sm text-gray-600">
-                  {searchQuery
-                    ? `Showing ${searchResults.length} matching results`
-                    : `Showing all ${searchResults.length} buses`}
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={closeSearchDialog}
-                  className="border-gray-300 text-gray-700 hover:bg-white"
-                >
-                  Close
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+        </div>
+      </nav>
     </>
   );
 };

@@ -2,7 +2,7 @@ import Schdule from "@/components/schedule";
 
 const SchedulePage = () => {
   return (
-    <div className="container mx-auto my-10 ">
+    <div>
       <Schdule />
     </div>
   );

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { API_BASE } from "@/lib/config";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
+import { API_BASE } from "@/lib/config";
+import { AnimatePresence, motion } from "framer-motion";
+import { Bell, Calendar, Eye, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Eye, Calendar, Users, Filter } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface Notice {
   id: string;
