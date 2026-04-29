@@ -1,71 +1,96 @@
-import { ChevronRight } from "lucide-react";
-import { Card, CardContent } from "../ui/card";
+'use client';
 
-const Details = [
-  {
-    step: 1,
-    title: "Sign Up",
-    description: "Create your account in seconds",
-  },
-  {
-    step: 2,
-    title: "Give Survey",
-    description: "For better bus distribution",
-  },
-  {
-    step: 3,
-    title: "Select Bus",
-    description: "Choose your preferred bus route",
-  },
+import { motion } from 'framer-motion';
+import { UserPlus, ClipboardList, Bus, MapPin } from 'lucide-react';
+import { SectionHeader } from './sectionHeader';
 
+const steps = [
   {
-    step: 4,
-    title: "Start Tracking",
-    description: "Track your bus in real-time",
+    step: "01",
+    title: "Seamless Registration",
+    description: "Onboard in seconds with your university credentials and unlock the full potential of campus travel.",
+    icon: UserPlus,
+    color: "bg-blue-600",
+    gradient: "from-blue-500/20 to-blue-500/0"
+  },
+  {
+    step: "02",
+    title: "Route Preference",
+    description: "Complete a quick commute survey so we can optimize bus frequency based on your actual needs.",
+    icon: ClipboardList,
+    color: "bg-purple-600",
+    gradient: "from-purple-500/20 to-purple-500/0"
+  },
+  {
+    step: "03",
+    title: "Intelligent Booking",
+    description: "Browse optimized routes and reserve your seat instantly with our real-time availability engine.",
+    icon: Bus,
+    color: "bg-orange-600",
+    gradient: "from-orange-500/20 to-orange-500/0"
+  },
+  {
+    step: "04",
+    title: "Live Command Center",
+    description: "Experience the power of live tracking. Watch your bus move in real-time and get precise ETAs.",
+    icon: MapPin,
+    color: "bg-emerald-600",
+    gradient: "from-emerald-500/20 to-emerald-500/0"
   },
 ];
 
 const HowItWorks = () => {
   return (
-    <section className="space-y-5">
-      <div className="bg-gradient-to-br from-primary/5 via-secondary/5 to-background py-16 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              How It Works
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Get started in just 4 simple steps
-            </p>
-          </div>
+    <section className="py-24 bg-background overflow-hidden">
+      <div className="container mx-auto px-4">
+        {/* Header - Kept as per request */}
+        <SectionHeader 
+          badge="Efficiency Redefined"
+          title="Your Journey,"
+          accentTitle="Simplified"
+          description="Our intelligent workflow is designed to get you from your doorstep to the campus with absolute zero friction."
+        />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {Details.map((item, index) => (
-              <div
-                key={item.title}
-                className="relative hover:scale-110 transition-all duration-300"
-              >
-                <Card className="border-primary/20 bg-white">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
-                        {item.step}
-                      </div>
-                      {index < 3 && (
-                        <ChevronRight className="w-5 h-5 text-primary/50 hidden lg:block absolute -right-6 top-1/2 -translate-y-1/2" />
-                      )}
-                    </div>
-                    <h3 className="font-semibold text-foreground mb-2">
-                      {item?.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {item.description}
-                    </p>
-                  </CardContent>
-                </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto">
+          {steps.map((item, index) => (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.6 }}
+              viewport={{ once: true }}
+              className={`relative group p-8 md:p-12 rounded-[3rem] border border-border/50 bg-muted/30 hover:bg-background transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 ${
+                index % 2 === 1 ? 'md:translate-y-12' : ''
+              }`}
+            >
+              {/* Background Gradient Glow */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[3rem]`} />
+              
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="flex items-start justify-between mb-8">
+                  <div className={`${item.color} w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+                    <item.icon size={32} />
+                  </div>
+                  <span className="text-6xl font-black text-muted/20 group-hover:text-primary/20 transition-colors">
+                    {item.step}
+                  </span>
+                </div>
+                
+                <h3 className="text-3xl font-bold mb-4 group-hover:text-primary transition-colors">
+                  {item.title}
+                </h3>
+                
+                <p className="text-xl text-muted-foreground leading-relaxed">
+                  {item.description}
+                </p>
+
+                <div className="mt-8 pt-8 border-t border-border/50 flex items-center gap-4 text-sm font-bold opacity-0 group-hover:opacity-100 transition-all duration-500">
+                  <div className="h-1 w-12 bg-primary rounded-full" />
+                  EXPLORE FEATURE
+                </div>
               </div>
-            ))}
-          </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
